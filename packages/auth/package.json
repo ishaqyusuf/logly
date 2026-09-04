@@ -1,0 +1,24 @@
+{
+  "name": "@logly/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "bootstrap:owner": "bun --cwd ../db build && bun scripts/bootstrap-owner.ts",
+    "lint": "biome check src scripts",
+    "test": "find src -name '*.test.ts' -o -name '*.spec.ts' | grep -q . && bun test src || echo 'No tests yet'",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "1.7.2",
+    "@logly/db": "workspace:*",
+    "better-auth": "1.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
+  }
+}

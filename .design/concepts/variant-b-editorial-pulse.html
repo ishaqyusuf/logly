@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Logly concept B — Editorial pulse</title>
+  <link rel="stylesheet" href="../assets/prototype.css?v=2">
+</head>
+<body class="concept-b">
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <a class="brand" href="#"><span class="brand-mark">L</span><span>Logly</span></a>
+      <button class="context-switcher" type="button" aria-label="Select organization and project"><span class="context-logo">A</span><span><span class="context-title">Afterservice</span><span class="context-subtitle">Personal</span></span><span>⌄</span></button>
+      <nav class="nav-group"><a class="nav-item active" href="#"><span class="nav-icon">⌁</span><span>Overview</span></a><a class="nav-item" href="#events"><span class="nav-icon">⌇</span><span>Events</span></a><a class="nav-item" href="#projects"><span class="nav-icon">▣</span><span>Projects</span></a><a class="nav-item" href="#settings"><span class="nav-icon">☷</span><span>Settings</span></a></nav>
+      <div class="sidebar-spacer"></div><div class="sidebar-status"><div class="status-row"><span class="status-dot"></span>Collector healthy</div></div>
+    </aside>
+    <div class="main">
+      <header class="topbar"><div class="breadcrumbs"><span>Personal</span><span>/</span><strong>Afterservice</strong></div><div class="page-actions"><button class="button ghost">Switch project</button><button class="icon-button" aria-label="Open profile">IY</button></div></header>
+      <main class="content">
+        <section class="page-heading"><div><p class="eyebrow">Weekly pulse · 26 Aug–2 Sep</p><h1>Usage is rising, led by service work.</h1><p data-pretext>Afterservice recorded 2,814 events from 184 project-scoped visitors. Service job creation grew fastest; browser delivery stayed healthy.</p></div><div class="toolbar"><button class="button">Export</button><button class="button primary">Watch live</button></div></section>
+
+        <section class="workspace">
+          <article class="panel">
+            <header class="panel-header"><div><h2 class="panel-title">Seven-day activity</h2><p class="panel-description">Daily events · compared with previous period</p></div><div class="segmented" aria-label="Date range"><button data-range="24h">24h</button><button class="active" data-range="7d">7d</button><button data-range="30d">30d</button></div></header>
+            <div class="panel-body chart-wrap"><div class="chart-legend"><span class="legend-key">Current</span><span class="legend-key secondary">Previous</span></div><svg viewBox="0 0 760 360" role="img" aria-label="Daily events increased throughout the week"><line class="grid-line" x1="34" y1="52" x2="744" y2="52"/><line class="grid-line" x1="34" y1="132" x2="744" y2="132"/><line class="grid-line" x1="34" y1="212" x2="744" y2="212"/><line class="grid-line" x1="34" y1="292" x2="744" y2="292"/><path class="area-fill" d="M34 278 C88 254 123 260 166 231 S241 230 274 194 S354 176 390 183 S459 137 508 150 S583 112 626 121 S700 72 744 82 L744 318 L34 318 Z"/><path class="area-line" d="M34 278 C88 254 123 260 166 231 S241 230 274 194 S354 176 390 183 S459 137 508 150 S583 112 626 121 S700 72 744 82"/><path class="area-line-secondary" d="M34 288 C88 275 123 280 166 261 S241 251 274 235 S354 222 390 228 S459 191 508 204 S583 181 626 190 S700 154 744 162"/><text class="axis-label" x="34" y="342">MON</text><text class="axis-label" x="150" y="342">TUE</text><text class="axis-label" x="266" y="342">WED</text><text class="axis-label" x="382" y="342">THU</text><text class="axis-label" x="498" y="342">FRI</text><text class="axis-label" x="614" y="342">SAT</text><text class="axis-label" x="714" y="342">SUN</text></svg></div>
+          </article>
+          <aside class="panel">
+            <header class="panel-header"><div><h2 class="panel-title">What changed</h2><p class="panel-description">Signals worth attention</p></div></header>
+            <ul class="list"><li class="list-row"><div><strong>Service work expanded</strong><div class="event-meta">service_job_created</div></div><span class="trend">+28%</span></li><li class="list-row"><div><strong>Messages stayed steady</strong><div class="event-meta">message_sent</div></div><span class="muted">+2%</span></li><li class="list-row"><div><strong>3 rejected batches</strong><div class="event-meta">Origin or signature</div></div><span class="badge warning">Review</span></li><li class="list-row"><div><strong>Collector online</strong><div class="event-meta">Last event 18s ago</div></div><span class="badge good">Healthy</span></li></ul>
+          </aside>
+        </section>
+
+        <section class="metric-strip" aria-label="Summary metrics"><article class="metric"><p class="metric-label">Visitors</p><p class="metric-value">184</p><span class="trend">↗ 12.4%</span></article><article class="metric"><p class="metric-label">New</p><p class="metric-value">67</p><span class="muted">36% share</span></article><article class="metric"><p class="metric-label">Returning</p><p class="metric-value">117</p><span class="muted">64% share</span></article><article class="metric"><p class="metric-label">Events</p><p class="metric-value">2,814</p><span class="trend">↗ 8.1%</span></article></section>
+
+        <article class="panel" id="events">
+          <header class="panel-header"><div><h2 class="panel-title">Latest activity</h2><p class="panel-description">Click any event for its safe, bounded payload</p></div><a href="#">Explore all events</a></header>
+          <div class="table-toolbar"><div class="search-wrap"><span>⌕</span><label class="sr-only" for="search-b">Search events</label><input id="search-b" class="search-input" data-event-search placeholder="Search event names or routes"></div><button class="button">Filters · 0</button></div>
+          <table class="data-table"><thead><tr><th>Event</th><th>Source</th><th>Route</th><th>Received</th></tr></thead><tbody><tr data-event-row data-event-name="service_job_created"><td><span class="row-primary event-name">service_job_created</span><span class="row-secondary">v1 · accepted</span></td><td><span class="badge">Server</span></td><td>—</td><td class="table-time">18s ago</td></tr><tr data-event-row data-event-name="follow_up_status_updated"><td><span class="row-primary event-name">follow_up_status_updated</span><span class="row-secondary">v1 · accepted</span></td><td><span class="badge">Server</span></td><td>—</td><td class="table-time">2m ago</td></tr><tr data-event-row data-event-name="message_sent"><td><span class="row-primary event-name">message_sent</span><span class="row-secondary">v1 · accepted</span></td><td><span class="badge">Server</span></td><td>—</td><td class="table-time">7m ago</td></tr><tr data-event-row data-event-name="page_view"><td><span class="row-primary event-name">page_view</span><span class="row-secondary">v1 · accepted</span></td><td><span class="badge">Browser</span></td><td>/dashboard</td><td class="table-time">11m ago</td></tr></tbody></table>
+        </article>
+      </main>
+    </div>
+  </div>
+  <nav class="mobile-nav" aria-label="Mobile navigation"><a class="active" href="#"><b>⌁</b>Overview</a><a href="#events"><b>⌇</b>Events</a><a href="#projects"><b>▣</b>Projects</a><a href="#settings"><b>☷</b>Settings</a></nav>
+  <dialog class="detail-sheet" data-detail-sheet aria-labelledby="event-detail-title"><div class="sheet-header"><div><div class="event-name" id="event-detail-title" data-sheet-event>Event detail</div><div class="event-meta">Afterservice · Production</div></div><button class="icon-button" data-sheet-close aria-label="Close event detail">×</button></div><div class="sheet-content"><span class="badge good">Accepted</span><h2>Bounded event payload</h2><dl class="property-list"><dt>Source</dt><dd>server</dd><dt>Version</dt><dd>1</dd><dt>Received</dt><dd>2026-09-02 06:21:18</dd><dt>Visitor</dt><dd>project-scoped</dd></dl></div></dialog>
+  <script type="module" src="../assets/prototype.js"></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "name": "logly",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo build",
+    "build:dashboard": "turbo build --filter=@logly/dashboard",
+    "build:packages": "turbo build --filter='./packages/*'",
+    "db:generate": "bun --env-file=/dev/null ../local-infra-kit/bin/db.ts generate --profile logly",
+    "db:migrate": "bun --env-file=/dev/null ../local-infra-kit/bin/db.ts migrate --profile logly",
+    "db:pull": "bun --env-file=/dev/null ../local-infra-kit/bin/db.ts pull --profile logly",
+    "db:push": "bun --env-file=/dev/null ../local-infra-kit/bin/db.ts push --profile logly",
+    "db:studio": "bun --env-file=/dev/null ../local-infra-kit/bin/db.ts drizzle-studio --profile logly",
+    "deploy:prepare": "bun --filter @logly/db db:migrate && bun scripts/bootstrap-if-configured.ts",
+    "dev": "bun --env-file=/dev/null ../local-infra-kit/bin/dev.ts --profile logly",
+    "dev:api": "bun run dev --filter=@logly/api",
+    "dev:dashboard": "bun run dev --filter=@logly/dashboard",
+    "dev:services": "bun --env-file=/dev/null ../local-infra-kit/bin/dev-services.ts --profile logly",
+    "format": "biome format --write .",
+    "kill:ports": "bun --env-file=/dev/null ../local-infra-kit/bin/kill-ports.ts --profile logly",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck"
+  },
+  "packageManager": "bun@1.3.0",
+  "devDependencies": {
+    "@biomejs/biome": "2.4.10",
+    "turbo": "2.9.3",
+    "typescript": "^5.9.3"
+  }
+}

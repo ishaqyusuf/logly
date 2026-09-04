@@ -1,0 +1,13 @@
+node_modules
+.turbo
+.next
+dist
+.vercel
+.env
+.env.local
+*.tsbuildinfo
+.DS_Store
+.gstack/
+.env*
+!.env.example
+!.env.local.example

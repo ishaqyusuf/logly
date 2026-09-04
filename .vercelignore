@@ -1,0 +1,9 @@
+.git
+.gstack
+.turbo
+.env*
+node_modules
+**/.next
+**/.turbo
+**/dist
+**/*.tsbuildinfo

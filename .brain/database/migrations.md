@@ -1,0 +1,40 @@
+# Database Migrations
+
+## Workflow
+
+- Generate migrations from the Drizzle schema.
+- Review generated SQL before applying it.
+- Apply changes through package scripts; do not hand-edit migration history.
+
+## Current State
+
+The initial migration is generated at
+`packages/db/drizzle/0000_slimy_chameleon.sql`. It creates projects, scoped
+project keys, immutable events, and daily rollups with their foreign keys and
+indexes.
+
+The reviewed second migration is generated at
+`packages/db/drizzle/0001_sturdy_harry_osborn.sql`. It adds Better Auth user,
+session, account, and verification tables plus the admin-plugin role/ban
+fields.
+
+The reviewed third migration is generated at
+`packages/db/drizzle/0002_colossal_zombie.sql`. It creates organizations, adds
+the indexed required organization foreign key to projects, seeds the default
+`Personal` organization, and backfills every existing project before enforcing
+the non-null constraint.
+
+## Production State
+
+- A standalone Neon database named `logly` was created from the Vercel Storage
+  dashboard on the free `iad1` plan with Neon Auth disabled.
+- The storage resource was deliberately not connected to the application, so
+  Vercel did not add Neon's generated environment-variable bundle.
+- Only the pooled connection URL is stored as the Logly project's Production
+  `DATABASE_URL` secret. The credential itself is never recorded in Brain.
+- All three reviewed migrations are applied to production. Deployment
+  preparation
+  reruns the idempotent migration command before the dashboard build.
+- The guarded initial owner bootstrap completed after migration; its temporary
+  environment inputs were removed and are not part of the runtime deployment.
+- A verified backup-and-restore exercise remains required.

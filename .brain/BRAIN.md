@@ -1,0 +1,50 @@
+# Logly Brain
+
+## Purpose
+
+Canonical project memory for Logly product, architecture, implementation, and operating decisions.
+
+## Current State
+
+- Phase: production trustworthiness and the first external pilot.
+- Primary surface: single-operator analytics dashboard.
+- First integration: the Logly dashboard itself.
+- Validation: packages built, tests/lint/typecheck passed, production dashboard
+  built, and desktop/mobile interaction QA passed. Better Auth protection,
+  owner bootstrap, sign-in, and sign-out also pass against an isolated database.
+  Production health, unauthenticated route protection, and authenticated
+  organization/project navigation are verified. A repeatable local Afterservice
+  same-origin event round-trip and the full Afterservice MVP smoke pass. The
+  coordinated `0.2.0` SDK release is published under `@ishaqyusuf`, installed
+  from npm by Afterservice, and production-verified. Chrome confirmed both a
+  browser `site_visit` and a newly discovered uncatalogued smoke event under
+  Personal / Afterservice after the production collector cutover.
+- Deployment: `https://logly-chi.vercel.app` in the `ishaqyusuf` account. A
+  standalone Neon `logly` database now exists on the free `iad1` plan, and only
+  its pooled URL is configured as the Vercel Production `DATABASE_URL` secret.
+  The storage resource remains unconnected and no generated Neon environment
+  variable bundle was added. All three reviewed migrations are applied, production
+  auth runtime values are configured, and the guarded owner bootstrap completed.
+- Production gates remaining: retention cleanup, truthful collection health,
+  and a verified backup/restore procedure. Fail-closed configuration,
+  full-scope aggregates, operator authentication, origin enforcement, and
+  server-signature verification are implemented and deployed. Signal Desk and
+  the Midday-derived Events workspace are live in production deployment
+  `dpl_DfoLrrGviexgUp88ETcThV5WFNYN`.
+- A second dashboard design exploration is ready in
+  `.design/project-workspaces/`. It changes the navigation contract so one
+  selected project is always the workspace for Overview, Events, Live,
+  Insights, and Settings; the Projects navigation page is removed. Six
+  connected HTML directions are browser-validated and awaiting user selection
+  before the production dashboard changes.
+
+## Read Order
+
+1. `SYSTEM_OVERVIEW.md`
+2. `system/architecture.md`
+3. `product/vision.md`
+4. `decisions/0003-focused-portfolio-telemetry.md`
+5. `features/first-party-analytics.md`
+6. `features/organizations-and-projects.md`
+7. `features/operator-authentication.md`
+8. `tasks/in-progress.md`

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Logly project workspace design board</title>
+  <style>
+    :root { color-scheme:light; font-family:Inter,ui-sans-serif,system-ui,sans-serif; background:#eceeea; color:#181b19; }
+    * { box-sizing:border-box; }
+    body { margin:0; }
+    header { position:sticky; top:0; z-index:10; display:flex; justify-content:space-between; gap:24px; align-items:end; padding:24px 30px; border-bottom:1px solid #d6dad4; background:rgba(246,247,244,.94); backdrop-filter:blur(16px); }
+    h1 { margin:0; font-size:28px; letter-spacing:-.045em; }
+    header p { max-width:760px; margin:8px 0 0; color:#68706a; }
+    .scope { flex:0 0 auto; padding:8px 11px; border:1px solid #cad1c9; border-radius:7px; background:#fff; color:#356246; font-size:12px; font-weight:700; }
+    main { padding:26px 30px 44px; }
+    .rules { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; margin-bottom:26px; overflow:hidden; border:1px solid #d6dad4; border-radius:10px; background:#d6dad4; }
+    .rule { min-height:94px; padding:16px; background:#f9faf8; }
+    .rule strong { display:block; margin-bottom:5px; font-size:13px; }
+    .rule span { color:#6b736d; font-size:12px; }
+    .board { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; }
+    article { overflow:hidden; border:1px solid #ced4ce; border-radius:12px; background:#f8f9f7; box-shadow:0 8px 32px rgba(28,36,30,.05); }
+    .card-head { min-height:78px; display:flex; justify-content:space-between; gap:16px; align-items:center; padding:14px 16px; border-bottom:1px solid #d9ddd8; }
+    .letter { display:inline-grid; place-items:center; width:28px; height:28px; margin-right:10px; border-radius:6px; background:#1d2922; color:#fff; font:700 11px ui-monospace,monospace; }
+    h2 { display:inline; margin:0; font-size:16px; }
+    .card-head p { margin:5px 0 0 39px; color:#6b736d; font-size:11px; }
+    a { min-height:38px; display:inline-flex; align-items:center; padding:0 12px; border:1px solid #cbd2cb; border-radius:6px; background:#fff; color:#1f4d36; text-decoration:none; font-size:12px; font-weight:700; }
+    iframe { display:block; width:100%; height:520px; border:0; background:#fff; }
+    .card-foot { display:flex; gap:8px; padding:10px 14px; border-top:1px solid #d9ddd8; color:#68706a; font-size:11px; }
+    .card-foot span { padding:3px 7px; border-radius:999px; background:#e8ece7; }
+    @media(max-width:1000px){ .rules,.board{grid-template-columns:1fr 1fr;} iframe{height:430px;} }
+    @media(max-width:700px){ header{display:block;padding:20px 16px}.scope{display:inline-block;margin-top:12px}main{padding:16px}.rules,.board{grid-template-columns:1fr}.rules{display:none}iframe{height:620px} }
+  </style>
+</head>
+<body>
+  <header><div><h1>Logly project workspace directions</h1><p>Six connected HTML prototypes. Each one treats the selected project as the workspace, enriches Events with counts and analytics, and removes Projects from navigation.</p></div><span class="scope">Open each at Events first</span></header>
+  <main>
+    <section class="rules" aria-label="Locked product rules">
+      <div class="rule"><strong>One active project</strong><span>Overview, Events, Live, Insights, and Settings inherit the selected project.</span></div>
+      <div class="rule"><strong>No Projects nav</strong><span>Switching and project creation live only inside the sidebar selector.</span></div>
+      <div class="rule"><strong>Rich Events page</strong><span>Filtered total, trend, event-name ranking, momentum, filters, table, and detail.</span></div>
+      <div class="rule"><strong>Thin product</strong><span>No replay, funnels, user profiles, billing, or cross-project identity.</span></div>
+    </section>
+    <section class="board">
+      <article><div class="card-head"><div><span class="letter">A</span><h2>Signal Studio</h2><p>Balanced Midday-style command center · recommended</p></div><a href="signal-studio.html#events">Open full prototype</a></div><iframe src="signal-studio.html#events" title="Signal Studio preview"></iframe><div class="card-foot"><span>balanced</span><span>shadcn-ready</span><span>best default</span></div></article>
+      <article><div class="card-head"><div><span class="letter">B</span><h2>Event Atlas</h2><p>Events-first analytical workspace with strong comparison</p></div><a href="event-atlas.html#events">Open full prototype</a></div><iframe src="event-atlas.html#events" title="Event Atlas preview"></iframe><div class="card-foot"><span>analytical</span><span>wide sidebar</span><span>events-first</span></div></article>
+      <article><div class="card-head"><div><span class="letter">C</span><h2>Dark Operations</h2><p>Dense console for real-time debugging and collection trust</p></div><a href="dark-operations.html#events">Open full prototype</a></div><iframe src="dark-operations.html#events" title="Dark Operations preview"></iframe><div class="card-foot"><span>dark</span><span>dense</span><span>live-first</span></div></article>
+      <article><div class="card-head"><div><span class="letter">D</span><h2>Editorial Ledger</h2><p>Quiet narrative hierarchy for periodic product review</p></div><a href="editorial-ledger.html#events">Open full prototype</a></div><iframe src="editorial-ledger.html#events" title="Editorial Ledger preview"></iframe><div class="card-foot"><span>editorial</span><span>warm</span><span>narrative</span></div></article>
+      <article><div class="card-head"><div><span class="letter">E</span><h2>Compact Grid</h2><p>High-density operator layout with minimal wasted space</p></div><a href="compact-grid.html#events">Open full prototype</a></div><iframe src="compact-grid.html#events" title="Compact Grid preview"></iframe><div class="card-foot"><span>compact</span><span>power-user</span><span>fast scan</span></div></article>
+      <article><div class="card-head"><div><span class="letter">F</span><h2>Calm Monitor</h2><p>Spacious low-noise workspace for occasional use</p></div><a href="calm-monitor.html#events">Open full prototype</a></div><iframe src="calm-monitor.html#events" title="Calm Monitor preview"></iframe><div class="card-foot"><span>calm</span><span>spacious</span><span>friendly</span></div></article>
+    </section>
+  </main>
+</body>
+</html>

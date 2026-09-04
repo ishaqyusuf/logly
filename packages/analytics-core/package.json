@@ -1,0 +1,36 @@
+{
+  "name": "@ishaqyusuf/logly-core",
+  "version": "0.2.0",
+  "description": "Privacy-safe browser analytics contracts, durable delivery, and batching for Logly.",
+  "license": "MIT",
+  "sideEffects": false,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "bun -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "lint": "biome check src",
+    "prepack": "bun run clean && bun run build",
+    "test": "bun test src",
+    "typecheck": "tsc --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
+  }
+}

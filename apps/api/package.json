@@ -1,0 +1,21 @@
+{
+  "name": "@logly/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "bun --env-file=/dev/null ../../../local-infra-kit/bin/with-env.ts --profile logly -- PORTLESS_WILDCARD=1 PORTLESS_APP_PORT=${PORTLESS_APP_PORT:-${API_PORT:-4202}} portless api-logly bun --hot src/server.ts",
+    "lint": "biome check src",
+    "test": "find src -name '*.test.ts' -o -name '*.spec.ts' | grep -q . && bun test src || echo 'No tests yet'",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@logly/collector": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
+  }
+}

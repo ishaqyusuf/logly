@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: logly-postgres
+    restart: unless-stopped
+    ports:
+      - "${DB_HOST_PORT:?LOGLY_DATABASE_URL must include a local PostgreSQL port}:5432"
+    environment:
+      POSTGRES_DB: "${DB_NAME:?LOGLY_DATABASE_URL must include a database name}"
+      POSTGRES_USER: "${DB_USER:?LOGLY_DATABASE_URL must include a user}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD:?LOGLY_DATABASE_URL must include a password}"
+    volumes:
+      - logly-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  logly-postgres-data:

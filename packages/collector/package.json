@@ -1,0 +1,25 @@
+{
+  "name": "@logly/collector",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "biome check src",
+    "test": "bun test src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ishaqyusuf/logly-core": "workspace:*",
+    "@logly/db": "workspace:*",
+    "@logly/utils": "workspace:*",
+    "hono": "^4.12.9"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
+  }
+}

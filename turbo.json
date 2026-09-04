@@ -1,0 +1,33 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "globalEnv": [
+    "BETTER_AUTH_SECRET",
+    "BETTER_AUTH_TRUSTED_ORIGINS",
+    "BETTER_AUTH_URL",
+    "DATABASE_URL",
+    "LOGLY_DATABASE_URL",
+    "LOGLY_HASH_SECRET",
+    "LOGLY_PROJECT_KEY",
+    "LOGLY_READ_KEY",
+    "LOGLY_SERVER_KEY",
+    "NEXT_PUBLIC_API_URL",
+    "NEXT_PUBLIC_DASHBOARD_URL",
+    "NEXT_PUBLIC_LOGLY_ENDPOINT",
+    "NEXT_PUBLIC_LOGLY_PROJECT",
+    "DASHBOARD_PORT",
+    "API_PORT",
+    "PORTLESS_APP_PORT",
+    "PORTLESS_WILDCARD",
+    "VERCEL_URL"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": { "cache": false, "persistent": true },
+    "lint": { "dependsOn": ["^build"] },
+    "test": { "dependsOn": ["^build"], "cache": false },
+    "typecheck": { "dependsOn": ["^build"], "outputs": [] }
+  }
+}

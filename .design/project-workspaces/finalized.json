@@ -1,0 +1,28 @@
+{
+  "mode": "freeform-html-fallback",
+  "screen": "project-workspace-dashboard",
+  "framework": "vanilla",
+  "pretext_tier": "card/grid prepare+layout",
+  "branch": "main",
+  "date": "2026-09-04T15:00:00+01:00",
+  "comparison_board": "index.html",
+  "variants": [
+    "signal-studio.html",
+    "event-atlas.html",
+    "dark-operations.html",
+    "editorial-ledger.html",
+    "compact-grid.html",
+    "calm-monitor.html"
+  ],
+  "connected_pages": ["overview", "events", "live", "insights", "settings"],
+  "recommended": "signal-studio",
+  "qa": {
+    "desktop_width": 1440,
+    "mobile_width": 390,
+    "horizontal_overflow": false,
+    "console_errors": false,
+    "project_switching": "passed",
+    "event_filters": "passed",
+    "event_detail": "passed"
+  }
+}

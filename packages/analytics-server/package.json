@@ -1,0 +1,36 @@
+{
+  "name": "@ishaqyusuf/logly-server",
+  "version": "0.2.0",
+  "description": "Trusted server event and read client for the Logly collector.",
+  "license": "MIT",
+  "sideEffects": false,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "bun -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "lint": "biome check src",
+    "prepack": "bun run clean && bun run build",
+    "test": "bun test src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ishaqyusuf/logly-core": "^0.2.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^25.2.3",
+    "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "source_mockup": null,
+  "source_plan": ".brain/features/first-party-analytics.md",
+  "mode": "plan-driven",
+  "html_files": [
+    "overview.html",
+    "events.html",
+    "projects.html",
+    "settings.html",
+    "states.html"
+  ],
+  "pretext_tier": "card/grid via prepare() + layout()",
+  "framework": "vanilla-html-prototype",
+  "iterations": 2,
+  "date": "2026-09-02T08:00:00+01:00",
+  "screen": "logly-dashboard-system",
+  "branch": "uncommitted-initial-worktree",
+  "recommended_concept": "variant-a-signal-desk",
+  "status": "recommended-for-user-review",
+  "navigation_note": "Concept A now links directly to the dedicated Events, Projects, and Settings prototypes."
+}
