@@ -142,8 +142,8 @@ integration before widening the shared SDK interface or product scope.
 - [x] Add connected Live, Insights, and project Settings pages.
 - [x] Run typecheck, full tests, lint, production dashboard build, and local
   authenticated Chrome QA with no console errors.
-- [ ] Deploy the Signal Studio implementation and run authenticated production
-  canary QA after explicit release approval.
+- [x] Deploy the Signal Studio implementation through Git and run production
+  health and route-protection canaries.
 
 ## Git-Triggered Vercel Deployment
 
@@ -153,8 +153,8 @@ integration before widening the shared SDK interface or product scope.
 - [x] Enable automatic Git deployments with `main` as production.
 - [x] Align the Vercel build override with the repository deployment contract:
   run `deploy:prepare` before `build:dashboard`.
-- [ ] Commit and push the current release, then confirm Vercel created and
-  completed the Git-triggered production deployment.
+- [x] Commit and push the current release, then confirm Vercel created,
+  completed, and promoted the Git-triggered production deployment.
 
 ## Active Implementation: Signal Desk Midday Migration
 

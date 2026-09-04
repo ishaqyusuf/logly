@@ -137,5 +137,7 @@
 - Vercel Git integration is connected to `ishaqyusuf/logly`; `main` is the
   production branch and automatic Git deployments are enabled. The Vercel
   project build command now runs `deploy:prepare` before `build:dashboard`.
-  Verify the first Git-triggered deployment and production canary before
-  marking the Signal Studio release complete.
+  The first Git-triggered production deployment completed as
+  `dpl_GeFSJRRcQcv7qsZJns3qGrUpwa4j` and was promoted to the canonical alias.
+  Health and unauthenticated route-protection canaries pass, so the Signal
+  Studio production release is complete.

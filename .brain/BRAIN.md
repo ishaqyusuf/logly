@@ -35,10 +35,14 @@ Canonical project memory for Logly product, architecture, implementation, and op
   server-signature verification are implemented and deployed. Signal Desk and
   the Midday-derived Events workspace are live in production deployment
   `dpl_DfoLrrGviexgUp88ETcThV5WFNYN`.
+- The first verified Git-triggered production run completed in deployment
+  `dpl_GeFSJRRcQcv7qsZJns3qGrUpwa4j`, promoted automatically to
+  `https://logly-chi.vercel.app`. Production health returned HTTP 200 and the
+  protected Overview route redirected unauthenticated traffic to sign-in.
 - Signal Studio is implemented locally as the mandatory selected-project
   workspace for Overview, Events, Live, Insights, and Settings. Projects is
-  removed from navigation; the connected implementation is awaiting its first
-  Git-triggered production deployment.
+  removed from navigation; the connected implementation is deployed through
+  the verified GitHub-to-Vercel pipeline.
 
 ## Read Order
 
