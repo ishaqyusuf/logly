@@ -145,6 +145,17 @@ integration before widening the shared SDK interface or product scope.
 - [ ] Deploy the Signal Studio implementation and run authenticated production
   canary QA after explicit release approval.
 
+## Git-Triggered Vercel Deployment
+
+- [x] Verify `origin` is `ishaqyusuf/logly` and `main` is the GitHub default
+  branch.
+- [x] Connect the existing Vercel `logly` project to the GitHub repository.
+- [x] Enable automatic Git deployments with `main` as production.
+- [x] Align the Vercel build override with the repository deployment contract:
+  run `deploy:prepare` before `build:dashboard`.
+- [ ] Commit and push the current release, then confirm Vercel created and
+  completed the Git-triggered production deployment.
+
 ## Active Implementation: Signal Desk Midday Migration
 
 ### Status

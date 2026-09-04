@@ -25,18 +25,20 @@ Canonical project memory for Logly product, architecture, implementation, and op
   The storage resource remains unconnected and no generated Neon environment
   variable bundle was added. All three reviewed migrations are applied, production
   auth runtime values are configured, and the guarded owner bootstrap completed.
+  The Vercel project is Git-connected to `ishaqyusuf/logly`, uses `main` as the
+  production branch, and has automatic Git deployments enabled. Its project
+  build override matches `vercel.json`: `bun run deploy:prepare && bun run
+  build:dashboard`.
 - Production gates remaining: retention cleanup, truthful collection health,
   and a verified backup/restore procedure. Fail-closed configuration,
   full-scope aggregates, operator authentication, origin enforcement, and
   server-signature verification are implemented and deployed. Signal Desk and
   the Midday-derived Events workspace are live in production deployment
   `dpl_DfoLrrGviexgUp88ETcThV5WFNYN`.
-- A second dashboard design exploration is ready in
-  `.design/project-workspaces/`. It changes the navigation contract so one
-  selected project is always the workspace for Overview, Events, Live,
-  Insights, and Settings; the Projects navigation page is removed. Six
-  connected HTML directions are browser-validated and awaiting user selection
-  before the production dashboard changes.
+- Signal Studio is implemented locally as the mandatory selected-project
+  workspace for Overview, Events, Live, Insights, and Settings. Projects is
+  removed from navigation; the connected implementation is awaiting its first
+  Git-triggered production deployment.
 
 ## Read Order
 

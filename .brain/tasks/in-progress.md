@@ -133,4 +133,9 @@
 - Local Chrome QA confirmed all five connected pages, URL-preserved project
   scope, the event detail sheet, empty Live state, and no console errors.
   Typecheck, the full test suite, lint, and the production dashboard build pass.
-  No database migration was required. Production deployment remains pending.
+  No database migration was required.
+- Vercel Git integration is connected to `ishaqyusuf/logly`; `main` is the
+  production branch and automatic Git deployments are enabled. The Vercel
+  project build command now runs `deploy:prepare` before `build:dashboard`.
+  Verify the first Git-triggered deployment and production canary before
+  marking the Signal Studio release complete.
