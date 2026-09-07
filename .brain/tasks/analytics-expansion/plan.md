@@ -9,7 +9,7 @@ Reuse:
 - `packages/utils/src/index.ts`: reporting contracts and demo summaries.
 - `apps/dashboard/src/lib/dashboard-data.ts`: authenticated collector read boundary.
 - `apps/dashboard/src/app/(sidebar)/insights/page.tsx`: existing Insights route.
-- Afterservice integration in sibling `auto-service`: inspect before consumer work.
+- Afterservice integration in `/Users/M1PRO/Documents/code/micro-startups/after-service`: inspected its `packages/events` provider/proxy pattern.
 
 Extend / Update:
 - Reporting contracts, DB aggregates, Insights components, and focused tests.
@@ -28,11 +28,11 @@ Avoid:
 - [x] LGL-101: Acquisition reporting. Complete-window referrer and UTM-source visit counts, direct/unknown labels, empty states, scoped by project/time; desktop/mobile screenshots.
 - [x] LGL-102: Ordered same-day conversion funnels. Select discovered events; count project-scoped visitor-days in chronological step order; show step conversion/drop-off; exclude anonymous server events; no cross-day retention claim; tests and screenshots.
 - [x] LGL-103: Truthful collection health. Replace placeholder delivery-rate claims with observed persisted arrival timestamps/lag and clear unknown states; tests and screenshots.
-- [ ] LGL-104: Validate and deploy Logly. Full tests, typecheck, lint, production build, responsive browser QA and production verification.
-- [ ] LGL-105: Halaalvest integration. Confirm repository identity (`halaal-coperative` candidate), inspect Afterservice pattern, provision web/mobile project credentials in Chrome, implement privacy-safe web/native adapters and server proxy, validate build/unit behavior.
-- [ ] LGL-106: Ewatrade integration. Separate web/mobile tracking projects, migrate existing wrappers and validate build/unit behavior.
-- [ ] LGL-107: School Clerk web integration. Provision project, replace existing analytics, validate build/unit behavior.
-- [ ] LGL-108: Final screenshot report and integration handoff; leave consumer website acceptance testing pending user's follow-up.
+- [x] LGL-104: Validate and deploy Logly. Full tests, typecheck, lint, production build, responsive browser QA and production verification.
+- [x] LGL-105: Halaalvest integration. Confirm repository identity (`halaal-coperative` candidate), inspect Afterservice pattern, provision web/mobile project credentials in Chrome, implement privacy-safe web/native adapters and server proxy, validate build/unit behavior.
+- [x] LGL-106: Ewatrade integration. Separate web/mobile tracking projects, migrate existing wrappers and validate build/unit behavior.
+- [x] LGL-107: School Clerk web integration. Provision project, replace existing analytics, validate build/unit behavior.
+- [x] LGL-108: Final screenshot report and integration handoff; leave consumer website acceptance testing pending user's follow-up.
 
 ## Validation
 
@@ -79,3 +79,29 @@ None blocking initial implementation. Resolve canonical product names, domains, 
 - UI flow tested by selecting three actual options and clicking Analyze funnel; URL and rendered counts verified. Desktop 1440px and mobile 390px screenshots saved as `screenshots/funnel-desktop.png` and `screenshots/funnel-mobile.png`; mobile horizontal width = 390. Earlier hot-reload errors occurred before UI package compilation; a fresh reload after compilation produced zero new console errors.
 - Combined release candidate: 49 source tests pass, full lint and typecheck pass, production dashboard build passes. SQL fixture run succeeds. Browser viewport reset after QA.
 - Next: commit/push this release through the existing Git-connected Vercel production pipeline, verify deployed features, then proceed to consumer projects. All five integrations still pending.
+
+## Production release 2026-09-07
+
+- Release commit `4f8cea9` pushed to main; Git-triggered production deployment `dpl_ELKo4hVahZmsWW6AXjVpeRzDDjL4` reached Ready and aliases `https://logly-chi.vercel.app`.
+- Authenticated production Chrome confirmed Insights acquisition over real Afterservice data (11 arrivals), successfully executed site_visit → site_visit funnel (11 → 0), and Overview observed health (0 recent arrivals, unknown lag, historical receipt timestamp). No production console errors.
+- Local and deployed reporting are complete; next is consumer provisioning/integration. Halaal-coperative `.brain/SYSTEM_OVERVIEW.md` confirms product name Halaalvest. Root AGENTS files for all three consumer repositories read. Initial searches found no OpenPanel wrappers in expected source paths; locate actual tracking before replacement.
+- Important: `auto-service` is a different-looking skeleton and did not contain Logly imports; locate the real Afterservice repository before claiming its integration pattern has been copied.
+- Production canaries: `/health` HTTP 200; unauthenticated `/v1/dashboard/funnel?project=afterservice&steps=site_visit,site_visit` HTTP 401. Used system curl trust after Python's local certificate bundle failed verification; no TLS verification bypass.
+
+## Portfolio implementation checkpoint
+
+All five production projects were created through authenticated Chrome under Halaalvest, Ewatrade and SchoolClerk organizations. SchoolClerk's canonical origin was independently verified against `apps/marketing/src/lib/social-metadata.ts` and authenticated Vercel domain ownership after automatic review initially requested stronger domain evidence; creation then succeeded.
+
+- Halaalvest (`halaal-coperative`): dashboard + marketing web wrappers/proxies, native adapter/runtime, separate native ingest proxy; root production configuration and Turbo declarations. Eight package tests / 29 assertions and package/dashboard/marketing/mobile typechecks pass.
+- Ewatrade: dashboard + marketing + storefront + POS web wrappers/proxies, native adapter/runtime, separate native ingest proxy; production configuration and Turbo declarations. Eight package tests / 29 assertions and package typecheck pass. Broad mobile/dashboard/marketing/storefront TypeScript exceeded Node's default heap; POS passed. The 8 GB mobile retry also exhausted its heap; no full-mobile typecheck pass is claimed.
+- SchoolClerk: dashboard + marketing + school-site web wrappers/proxies; no native integration. Five package tests / 16 assertions, package and marketing typechecks pass. Dashboard/site checks report errors in current API/database/template work, outside the analytics paths; full-app validation is not green.
+- No active OpenPanel source imports were found. SchoolClerk's unused Vercel analytics dependency remains installed, with no active import found. No existing data or unrelated work was deleted.
+- Production namespaces and local `.env.production` wiring do not constitute deployed consumer releases. Hosted Vercel/EAS env propagation and consumer deployments are still pending. All three worktrees contain substantial unrelated ongoing work, so do not blanket commit or deploy them.
+- Each consumer's `.brain/features/logly-analytics.md`, `.brain/decisions/2026-09-07-logly-product-analytics.md`, `.brain/api/endpoints.md`, `.brain/api/contracts.md` and `.brain/tasks/in-progress.md` document the exact contracts, verification and outstanding rollout.
+- Screenshots: `halaalvest-projects.png`, `ewatrade-projects.png`, `schoolclerk-projects.png`. These prove production project setup, not consumer runtime acceptance.
+
+Ticket checkmarks denote source integration/provisioning and the documented focused checks. They do not clear the consumer deployment or full-app validation limitations in the report. Final analytics-package Biome checks and all 21 tests pass after formatting/lint fixes. Production credential files are Git-ignored in all three repositories.
+
+## Verified configuration follow-up
+
+All 30 analytics variables added successfully across the six existing Vercel dashboard/marketing targets; both verified Expo production projects also have the two public native analytics variables. Consumer deployment and deferred live acceptance are not complete. Streaming-cap checks strengthen each proxy; 27 tests and all three package typechecks pass. Halaalvest/Ewatrade/SchoolClerk worktrees currently have 895/907/112 entries respectively, so unrelated work cannot be included in an analytics release. Separate hosted targets for Ewa storefront/POS and SchoolClerk school-site were not listed in the inspected Vercel account.

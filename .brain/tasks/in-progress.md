@@ -151,3 +151,8 @@
 - ADR 0006 records the updated scope and preserves privacy boundaries.
 - Acquisition and observed collection-health UI are now implemented locally with real SQL acceptance checks and desktop/mobile screenshots. Combined validation/release and funnels remain pending before consumer cutovers.
 - Same-day funnel reporting now implemented locally with 251 → 200 → 100 SQL fixture and responsive screenshot evidence. All three selected features pass the combined 49-test suite, typecheck, lint and production build; deployment pending.
+- Reporting release `4f8cea9` deployed successfully to the canonical Logly alias; production acquisition/funnel/health checks pass. Consumer integrations remain active.
+
+## Portfolio integration source checkpoint — 2026-09-07
+
+All five production projects provisioned. Halaalvest, Ewatrade and SchoolClerk shared analytics packages, layouts/proxies, native runtimes where requested, local production credentials and Turbo declarations are implemented. 21 consumer tests pass. See [screenshot and validation report](analytics-expansion/report.md) for broader-check limitations and outstanding consumer rollout/acceptance. Logly itself is deployed and verified.

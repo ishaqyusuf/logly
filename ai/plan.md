@@ -284,3 +284,6 @@ Acquisition reporting starts first, followed by same-day funnels, observed colle
 - Shared local dev filter syntax repaired so dashboard/API scripts match the launcher.
 - Next: finish funnel reporting, validate combined release, deploy, then provision and integrate the five consumer analytics projects. See expansion plan for exact evidence and live tool handles.
 - Same-day funnel report implemented with complete-window SQL and URL-owned selectors; four unit tests, real SQL fixtures, and desktop/mobile UI QA pass. Combined release passes 49 source tests, typecheck, lint and production build; Git deployment is next.
+- Reporting release is live: `4f8cea9`, deployment `dpl_ELKo4hVahZmsWW6AXjVpeRzDDjL4`; production Chrome reads pass. Continue with consumer repository discovery, five production tracking projects and integration.
+
+Portfolio checkpoint: five production namespaces created; three consumer source integrations and 21 focused tests complete. Broader app validation/deployment limitations and screenshots are recorded in `.brain/tasks/analytics-expansion/report.md`. Consumer live acceptance remains deferred.

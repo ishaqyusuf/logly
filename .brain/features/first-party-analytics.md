@@ -127,3 +127,9 @@ Local SQL fixture verifies 251 → 200 → 100 and rejects reverse ordering and
 wrong-organization matches. Four unit tests cover ordering, ties, repeated
 steps, source/identity/day/project exclusion and invalid ranges. Desktop and
 390px mobile screenshots are in the expansion task directory.
+
+The acquisition, funnel and observed-health reports are deployed in release
+`4f8cea9`, Vercel deployment `dpl_ELKo4hVahZmsWW6AXjVpeRzDDjL4`. Production
+Chrome verified real Afterservice acquisition, a successful funnel read and
+truthful no-recent-arrival health. Earlier local-only notes above are superseded
+by this release evidence.
