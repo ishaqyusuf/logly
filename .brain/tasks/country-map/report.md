@@ -23,7 +23,7 @@ Released commit `7f9e1ab` to https://logly-chi.vercel.app via Git deployment `dp
 
 ![Production historical unknown state](screenshots/production-unknown.png)
 
-Next adapter 0.2.1 is prepared and package contents inspected (8 files; no secrets). Public npm publication was rejected by automatic approval review because explicit public SDK release authorization was required. It has not been published. Logly uses the workspace adapter and can collect new country metadata upon dashboard deployment. Existing external proxies require the updated adapter or equivalent trusted metadata forwarding and a consumer deployment; no consumer live testing is claimed.
+Next adapter 0.2.1 package contents inspected (8 files; no secrets). The user explicitly approved npm publication after the initial automatic review rejection. `npm publish --access public` succeeded on 2026-09-07 using existing authentication; npm reported processing in progress. Registry metadata and the published tarball are now verified: version 0.2.1, SHA-1 `9c1d3bd02bcffe4e5e6576ca196ff5d980985683`, eight allowlisted package/runtime/README files, and the built product-edge country forwarding code. Logly uses the workspace adapter and can collect new country metadata upon dashboard deployment. Existing external proxies require the updated adapter or equivalent trusted metadata forwarding and a consumer deployment; no consumer live testing is claimed.
 
 ## Sources
 
@@ -32,3 +32,5 @@ Next adapter 0.2.1 is prepared and package contents inspected (8 files; no secre
 ## Brain impact check
 
 Updated: `.brain/api/contracts.md`, `.brain/api/endpoints.md`, `.brain/database/schema.md`, `.brain/database/migrations.md`, `.brain/features/first-party-analytics.md`, `.brain/decisions/0007-country-visit-map.md`, `.brain/tasks/in-progress.md`, `.brain/tasks/country-map/plan.md`, this report, `.brain/BRAIN.md`, and `ai/plan.md`. Country metadata adds an event column and report field; authentication, organization relationships and retention policy are unchanged.
+
+The user is away from their laptop; any further interactive authentication must be deferred. No new login was required for npm publication.

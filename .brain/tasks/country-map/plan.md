@@ -25,4 +25,4 @@ Source tests, typecheck, lint, dashboard build; local-only SQL fixture proves co
 
 None. Visits retain Logly's visitor-day arrival semantics. Old proxy versions require forwarding updates; delayed delivery locates the sending network at receipt time. No third-party lookup or map runtime requests.
 
-Released as `7f9e1ab`; production migration and empty/unknown UI checks pass. SDK npm publication remains separately blocked pending explicit authorization.
+Released as `7f9e1ab`; production migration and empty/unknown UI checks pass. SDK 0.2.1 publication was explicitly approved and accepted by npm; registry metadata and downloaded artifact are verified.

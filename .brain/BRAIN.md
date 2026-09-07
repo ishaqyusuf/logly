@@ -55,4 +55,4 @@ Canonical project memory for Logly product, architecture, implementation, and op
 7. `features/operator-authentication.md`
 8. `tasks/in-progress.md`
 
-Country visit heat map is live (commit `7f9e1ab`), with mobile/desktop QA, scoped SQL checks and explicit historical unknown locations. See `.brain/tasks/country-map/report.md`. Public Next adapter 0.2.1 release awaits explicit authorization after automatic approval review rejection; existing consumer proxies need that forwarding update and deployment.
+Country visit heat map is live (commit `7f9e1ab`), with mobile/desktop QA, scoped SQL checks and explicit historical unknown locations. See `.brain/tasks/country-map/report.md`. Public Next adapter 0.2.1 was explicitly approved and accepted by npm on 2026-09-07; registry metadata and downloaded artifact are verified; existing consumer proxies need that forwarding update and deployment.

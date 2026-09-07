@@ -159,4 +159,4 @@ All five production projects provisioned. Halaalvest, Ewatrade and SchoolClerk s
 
 ## Country heat map — 2026-09-07
 
-User-authorized world map implemented with country rankings, percentage readout, unknown locations and responsive layouts. Country ingestion/aggregation and additive migration pass local SQL retry/scope checks. Tests, lint, typecheck and dashboard build pass; see `country-map/report.md` for deployment and screenshots. SDK 0.2.1 publication is awaiting explicit authorization after automatic review rejection; consumer live testing remains deferred.
+User-authorized world map implemented with country rankings, percentage readout, unknown locations and responsive layouts. Country ingestion/aggregation and additive migration pass local SQL retry/scope checks. Tests, lint, typecheck and dashboard build pass; see `country-map/report.md` for deployment and screenshots. SDK 0.2.1 publication was explicitly approved and accepted by npm; registry metadata and downloaded artifact are verified; consumer live testing remains deferred.
