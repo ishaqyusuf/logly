@@ -20,9 +20,13 @@ const batch: AnalyticsBatch = {
 };
 
 const originalFetch = globalThis.fetch;
+const originalVercel = process.env.VERCEL;
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
+  if (originalVercel === undefined)
+    Reflect.deleteProperty(process.env, "VERCEL");
+  else process.env.VERCEL = originalVercel;
 });
 
 describe("analytics route", () => {
@@ -70,4 +74,35 @@ describe("analytics route", () => {
     expect(response.status).toBe(202);
     expect(received[0]?.events[0]?.name).toBe("page_view");
   });
+});
+
+test("only forwards edge country on Vercel, ignoring browser override headers", async () => {
+  const handler = createAnalyticsRoute({
+    collectorUrl: "https://collector.test",
+    projectKey: "key",
+  });
+  for (const [vercel, country, expected] of [
+    ["1", "NG", "NG"],
+    ["0", "NG", null],
+    ["1", "invalid", null],
+  ] as const) {
+    process.env.VERCEL = vercel;
+    globalThis.fetch = (async (_url, init) => {
+      const headers = new Headers(init?.headers);
+      expect(headers.get("x-logly-country")).toBe(expected);
+      expect(headers.get("x-forwarded-for")).toBeNull();
+      return Response.json({ accepted: 1 }, { status: 202 });
+    }) as typeof fetch;
+    await handler(
+      new Request("https://product.test/api/analytics", {
+        method: "POST",
+        headers: {
+          "x-vercel-ip-country": country,
+          "x-logly-country": "US",
+          "x-forwarded-for": "192.0.2.1",
+        },
+        body: JSON.stringify(batch),
+      }),
+    );
+  }
 });

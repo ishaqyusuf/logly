@@ -133,3 +133,7 @@ The acquisition, funnel and observed-health reports are deployed in release
 Chrome verified real Afterservice acquisition, a successful funnel read and
 truthful no-recent-arrival health. Earlier local-only notes above are superseded
 by this release evidence.
+
+### World country heat map
+
+Insights shows country-shaded daily visit arrivals for the selected project's last 30 days. Country selection exposes count and percentage; the ranked HTML list supports touch/keyboard and territories too small for the map. Missing/invalid/historical metadata remains explicitly unknown. Self-hosted public-domain Natural Earth geometry avoids runtime map service requests. No IP or precise location is stored. ADR 0007 authorizes this feature. Validation/screenshots/release evidence: `../tasks/country-map/report.md`. The Next adapter patch is prepared as 0.2.1; registry publication requires explicit authorization after automatic review rejected it. Existing consumer proxies need updating and deployment to forward country.

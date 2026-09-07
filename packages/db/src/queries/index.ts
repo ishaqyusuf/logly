@@ -12,7 +12,9 @@ import {
   type AnalyticsEventRow,
   type AnalyticsEventSummary,
   getDemoAnalytics,
+  normalizeCountry,
   summarizeAnalyticsEvents,
+  summarizeCountries,
 } from "@logly/utils";
 import {
   and,
@@ -210,6 +212,7 @@ export async function verifyProjectCredential(
 export async function ingestEventBatch(
   batch: AnalyticsBatch,
   hashSecret: string,
+  country?: string | null,
 ) {
   const db = getDatabase();
   if (!db)
@@ -258,6 +261,7 @@ export async function ingestEventBatch(
     visitKind: event.visitKind ?? null,
     route: event.route ?? null,
     referrerHost: event.referrerHost ?? null,
+    country: event.source === "browser" ? normalizeCountry(country) : null,
     properties: event.properties,
     campaign: event.campaign,
   }));
@@ -587,6 +591,7 @@ export async function getDashboardEventSummary(
       .limit(10),
     db
       .select({
+        country: analyticsEvents.country,
         referrer: sql<string>`coalesce(nullif(${analyticsEvents.referrerHost}, ''), 'Direct / unknown')`,
         campaignSource: sql<string>`coalesce(nullif(${analyticsEvents.campaign}->>'source', ''), 'Unattributed')`,
         count: sql<number>`count(*)::int`,
@@ -608,6 +613,7 @@ export async function getDashboardEventSummary(
         ),
       )
       .groupBy(
+        analyticsEvents.country,
         sql`coalesce(nullif(${analyticsEvents.referrerHost}, ''), 'Direct / unknown')`,
         sql`coalesce(nullif(${analyticsEvents.campaign}->>'source', ''), 'Unattributed')`,
       ),
@@ -627,6 +633,7 @@ export async function getDashboardEventSummary(
 
   return {
     totalEvents: totals[0]?.count ?? 0,
+    geography: summarizeCountries(acquisitionRows),
     acquisition: {
       totalVisits: acquisitionRows.reduce((total, row) => total + row.count, 0),
       referrers: acquisitionGroups("referrer"),

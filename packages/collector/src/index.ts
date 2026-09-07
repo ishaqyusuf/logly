@@ -115,7 +115,11 @@ export function createCollectorApp() {
 
     try {
       return context.json(
-        await ingestEventBatch(parsed.data, getRequiredHashSecret()),
+        await ingestEventBatch(
+          parsed.data,
+          getRequiredHashSecret(),
+          projectKey ? context.req.header("x-logly-country") : null,
+        ),
         202,
       );
     } catch (error) {

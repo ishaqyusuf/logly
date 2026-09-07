@@ -1,6 +1,6 @@
 {
   "name": "@ishaqyusuf/logly-next",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Thin React provider and Next.js same-origin route adapter for Logly.",
   "license": "MIT",
   "sideEffects": false,

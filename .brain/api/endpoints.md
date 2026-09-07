@@ -32,3 +32,5 @@
 - `GET /v1/dashboard/funnel?project=<slug>&steps=<event,event>`: authenticated,
   complete-window ordered visitor-day funnel; optional organization/start/end,
   two to five steps, maximum 90-day range. See contracts for counting rules.
+
+- Event-summary endpoints now include the additive `geography` country-visit aggregate. `POST /v1/events` accepts country only through authenticated proxy request metadata; see country contract.

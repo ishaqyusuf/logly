@@ -217,6 +217,7 @@ export const analyticsEvents = pgTable(
     visitKind: text("visit_kind"),
     route: text("route"),
     referrerHost: text("referrer_host"),
+    country: text("country"),
     properties: jsonb("properties")
       .$type<Record<string, string | number | boolean | null>>()
       .notNull()

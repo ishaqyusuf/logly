@@ -40,3 +40,7 @@
 - TODO: implement idempotent daily-rollup and retention-cleanup jobs.
 - Production Postgres and both reviewed migrations are deployed; a verified
   backup-and-restore process remains pending.
+
+## Country visit metadata
+
+`analytics_events.country` is nullable text, storing normalized ISO alpha-2 country codes for browser events. Existing rows remain null. The write boundary enforces the whitelist; server rows always receive null. The existing unique project/event ID constraint preserves country on retries. Complete-window country counts reuse the scoped acquisition aggregation; no additional index or retention contract is introduced.

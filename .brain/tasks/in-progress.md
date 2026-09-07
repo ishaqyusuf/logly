@@ -156,3 +156,7 @@
 ## Portfolio integration source checkpoint — 2026-09-07
 
 All five production projects provisioned. Halaalvest, Ewatrade and SchoolClerk shared analytics packages, layouts/proxies, native runtimes where requested, local production credentials and Turbo declarations are implemented. 21 consumer tests pass. See [screenshot and validation report](analytics-expansion/report.md) for broader-check limitations and outstanding consumer rollout/acceptance. Logly itself is deployed and verified.
+
+## Country heat map — 2026-09-07
+
+User-authorized world map implemented with country rankings, percentage readout, unknown locations and responsive layouts. Country ingestion/aggregation and additive migration pass local SQL retry/scope checks. Tests, lint, typecheck and dashboard build pass; see `country-map/report.md` for deployment and screenshots. SDK 0.2.1 publication is awaiting explicit authorization after automatic review rejection; consumer live testing remains deferred.

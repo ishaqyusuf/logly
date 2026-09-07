@@ -38,12 +38,20 @@ export function createAnalyticsRoute(options: RouteOptions) {
     }
 
     const origin = request.headers.get("origin");
+    // Read location only at the product edge, never at the remote collector.
+    const country =
+      process.env.VERCEL === "1"
+        ? request.headers.get("x-vercel-ip-country")
+        : null;
     const response = await fetch(
       `${options.collectorUrl.replace(/\/$/, "")}/v1/events`,
       {
         method: "POST",
         headers: {
           "content-type": "application/json",
+          ...(country && /^[A-Z]{2}$/.test(country)
+            ? { "x-logly-country": country }
+            : {}),
           ...(options.projectKey
             ? { "x-logly-project-key": options.projectKey }
             : {}),

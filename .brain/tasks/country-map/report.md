@@ -1,0 +1,26 @@
+# Country heat map implementation report
+
+## Behavior
+
+Country-shaded world map, ranked visit counts, percentage selection, explicit unknown count, and desktop/mobile layouts in Insights. Scope is the selected project and last 30 days. Metric is daily browser `site_visit` arrivals, not pageviews or cross-day unique people. The first accepted country survives retries. Locations reflect the delivery network; historical data stays unknown.
+
+## Validation
+
+- `bun run test`, `bun run typecheck`, `bun run lint`, `bun run build:dashboard`: pass. Source suite: 52 tests.
+- `bun --env-file=.env.local packages/db/scripts/verify-country.ts`: pass, guarded local port 55438; 251 arrivals = Nigeria 100, United States 100, United Kingdom 50, unknown 1. Duplicate first-batch retry with France retains original counts/location. Organization/name/source exclusion and acquisition/funnel regression checks pass. Fixtures retained.
+- Chrome: 1440px desktop and 390px mobile, map and ranked-list selection, no horizontal overflow. Fixed SVG title hydration mismatch; fresh reload has no new console errors.
+- Populated screenshots use clearly named local QA data, not production traffic.
+
+![Desktop country map](screenshots/world-desktop.png)
+
+![Mobile country map](screenshots/world-mobile.png)
+
+## Release
+
+Dashboard production deployment pending. Additive migration runs through existing deployment preparation.
+
+Next adapter 0.2.1 is prepared and package contents inspected (8 files; no secrets). Public npm publication was rejected by automatic approval review because explicit public SDK release authorization was required. It has not been published. Logly uses the workspace adapter and can collect new country metadata upon dashboard deployment. Existing external proxies require the updated adapter or equivalent trusted metadata forwarding and a consumer deployment; no consumer live testing is claimed.
+
+## Sources
+
+[Vercel geographic headers](https://vercel.com/kb/guide/geo-ip-headers-geolocation-vercel-functions), [Natural Earth public-domain terms](https://www.naturalearthdata.com/about/terms-of-use/). Map provenance is recorded in `apps/dashboard/src/data/world-map.LICENSE.md`.

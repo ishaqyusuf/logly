@@ -51,3 +51,13 @@ export const POST = createAnalyticsRoute({
   projectKey: process.env.LOGLY_PROJECT_KEY,
 });
 ```
+
+## Country analytics
+
+Version 0.2.1 forwards Vercel's product-edge `x-vercel-ip-country` header to
+the collector as `x-logly-country` when `VERCEL=1`. Keep the project key
+server-only. Country is request metadata, never a browser event property.
+Older adapters and deployments without trusted geographic metadata produce
+unknown locations. The collector stores only validated ISO country codes,
+never IP addresses or GPS coordinates. Update and deploy your product proxy
+to enable country counts for new visits; historical visits remain unknown.

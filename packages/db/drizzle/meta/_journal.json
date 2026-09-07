@@ -22,6 +22,13 @@
       "when": 1788251567820,
       "tag": "0002_colossal_zombie",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788817197366,
+      "tag": "0003_broad_green_goblin",
+      "breakpoints": true
     }
   ]
 }

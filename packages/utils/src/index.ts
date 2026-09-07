@@ -1,3 +1,6 @@
+import { type CountryVisits, summarizeCountries } from "./countries";
+
+export * from "./countries";
 export type AnalyticsEventRow = {
   id: string;
   name: string;
@@ -7,6 +10,7 @@ export type AnalyticsEventRow = {
   visitKind: "new" | "returning" | null;
   route: string | null;
   referrerHost: string | null;
+  country?: string | null;
   campaign?: Record<string, string | undefined> | null;
   occurredAt: string;
   properties: Record<string, string | number | boolean | null>;
@@ -78,6 +82,7 @@ export type AnalyticsEventSummary = {
   sources: AnalyticsEventSourceSummary[];
   routes: AnalyticsEventRouteSummary[];
   acquisition: AnalyticsAcquisitionSummary;
+  geography: CountryVisits;
   trend: AnalyticsTrendPoint[];
 };
 
@@ -267,6 +272,13 @@ export function summarizeAnalyticsEvents(
   return {
     totalEvents: current.length,
     acquisition: summarizeAcquisition(current),
+    geography: summarizeCountries(
+      current
+        .filter(
+          (event) => event.source === "browser" && event.name === "site_visit",
+        )
+        .map((event) => ({ country: event.country ?? null, count: 1 })),
+    ),
     uniqueEventNames: eventNames.length,
     eventNames,
     sources,

@@ -101,3 +101,9 @@ names therefore require another event. Counts are independent of row paging.
 Response: `{ start, end, steps: [{ name, visitors, conversion, dropOff }] }`.
 Visitors means visitor-days, conversion is percent of first-stage entrants,
 and dropOff is the count lost from the preceding stage. No cross-day joining.
+
+### Country visit summary
+
+Event-summary responses add `geography: { totalVisits, unknownVisits, countries: [{ code, name, count }] }`. Codes are ISO 3166-1 alpha-2; names use English display names. Rows sort by count descending then name. Only browser `site_visit` events contribute, across the complete matching project/organization/date/name/source/search scope, independent of pagination. Unknown locations stay in the denominator. No event-body location field is introduced.
+
+After existing client-ingest authentication and origin checks, the collector accepts `x-logly-country` from the credential-authenticated product proxy. The Next adapter reads only Vercel's product-edge `x-vercel-ip-country` when `VERCEL=1`. It ignores browser `x-logly-country` overrides. The collector validates the exact country whitelist and ignores its own geographic edge header; server-write requests never supply country. Country records the delivery network, not residence. No IP/GPS/city is persisted; retries retain the first accepted location.

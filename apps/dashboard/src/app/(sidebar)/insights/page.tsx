@@ -3,6 +3,7 @@ import { type AnalyticsFunnel, normalizeFunnelQuery } from "@logly/utils";
 import type { Metadata } from "next";
 import type { SearchParams } from "nuqs/server";
 import { AcquisitionReport } from "@/components/acquisition-report";
+import { CountryReport } from "@/components/country-report";
 import { FunnelReport } from "@/components/funnel-report";
 import { ScrollableContent } from "@/components/scrollable-content";
 import {
@@ -73,6 +74,10 @@ export default async function InsightsPage({
             identity.
           </p>
         </div>
+        <CountryReport
+          key={workspace.project.slug}
+          summary={summary.geography}
+        />
         <AcquisitionReport summary={summary.acquisition} />
         <FunnelReport
           project={workspace.project.slug}

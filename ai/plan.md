@@ -287,3 +287,7 @@ Acquisition reporting starts first, followed by same-day funnels, observed colle
 - Reporting release is live: `4f8cea9`, deployment `dpl_ELKo4hVahZmsWW6AXjVpeRzDDjL4`; production Chrome reads pass. Continue with consumer repository discovery, five production tracking projects and integration.
 
 Portfolio checkpoint: five production namespaces created; three consumer source integrations and 21 focused tests complete. Broader app validation/deployment limitations and screenshots are recorded in `.brain/tasks/analytics-expansion/report.md`. Consumer live acceptance remains deferred.
+
+## Country visit heat map
+
+Implemented per `.brain/tasks/country-map/plan.md` and ADR 0007. Country ingestion, scoped report, mobile interactions and local SQL retry validation pass. Full test/typecheck/lint/build pass. Dashboard deployment and screenshot evidence are tracked in `.brain/tasks/country-map/report.md`. Public Next SDK 0.2.1 publication requires explicit authorization after automatic review rejection.
