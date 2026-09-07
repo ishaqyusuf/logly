@@ -39,3 +39,21 @@ Resolve the recorded full-app validation failures, release reviewed consumer cha
 ## Configuration follow-up
 
 Both native production Expo projects are verified as `@cipron-startups/halaalvest` and `@cipron-startups/ewatrade`. Their analytics switch and endpoint variables are configured; no native release was dispatched. Streaming proxy reads now enforce the 48 KiB limit before the entire body is retained, with exact-boundary and cancellation tests. All 27 focused tests and three package typechecks passed. Vercel configuration completed on all six verified existing projects: `halaal-vest-marketing`, `halaalvest-dashboard`, `ewatrade-marketing`, `ewatrade-dashboard`, `schoolify`, and `schoolclerk-dashboard`. All 30 variable additions succeeded, including sensitive server-side ingest credentials. These changes take effect only on a future consumer release.
+
+## Handoff gate audit
+
+The implementation artifacts, nine nonempty screenshots, and six-target/30-variable Vercel completion receipt were rechecked. The Logly working tree was clean before this audit note. The consumer live acceptance gate remains explicitly deferred by the owner and has remained unchanged across three consecutive goal turns. The goal is not claimed complete: consumer releases, broader validation issues and runtime acceptance remain recorded above. Further live testing requires the owner's promised follow-up.
+
+## Country heat-map integration follow-up
+
+The Logly heat map is live (`7f9e1ab`), and the user-approved `@ishaqyusuf/logly-next@0.2.1` release is registry-verified. The three consumer integrations use custom privacy-enforcing routes, so those routes now independently forward trusted Vercel country metadata to the collector. Coverage includes Halaalvest and Ewatrade web/mobile and SchoolClerk web. Browser country overrides and raw IP headers are ignored, while missing/non-Vercel metadata remains unknown.
+
+All 32 focused tests pass: Halaalvest 12/50 assertions, Ewatrade 12/50, SchoolClerk 8/33. All three events-package TypeScript checks pass (Ewatrade disables incremental output to avoid sandbox writes). Changed proxy/test files pass Biome. No consumer UI changed, telemetry was not sent to production, and no consumer deploy or live acceptance is claimed. Each consumer's `features/logly-analytics.md`, `api/contracts.md` and `tasks/in-progress.md` records this additive metadata contract.
+
+Previous goal turn made concrete progress by publishing and verifying the SDK; this continuation closes the custom consumer proxy gap. Consumer release/full-app validation limitations and the owner's deferred website acceptance boundary remain. Any interactive authentication is deferred while the owner is away from their laptop.
+
+## Current-source handoff audit
+
+Rechecked provider and proxy wiring in all requested consumer surfaces, including Halaalvest marketing's actual `apps/marketing/app` tree (not its `src/app` directory), both Expo root runtimes, Ewatrade storefront/POS and SchoolClerk school-site. All thirteen report/setup screenshots are present across the expansion and country-map folders. Analytics packages and proxy routes remain local, uncommitted integration files inside worktrees with unrelated ongoing changes; they are not represented as deployed.
+
+The preceding goal continuation made progress by adding and testing country forwarding. The remaining owner-deferred consumer live acceptance gate is unchanged in this handoff audit; interactive authentication also remains deferred. No consumer website was opened or tested.

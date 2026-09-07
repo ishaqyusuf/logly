@@ -105,3 +105,7 @@ Ticket checkmarks denote source integration/provisioning and the documented focu
 ## Verified configuration follow-up
 
 All 30 analytics variables added successfully across the six existing Vercel dashboard/marketing targets; both verified Expo production projects also have the two public native analytics variables. Consumer deployment and deferred live acceptance are not complete. Streaming-cap checks strengthen each proxy; 27 tests and all three package typechecks pass. Halaalvest/Ewatrade/SchoolClerk worktrees currently have 895/907/112 entries respectively, so unrelated work cannot be included in an analytics release. Separate hosted targets for Ewa storefront/POS and SchoolClerk school-site were not listed in the inspected Vercel account.
+
+## Country map follow-up
+
+Trusted edge country forwarding now implemented in all three custom consumer packages (all five namespaces), with 32 focused tests and package typechecks passing. Published SDK release alone would not update these custom proxies. See report for release/acceptance boundaries.
