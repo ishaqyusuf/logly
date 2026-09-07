@@ -29,3 +29,6 @@
   for filter-aware, complete-window event analytics.
 - `GET /api/dashboard/events/:eventId?project=<slug>`: Better Auth-protected,
   project-scoped event-detail proxy used by the global detail sheet.
+- `GET /v1/dashboard/funnel?project=<slug>&steps=<event,event>`: authenticated,
+  complete-window ordered visitor-day funnel; optional organization/start/end,
+  two to five steps, maximum 90-day range. See contracts for counting rules.

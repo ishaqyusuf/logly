@@ -1,8 +1,14 @@
 import { Badge } from "@logly/ui/badge";
+import { type AnalyticsFunnel, normalizeFunnelQuery } from "@logly/utils";
 import type { Metadata } from "next";
 import type { SearchParams } from "nuqs/server";
+import { AcquisitionReport } from "@/components/acquisition-report";
+import { FunnelReport } from "@/components/funnel-report";
 import { ScrollableContent } from "@/components/scrollable-content";
-import { getDashboardEventSummary } from "@/lib/dashboard-data";
+import {
+  getDashboardEventSummary,
+  getDashboardFunnel,
+} from "@/lib/dashboard-data";
 import { loadProjectWorkspace } from "@/lib/project-workspace-server";
 
 export const metadata: Metadata = { title: "Insights" };
@@ -24,13 +30,37 @@ export default async function InsightsPage({
     project: workspace.project.slug,
     start: new Date(Date.now() - 30 * 86_400_000).toISOString(),
   });
+  const selectedSteps = [
+    params.step1,
+    params.step2,
+    params.step3,
+    params.step4,
+    params.step5,
+  ].filter(
+    (value): value is string => typeof value === "string" && value.length > 0,
+  );
+  let funnel: AnalyticsFunnel | null = null;
+  let funnelError: string | undefined;
+  if (selectedSteps.length) {
+    let query: ReturnType<typeof normalizeFunnelQuery> | undefined;
+    try {
+      query = normalizeFunnelQuery({
+        project: workspace.project.slug,
+        organization: workspace.organization?.slug,
+        steps: selectedSteps,
+      });
+    } catch (error) {
+      funnelError = error instanceof Error ? error.message : "Invalid funnel";
+    }
+    if (query) funnel = await getDashboardFunnel(query);
+  }
   const totalSources = summary.sources.reduce(
     (total, source) => total + source.count,
     0,
   );
   return (
     <ScrollableContent>
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
             Project insights
@@ -43,6 +73,15 @@ export default async function InsightsPage({
             identity.
           </p>
         </div>
+        <AcquisitionReport summary={summary.acquisition} />
+        <FunnelReport
+          project={workspace.project.slug}
+          organization={workspace.organization?.slug}
+          names={summary.eventNames.map((event) => event.name)}
+          selectedSteps={selectedSteps}
+          report={funnel}
+          error={funnelError}
+        />
         <div className="grid gap-6 lg:grid-cols-2">
           <InsightList
             title="Top events"

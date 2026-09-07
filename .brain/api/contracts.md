@@ -65,3 +65,39 @@ window with equal duration and does not overlap it.
 
 Event-detail reads require both an event ID and project slug. An ID from another
 project returns not found, including when opened through URL-owned sheet state.
+
+### Acquisition summary (local implementation)
+
+Event-summary responses now include `acquisition: { totalVisits, referrers,
+campaignSources }`. Each breakdown contains `{ label, count }` rows sorted by
+count descending then label. Only browser `site_visit` events contribute;
+pageviews and server activity do not inflate arrival counts. The same project,
+organization, date, name, source, and search filters apply. Missing referrers
+are `Direct / unknown`; missing UTM sources are `Unattributed`. These are
+visitor-day arrival counts, not sessions or unique people across days.
+The database aggregates the complete matching window independently of event
+pagination. No migration or additional event collection is required.
+
+### Observed collection health (local implementation)
+
+Overview responses include `collectionHealth` with `recentEvents` (receipts in
+the past 24 hours), `lastReceivedAt` (latest persisted receipt, ISO UTC or null),
+`averageLagSeconds` (receipt minus occurrence time for recent receipts with
+nonnegative lag, or null), and `clockSkewEvents` (recent receipts timestamped
+ahead of receipt). All queries preserve organization/project boundaries.
+`deliveryRate` is retained as a nullable compatibility field and returns null;
+no success denominator exists for events that never reach the collector.
+Demo health is unmeasured. No persistence migration is needed.
+
+### Same-day funnel reports
+
+`GET /v1/dashboard/funnel` requires `project` and comma-separated `steps` (2–5
+valid event names); accepts organization and ISO start/end. Defaults to the
+last 30 days; windows over 90 days or invalid/reversed dates return 400.
+The existing dashboard read credential middleware applies. SQL uses full
+project-scoped pseudonymous visitor keys, browser events only and UTC days.
+Each stage requires a strictly later occurrence in the same day; repeated
+names therefore require another event. Counts are independent of row paging.
+Response: `{ start, end, steps: [{ name, visitors, conversion, dropOff }] }`.
+Visitors means visitor-days, conversion is percent of first-stage entrants,
+and dropOff is the count lost from the preceding stage. No cross-day joining.

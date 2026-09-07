@@ -41,6 +41,18 @@
     "./table": {
       "types": "./dist/table.d.ts",
       "import": "./dist/table.js"
+    },
+    "./card": {
+      "types": "./dist/card.d.ts",
+      "import": "./dist/card.js"
+    },
+    "./native-select": {
+      "types": "./dist/native-select.d.ts",
+      "import": "./dist/native-select.js"
+    },
+    "./field": {
+      "types": "./dist/field.d.ts",
+      "import": "./dist/field.js"
     }
   },
   "scripts": {

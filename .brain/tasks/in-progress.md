@@ -141,3 +141,13 @@
   `dpl_GeFSJRRcQcv7qsZJns3qGrUpwa4j` and was promoted to the canonical alias.
   Health and unauthenticated route-protection canaries pass, so the Signal
   Studio production release is complete.
+
+## Portfolio Analytics Expansion
+
+- Status: in progress, authorized 2026-09-07.
+- Tickets LGL-101–108 and acceptance evidence are tracked in `analytics-expansion/plan.md`.
+- Feature selection: acquisition reports, same-day ordered funnels, observed collection health.
+- Integrations: Halaalvest web/mobile, Ewatrade web/mobile, School Clerk web.
+- ADR 0006 records the updated scope and preserves privacy boundaries.
+- Acquisition and observed collection-health UI are now implemented locally with real SQL acceptance checks and desktop/mobile screenshots. Combined validation/release and funnels remain pending before consumer cutovers.
+- Same-day funnel reporting now implemented locally with 251 → 200 → 100 SQL fixture and responsive screenshot evidence. All three selected features pass the combined 49-test suite, typecheck, lint and production build; deployment pending.

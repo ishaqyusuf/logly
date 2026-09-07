@@ -1,9 +1,10 @@
 import { Badge } from "@logly/ui/badge";
 import { formatDistanceToNowStrict } from "date-fns";
-import { Activity, ArrowRight, Radio } from "lucide-react";
+import { Activity, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { SearchParams } from "nuqs/server";
+import { CollectionHealth } from "@/components/collection-health";
 import { OverviewChart } from "@/components/overview-chart";
 import { ScrollableContent } from "@/components/scrollable-content";
 import { SummaryGrid } from "@/components/summary-grid";
@@ -126,26 +127,10 @@ export default async function OverviewPage({
               ))}
             </div>
           </section>
-          <section className="rounded-xl border bg-[#17201b] p-5 text-white shadow-soft">
-            <div className="flex items-center gap-2 text-emerald-300">
-              <Radio className="size-4" />
-              <span className="text-xs font-medium uppercase tracking-[0.12em]">
-                Collector health
-              </span>
-            </div>
-            <p className="mt-8 text-3xl font-medium tracking-[-0.04em]">
-              {data.overview.deliveryRate}%
-            </p>
-            <p className="mt-2 text-sm text-white/60">
-              Delivery rate across the selected project scope.
-            </p>
-            <div className="mt-8 h-2 overflow-hidden rounded-full bg-white/10">
-              <div
-                className="h-full rounded-full bg-emerald-400"
-                style={{ width: `${data.overview.deliveryRate}%` }}
-              />
-            </div>
-          </section>
+          <CollectionHealth
+            health={data.overview.collectionHealth}
+            mode={data.mode}
+          />
         </div>
       </div>
     </ScrollableContent>

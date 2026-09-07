@@ -5,11 +5,14 @@ import {
   type AnalyticsEventQuery,
   type AnalyticsEventRow,
   type AnalyticsEventSummary,
+  type AnalyticsFunnel,
+  type AnalyticsFunnelQuery,
   type AnalyticsOrganizationSummary,
   type AnalyticsOverview,
   type AnalyticsProjectSummary,
   getDemoAnalytics,
   summarizeAnalyticsEvents,
+  summarizeFunnel,
 } from "@logly/utils";
 import { cache } from "react";
 
@@ -155,4 +158,19 @@ export async function getDashboardEventById(
   return client.read<AnalyticsEventRow>(
     `/v1/dashboard/events/${encodeURIComponent(eventId)}?${queryString({ project })}`,
   );
+}
+
+export async function getDashboardFunnel(
+  query: AnalyticsFunnelQuery,
+): Promise<AnalyticsFunnel> {
+  const client = dashboardClient();
+  if (!client) return summarizeFunnel(getDemoAnalytics().events, query);
+  const params = new URLSearchParams({
+    project: query.project,
+    steps: query.steps.join(","),
+  });
+  if (query.organization) params.set("organization", query.organization);
+  if (query.start) params.set("start", query.start);
+  if (query.end) params.set("end", query.end);
+  return client.read<AnalyticsFunnel>(`/v1/dashboard/funnel?${params}`);
 }

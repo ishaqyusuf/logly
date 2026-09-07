@@ -93,3 +93,37 @@
 - `admin` is reserved for project and key administration.
 - Project keys are hashed at rest, revocable, expirable, and never exposed to
   browser bundles.
+
+## Acquisition reporting expansion (in progress)
+
+The event-summary read contract includes complete-window browser visitor-day
+arrival counts by referrer host and campaign source, using existing captured
+fields. Database and demo summaries are implemented locally; Insights UI,
+real-database verification, responsive screenshots, and deployment remain
+pending under LGL-101. See ADR 0006 for the authorized expansion scope.
+
+### Local reporting UI and health implementation
+
+Insights now renders acquisition cards with full-window totals and shares,
+explicit unattributed/direct labels, and empty messaging. Populated and empty
+local browser states were inspected; desktop and 390px screenshots are stored
+under `.brain/tasks/analytics-expansion/screenshots/`.
+
+Overview now replaces the placeholder delivery percentage with observed
+receipt count, last receipt and mean nonnegative arrival lag; the header no
+longer claims collector uptime. Batching, offline time and clock differences
+are explained. Unknown and demo states do not show fabricated metrics.
+Database-backed checks pass for acquisition and populated/empty health.
+These changes are local and await the combined production release.
+
+### Same-day conversion funnels
+
+Insights includes two required and three optional event selectors backed by
+discovered event names. A GET form persists the chosen steps and project in
+the URL and renders ordered visitor-day counts, entrant conversion percentage,
+and drop-off counts. Only browser events with a visitor key qualify; steps
+must be strictly later on the same UTC day. No cross-day identity is added.
+Local SQL fixture verifies 251 → 200 → 100 and rejects reverse ordering and
+wrong-organization matches. Four unit tests cover ordering, ties, repeated
+steps, source/identity/day/project exclusion and invalid ranges. Desktop and
+390px mobile screenshots are in the expansion task directory.

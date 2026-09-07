@@ -3,7 +3,7 @@
 import { Badge } from "@logly/ui/badge";
 import { Button } from "@logly/ui/button";
 import type { AnalyticsProjectSummary } from "@logly/utils";
-import { CircleHelp, Radio } from "lucide-react";
+import { CircleHelp } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { SignOutButton } from "@/components/sign-out-button";
 
@@ -76,9 +76,9 @@ export function Header({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="hidden items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-700 sm:flex">
-            <Radio className="h-3 w-3" /> Collector healthy
-          </div>
+          <Badge variant="outline" className="hidden sm:inline-flex">
+            {mode === "database" ? "Stored event data" : "Demo data"}
+          </Badge>
           <Button variant="ghost" size="icon" aria-label="Help">
             <CircleHelp className="h-4 w-4" />
           </Button>

@@ -4,12 +4,13 @@ import {
   getDashboardEventById,
   getDashboardEventFilterOptions,
   getDashboardEventSummary,
+  getDashboardFunnel,
   getProjectPolicy,
   ingestEventBatch,
   listDashboardEventPage,
   verifyProjectCredential,
 } from "@logly/db/queries";
-import type { AnalyticsEventQuery } from "@logly/utils";
+import { type AnalyticsEventQuery, normalizeFunnelQuery } from "@logly/utils";
 import { Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 import {
@@ -173,6 +174,24 @@ export function createCollectorApp() {
       pageSize: Number(context.req.query("pageSize")) || undefined,
     };
     return context.json(await listDashboardEventPage(query));
+  });
+  app.get("/v1/dashboard/funnel", async (context) => {
+    let query: ReturnType<typeof normalizeFunnelQuery>;
+    try {
+      query = normalizeFunnelQuery({
+        project: context.req.query("project") ?? "",
+        organization: context.req.query("organization"),
+        steps: context.req.query("steps")?.split(",") ?? [],
+        start: context.req.query("start"),
+        end: context.req.query("end"),
+      });
+    } catch (error) {
+      return context.json(
+        { error: error instanceof Error ? error.message : "Invalid funnel" },
+        400,
+      );
+    }
+    return context.json(await getDashboardFunnel(query));
   });
   app.get("/v1/dashboard/event-summary", async (context) => {
     const split = (value?: string) => value?.split(",").filter(Boolean);

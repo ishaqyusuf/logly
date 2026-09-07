@@ -476,115 +476,162 @@ export async function getDashboardEventSummary(
         end: previousRange.previousEnd,
       }
     : null;
-  const [totals, trend, names, previousNames, sources, routes] =
-    await Promise.all([
-      db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(analyticsEvents)
-        .innerJoin(
-          analyticsProjects,
-          eq(analyticsEvents.projectId, analyticsProjects.id),
-        )
-        .innerJoin(
-          analyticsOrganizations,
-          eq(analyticsProjects.organizationId, analyticsOrganizations.id),
-        )
-        .where(eventConditions(query)),
-      db
-        .select({
-          date: sql<string>`to_char(date_trunc('day', ${analyticsEvents.occurredAt}), 'YYYY-MM-DD')`,
-          events: sql<number>`count(*)::int`,
-          visitors: sql<number>`count(distinct ${analyticsEvents.visitorKey})::int`,
-        })
-        .from(analyticsEvents)
-        .innerJoin(
-          analyticsProjects,
-          eq(analyticsEvents.projectId, analyticsProjects.id),
-        )
-        .innerJoin(
-          analyticsOrganizations,
-          eq(analyticsProjects.organizationId, analyticsOrganizations.id),
-        )
-        .where(eventConditions(query))
-        .groupBy(sql`date_trunc('day', ${analyticsEvents.occurredAt})`)
-        .orderBy(sql`date_trunc('day', ${analyticsEvents.occurredAt})`),
-      db
-        .select({
-          name: analyticsEvents.name,
-          count: sql<number>`count(*)::int`,
-        })
-        .from(analyticsEvents)
-        .innerJoin(
-          analyticsProjects,
-          eq(analyticsEvents.projectId, analyticsProjects.id),
-        )
-        .innerJoin(
-          analyticsOrganizations,
-          eq(analyticsProjects.organizationId, analyticsOrganizations.id),
-        )
-        .where(eventConditions(query))
-        .groupBy(analyticsEvents.name)
-        .orderBy(desc(sql`count(*)`), analyticsEvents.name),
-      previousQuery
-        ? db
-            .select({
-              name: analyticsEvents.name,
-              count: sql<number>`count(*)::int`,
-            })
-            .from(analyticsEvents)
-            .innerJoin(
-              analyticsProjects,
-              eq(analyticsEvents.projectId, analyticsProjects.id),
-            )
-            .innerJoin(
-              analyticsOrganizations,
-              eq(analyticsProjects.organizationId, analyticsOrganizations.id),
-            )
-            .where(eventConditions(previousQuery))
-            .groupBy(analyticsEvents.name)
-        : Promise.resolve([]),
-      db
-        .select({
-          source: analyticsEvents.source,
-          count: sql<number>`count(*)::int`,
-        })
-        .from(analyticsEvents)
-        .innerJoin(
-          analyticsProjects,
-          eq(analyticsEvents.projectId, analyticsProjects.id),
-        )
-        .innerJoin(
-          analyticsOrganizations,
-          eq(analyticsProjects.organizationId, analyticsOrganizations.id),
-        )
-        .where(eventConditions(query))
-        .groupBy(analyticsEvents.source)
-        .orderBy(desc(sql`count(*)`)),
-      db
-        .select({
-          route: analyticsEvents.route,
-          count: sql<number>`count(*)::int`,
-        })
-        .from(analyticsEvents)
-        .innerJoin(
-          analyticsProjects,
-          eq(analyticsEvents.projectId, analyticsProjects.id),
-        )
-        .innerJoin(
-          analyticsOrganizations,
-          eq(analyticsProjects.organizationId, analyticsOrganizations.id),
-        )
-        .where(and(eventConditions(query), isNotNull(analyticsEvents.route)))
-        .groupBy(analyticsEvents.route)
-        .orderBy(desc(sql`count(*)`))
-        .limit(10),
-    ]);
+  const [
+    totals,
+    trend,
+    names,
+    previousNames,
+    sources,
+    routes,
+    acquisitionRows,
+  ] = await Promise.all([
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(analyticsEvents)
+      .innerJoin(
+        analyticsProjects,
+        eq(analyticsEvents.projectId, analyticsProjects.id),
+      )
+      .innerJoin(
+        analyticsOrganizations,
+        eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+      )
+      .where(eventConditions(query)),
+    db
+      .select({
+        date: sql<string>`to_char(date_trunc('day', ${analyticsEvents.occurredAt}), 'YYYY-MM-DD')`,
+        events: sql<number>`count(*)::int`,
+        visitors: sql<number>`count(distinct ${analyticsEvents.visitorKey})::int`,
+      })
+      .from(analyticsEvents)
+      .innerJoin(
+        analyticsProjects,
+        eq(analyticsEvents.projectId, analyticsProjects.id),
+      )
+      .innerJoin(
+        analyticsOrganizations,
+        eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+      )
+      .where(eventConditions(query))
+      .groupBy(sql`date_trunc('day', ${analyticsEvents.occurredAt})`)
+      .orderBy(sql`date_trunc('day', ${analyticsEvents.occurredAt})`),
+    db
+      .select({
+        name: analyticsEvents.name,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(analyticsEvents)
+      .innerJoin(
+        analyticsProjects,
+        eq(analyticsEvents.projectId, analyticsProjects.id),
+      )
+      .innerJoin(
+        analyticsOrganizations,
+        eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+      )
+      .where(eventConditions(query))
+      .groupBy(analyticsEvents.name)
+      .orderBy(desc(sql`count(*)`), analyticsEvents.name),
+    previousQuery
+      ? db
+          .select({
+            name: analyticsEvents.name,
+            count: sql<number>`count(*)::int`,
+          })
+          .from(analyticsEvents)
+          .innerJoin(
+            analyticsProjects,
+            eq(analyticsEvents.projectId, analyticsProjects.id),
+          )
+          .innerJoin(
+            analyticsOrganizations,
+            eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+          )
+          .where(eventConditions(previousQuery))
+          .groupBy(analyticsEvents.name)
+      : Promise.resolve([]),
+    db
+      .select({
+        source: analyticsEvents.source,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(analyticsEvents)
+      .innerJoin(
+        analyticsProjects,
+        eq(analyticsEvents.projectId, analyticsProjects.id),
+      )
+      .innerJoin(
+        analyticsOrganizations,
+        eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+      )
+      .where(eventConditions(query))
+      .groupBy(analyticsEvents.source)
+      .orderBy(desc(sql`count(*)`)),
+    db
+      .select({
+        route: analyticsEvents.route,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(analyticsEvents)
+      .innerJoin(
+        analyticsProjects,
+        eq(analyticsEvents.projectId, analyticsProjects.id),
+      )
+      .innerJoin(
+        analyticsOrganizations,
+        eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+      )
+      .where(and(eventConditions(query), isNotNull(analyticsEvents.route)))
+      .groupBy(analyticsEvents.route)
+      .orderBy(desc(sql`count(*)`))
+      .limit(10),
+    db
+      .select({
+        referrer: sql<string>`coalesce(nullif(${analyticsEvents.referrerHost}, ''), 'Direct / unknown')`,
+        campaignSource: sql<string>`coalesce(nullif(${analyticsEvents.campaign}->>'source', ''), 'Unattributed')`,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(analyticsEvents)
+      .innerJoin(
+        analyticsProjects,
+        eq(analyticsEvents.projectId, analyticsProjects.id),
+      )
+      .innerJoin(
+        analyticsOrganizations,
+        eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+      )
+      .where(
+        and(
+          eventConditions(query),
+          eq(analyticsEvents.name, "site_visit"),
+          eq(analyticsEvents.source, "browser"),
+        ),
+      )
+      .groupBy(
+        sql`coalesce(nullif(${analyticsEvents.referrerHost}, ''), 'Direct / unknown')`,
+        sql`coalesce(nullif(${analyticsEvents.campaign}->>'source', ''), 'Unattributed')`,
+      ),
+  ]);
+  const acquisitionGroups = (key: "referrer" | "campaignSource") => {
+    const counts = new Map<string, number>();
+    for (const row of acquisitionRows) {
+      counts.set(row[key], (counts.get(row[key]) ?? 0) + row.count);
+    }
+    return [...counts]
+      .map(([label, count]) => ({ label, count }))
+      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+  };
   const previousByName = new Map(
     previousNames.map((event) => [event.name, event.count]),
   );
 
   return {
     totalEvents: totals[0]?.count ?? 0,
+    acquisition: {
+      totalVisits: acquisitionRows.reduce((total, row) => total + row.count, 0),
+      referrers: acquisitionGroups("referrer"),
+      campaignSources: acquisitionGroups("campaignSource"),
+    },
     uniqueEventNames: names.length,
     trend,
     eventNames: names.map((event) => {
@@ -720,7 +767,13 @@ export async function getDashboardData(
             event.name === "site_visit" && event.visitKind === "returning",
         ).length,
         totalEvents: events.length,
-        deliveryRate: 100,
+        deliveryRate: null,
+        collectionHealth: {
+          recentEvents: 0,
+          lastReceivedAt: null,
+          averageLagSeconds: null,
+          clockSkewEvents: 0,
+        },
         change: { visitors: 0, events: 0 },
         trend: summary.trend,
         topEvents: summary.eventNames.slice(0, 5).map(({ name, count }) => ({
@@ -737,6 +790,28 @@ export async function getDashboardData(
       ? eq(analyticsOrganizations.slug, organizationSlug)
       : undefined,
   );
+  const healthStart = new Date(Date.now() - 86_400_000).toISOString();
+  const [health] = await db
+    .select({
+      recentEvents: sql<number>`count(*) filter (where ${analyticsEvents.receivedAt} >= ${healthStart})::int`,
+      lastReceivedAt: sql<
+        Date | string | null
+      >`max(${analyticsEvents.receivedAt})`,
+      averageLagSeconds: sql<
+        number | null
+      >`avg(extract(epoch from (${analyticsEvents.receivedAt} - ${analyticsEvents.occurredAt}))) filter (where ${analyticsEvents.receivedAt} >= ${healthStart} and ${analyticsEvents.receivedAt} >= ${analyticsEvents.occurredAt})::float8`,
+      clockSkewEvents: sql<number>`count(*) filter (where ${analyticsEvents.receivedAt} >= ${healthStart} and ${analyticsEvents.occurredAt} > ${analyticsEvents.receivedAt})::int`,
+    })
+    .from(analyticsEvents)
+    .innerJoin(
+      analyticsProjects,
+      eq(analyticsEvents.projectId, analyticsProjects.id),
+    )
+    .innerJoin(
+      analyticsOrganizations,
+      eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+    )
+    .where(projectFilter);
   const [overview] = await db
     .select({
       uniqueVisitors: sql<number>`count(distinct ${analyticsEvents.visitorKey})::int`,
@@ -841,7 +916,16 @@ export async function getDashboardData(
       newVisitors: overview?.newVisitors ?? 0,
       returningVisitors: overview?.returningVisitors ?? 0,
       totalEvents: overview?.totalEvents ?? 0,
-      deliveryRate: 100,
+      deliveryRate: null,
+      collectionHealth: {
+        recentEvents: health?.recentEvents ?? 0,
+        lastReceivedAt:
+          coerceDatabaseTimestamp(
+            health?.lastReceivedAt ?? null,
+          )?.toISOString() ?? null,
+        averageLagSeconds: health?.averageLagSeconds ?? null,
+        clockSkewEvents: health?.clockSkewEvents ?? 0,
+      },
       change: { visitors: 0, events: 0 },
       trend,
       topEvents,
@@ -869,3 +953,5 @@ export async function getDashboardData(
     }),
   };
 }
+
+export { getDashboardFunnel } from "./funnel";

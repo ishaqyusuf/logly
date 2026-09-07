@@ -7,6 +7,7 @@ export type AnalyticsEventRow = {
   visitKind: "new" | "returning" | null;
   route: string | null;
   referrerHost: string | null;
+  campaign?: Record<string, string | undefined> | null;
   occurredAt: string;
   properties: Record<string, string | number | boolean | null>;
 };
@@ -76,8 +77,38 @@ export type AnalyticsEventSummary = {
   eventNames: AnalyticsEventNameSummary[];
   sources: AnalyticsEventSourceSummary[];
   routes: AnalyticsEventRouteSummary[];
+  acquisition: AnalyticsAcquisitionSummary;
   trend: AnalyticsTrendPoint[];
 };
+
+export type AnalyticsAcquisitionSummary = {
+  totalVisits: number;
+  referrers: Array<{ label: string; count: number }>;
+  campaignSources: Array<{ label: string; count: number }>;
+};
+
+export function summarizeAcquisition(
+  events: AnalyticsEventRow[],
+): AnalyticsAcquisitionSummary {
+  const visits = events.filter(
+    (event) => event.source === "browser" && event.name === "site_visit",
+  );
+  const group = (labelFor: (event: AnalyticsEventRow) => string) => {
+    const counts = new Map<string, number>();
+    for (const event of visits) {
+      const label = labelFor(event);
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+    return [...counts]
+      .map(([label, count]) => ({ label, count }))
+      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+  };
+  return {
+    totalVisits: visits.length,
+    referrers: group((event) => event.referrerHost || "Direct / unknown"),
+    campaignSources: group((event) => event.campaign?.source || "Unattributed"),
+  };
+}
 
 export type AnalyticsProjectSummary = {
   id: string;
@@ -99,12 +130,20 @@ export type AnalyticsOrganizationSummary = {
   projectCount: number;
 };
 
+export type AnalyticsCollectionHealth = {
+  recentEvents: number;
+  lastReceivedAt: string | null;
+  averageLagSeconds: number | null;
+  clockSkewEvents: number;
+};
+
 export type AnalyticsOverview = {
   uniqueVisitors: number;
   newVisitors: number;
   returningVisitors: number;
   totalEvents: number;
-  deliveryRate: number;
+  deliveryRate: number | null;
+  collectionHealth: AnalyticsCollectionHealth;
   change: { visitors: number; events: number };
   trend?: AnalyticsTrendPoint[];
   topEvents?: AnalyticsTopEvent[];
@@ -227,6 +266,7 @@ export function summarizeAnalyticsEvents(
 
   return {
     totalEvents: current.length,
+    acquisition: summarizeAcquisition(current),
     uniqueEventNames: eventNames.length,
     eventNames,
     sources,
@@ -395,7 +435,13 @@ export function getDemoAnalytics() {
       newVisitors: 94,
       returningVisitors: 137,
       totalEvents: 819,
-      deliveryRate: 99.8,
+      deliveryRate: null,
+      collectionHealth: {
+        recentEvents: 0,
+        lastReceivedAt: null,
+        averageLagSeconds: null,
+        clockSkewEvents: 0,
+      },
       change: { visitors: 12.4, events: 8.1 },
       trend: Array.from({ length: 14 }, (_, index) => ({
         date: new Date(now - (13 - index) * 86_400_000)
@@ -420,3 +466,11 @@ export function getDemoAnalytics() {
     projects,
   };
 }
+
+export {
+  type AnalyticsFunnel,
+  type AnalyticsFunnelQuery,
+  formatFunnelCounts,
+  normalizeFunnelQuery,
+  summarizeFunnel,
+} from "./funnel";

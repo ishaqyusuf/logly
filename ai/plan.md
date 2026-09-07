@@ -270,3 +270,17 @@ integration before widening the shared SDK interface or product scope.
   Overview data, Events filtering/sorting, and the detail sheet.
 - Deployment: `dpl_DfoLrrGviexgUp88ETcThV5WFNYN`, aliased to
   `https://logly-chi.vercel.app`.
+
+## Active: Portfolio analytics expansion (2026-09-07)
+
+Implementation tickets and acceptance checklist: `.brain/tasks/analytics-expansion/plan.md`.
+Decision: `.brain/decisions/0006-portfolio-analytics-expansion.md`.
+Acquisition reporting starts first, followed by same-day funnels, observed collection health, Logly deployment, and the five consumer tracking surfaces. No consumer website acceptance testing until the user requests it.
+
+### Reporting implementation progress
+
+- Acquisition SQL/demo contract and Insights cards implemented; SQL checks and desktop/mobile screenshot QA pass.
+- Observed collection health replaces placeholder delivery percentage; SQL populated/empty checks and desktop/mobile screenshot QA pass.
+- Shared local dev filter syntax repaired so dashboard/API scripts match the launcher.
+- Next: finish funnel reporting, validate combined release, deploy, then provision and integrate the five consumer analytics projects. See expansion plan for exact evidence and live tool handles.
+- Same-day funnel report implemented with complete-window SQL and URL-owned selectors; four unit tests, real SQL fixtures, and desktop/mobile UI QA pass. Combined release passes 49 source tests, typecheck, lint and production build; Git deployment is next.
