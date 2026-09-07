@@ -291,3 +291,5 @@ Portfolio checkpoint: five production namespaces created; three consumer source 
 ## Country visit heat map
 
 Implemented per `.brain/tasks/country-map/plan.md` and ADR 0007. Country ingestion, scoped report, mobile interactions and local SQL retry validation pass. Full test/typecheck/lint/build pass. Dashboard deployment and screenshot evidence are tracked in `.brain/tasks/country-map/report.md`. Public Next SDK 0.2.1 publication requires explicit authorization after automatic review rejection.
+
+Country heat map deployed as `7f9e1ab`; migration, health, authenticated empty/unknown production checks pass. SDK patch publication remains pending.

@@ -23,7 +23,7 @@ Canonical project memory for Logly product, architecture, implementation, and op
   standalone Neon `logly` database now exists on the free `iad1` plan, and only
   its pooled URL is configured as the Vercel Production `DATABASE_URL` secret.
   The storage resource remains unconnected and no generated Neon environment
-  variable bundle was added. All three reviewed migrations are applied, production
+  variable bundle was added. All four reviewed migrations are applied, production
   auth runtime values are configured, and the guarded owner bootstrap completed.
   The Vercel project is Git-connected to `ishaqyusuf/logly`, uses `main` as the
   production branch, and has automatic Git deployments enabled. Its project
@@ -54,3 +54,5 @@ Canonical project memory for Logly product, architecture, implementation, and op
 6. `features/organizations-and-projects.md`
 7. `features/operator-authentication.md`
 8. `tasks/in-progress.md`
+
+Country visit heat map is live (commit `7f9e1ab`), with mobile/desktop QA, scoped SQL checks and explicit historical unknown locations. See `.brain/tasks/country-map/report.md`. Public Next adapter 0.2.1 release awaits explicit authorization after automatic approval review rejection; existing consumer proxies need that forwarding update and deployment.

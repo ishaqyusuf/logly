@@ -15,7 +15,7 @@ Avoid: GPS, IP persistence, city precision, browser-supplied country event prope
 - [x] Generate and apply additive migration; preserve retries and scoped aggregation.
 - [x] Compose accessible responsive map and complete ranked list with unknown counts.
 - [x] Validate unit/SQL behavior, builds, desktop/mobile visual states.
-- [ ] Update Brain contracts and deploy Logly via the existing pipeline.
+- [x] Update Brain contracts and deploy Logly via the existing pipeline.
 
 ## Validation
 
@@ -24,3 +24,5 @@ Source tests, typecheck, lint, dashboard build; local-only SQL fixture proves co
 ## Open Questions
 
 None. Visits retain Logly's visitor-day arrival semantics. Old proxy versions require forwarding updates; delayed delivery locates the sending network at receipt time. No third-party lookup or map runtime requests.
+
+Released as `7f9e1ab`; production migration and empty/unknown UI checks pass. SDK npm publication remains separately blocked pending explicit authorization.

@@ -17,10 +17,18 @@ Country-shaded world map, ranked visit counts, percentage selection, explicit un
 
 ## Release
 
-Dashboard production deployment pending. Additive migration runs through existing deployment preparation.
+Released commit `7f9e1ab` to https://logly-chi.vercel.app via Git deployment `dpl_286efzufYcQir5m2NVhMgWhX59F5` (Ready). Deployment logs confirm migration success; `/health` returns 200 with the expected collector payload. Authenticated Chrome confirms SchoolClerk's empty map (zero visits) and Afterservice's 11 historical visits (all unknown), preserving the selected organization/project and with no production console errors. No consumer-site testing was performed.
+
+![Production empty state](screenshots/production-empty.png)
+
+![Production historical unknown state](screenshots/production-unknown.png)
 
 Next adapter 0.2.1 is prepared and package contents inspected (8 files; no secrets). Public npm publication was rejected by automatic approval review because explicit public SDK release authorization was required. It has not been published. Logly uses the workspace adapter and can collect new country metadata upon dashboard deployment. Existing external proxies require the updated adapter or equivalent trusted metadata forwarding and a consumer deployment; no consumer live testing is claimed.
 
 ## Sources
 
 [Vercel geographic headers](https://vercel.com/kb/guide/geo-ip-headers-geolocation-vercel-functions), [Natural Earth public-domain terms](https://www.naturalearthdata.com/about/terms-of-use/). Map provenance is recorded in `apps/dashboard/src/data/world-map.LICENSE.md`.
+
+## Brain impact check
+
+Updated: `.brain/api/contracts.md`, `.brain/api/endpoints.md`, `.brain/database/schema.md`, `.brain/database/migrations.md`, `.brain/features/first-party-analytics.md`, `.brain/decisions/0007-country-visit-map.md`, `.brain/tasks/in-progress.md`, `.brain/tasks/country-map/plan.md`, this report, `.brain/BRAIN.md`, and `ai/plan.md`. Country metadata adds an event column and report field; authentication, organization relationships and retention policy are unchanged.
