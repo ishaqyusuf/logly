@@ -57,3 +57,13 @@ Previous goal turn made concrete progress by publishing and verifying the SDK; t
 Rechecked provider and proxy wiring in all requested consumer surfaces, including Halaalvest marketing's actual `apps/marketing/app` tree (not its `src/app` directory), both Expo root runtimes, Ewatrade storefront/POS and SchoolClerk school-site. All thirteen report/setup screenshots are present across the expansion and country-map folders. Analytics packages and proxy routes remain local, uncommitted integration files inside worktrees with unrelated ongoing changes; they are not represented as deployed.
 
 The preceding goal continuation made progress by adding and testing country forwarding. The remaining owner-deferred consumer live acceptance gate is unchanged in this handoff audit; interactive authentication also remains deferred. No consumer website was opened or tested.
+
+## Halaalvest isolated release — 2026-09-09
+
+Both production targets were verified against Vercel metadata as source `4e8a66b9b66ef25df19bda7cd9fda077183fe5cc`. Worktree `/private/tmp/logly-rollout-halaalvest`, branch `codex/logly-portfolio-release`, commit `69d3a144` contains only analytics additions over that source. Original consumer worktree remains untouched. Dependencies resolve published Next adapter 0.2.1. Twelve analytics tests / 50 assertions, events-package typecheck, both web app typechecks, Prisma client generation from unchanged schema and both Next production builds pass. No database connection or migration was performed.
+
+Production-configured deployments dispatched with `--skip-domain` for existing marketing and dashboard targets; build/promotion verification pending. Logs: `/private/tmp/halaalvest-logly-marketing-deploy.log` and `/private/tmp/halaalvest-logly-dashboard-deploy.log`. No native build or consumer live acceptance is claimed.
+
+Staged remote build handles: dashboard `dpl_ey3CgBPmf9ZrVWFX847ecqMaajRg` (`halaalvest-dashboard-l03jny13n-ishaqyusufs-projects.vercel.app`), marketing `dpl_6PDXnBzM3KGtHjNxDMJPQpujN8xi` (`halaal-vest-marketing-c1z737gxu-ishaqyusufs-projects.vercel.app`). Upload commands completed; actual deployment state must be read from Vercel, not the CLI's optimistic no-wait message. Promotion has not been dispatched.
+
+Remote checkpoint: dashboard build log reports `2 successful` tasks and `Build Completed in /vercel/output`, followed by `Deploying outputs`. Marketing remains Queued. Neither is promoted. Continue polling these existing deployment IDs; do not create replacements solely because the bounded wait expired. Local checks and remote dashboard build are progress; consumer acceptance remains deferred.
