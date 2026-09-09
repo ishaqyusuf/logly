@@ -67,3 +67,9 @@ Production-configured deployments dispatched with `--skip-domain` for existing m
 Staged remote build handles: dashboard `dpl_ey3CgBPmf9ZrVWFX847ecqMaajRg` (`halaalvest-dashboard-l03jny13n-ishaqyusufs-projects.vercel.app`), marketing `dpl_6PDXnBzM3KGtHjNxDMJPQpujN8xi` (`halaal-vest-marketing-c1z737gxu-ishaqyusufs-projects.vercel.app`). Upload commands completed; actual deployment state must be read from Vercel, not the CLI's optimistic no-wait message. Promotion has not been dispatched.
 
 Remote checkpoint: dashboard build log reports `2 successful` tasks and `Build Completed in /vercel/output`, followed by `Deploying outputs`. Marketing remains Queued. Neither is promoted. Continue polling these existing deployment IDs; do not create replacements solely because the bounded wait expired. Local checks and remote dashboard build are progress; consumer acceptance remains deferred.
+
+## Halaalvest promoted; Ewatrade prepared
+
+Vercel confirmed both staged Halaalvest deployments Ready. Explicit promotions succeeded for dashboard `dpl_ey3CgBPmf9ZrVWFX847ecqMaajRg` and marketing `dpl_6PDXnBzM3KGtHjNxDMJPQpujN8xi`. This releases the web providers and independently scoped mobile ingest endpoint, not a native client build. Consumer interactive acceptance remains deferred.
+
+Ewatrade dashboard and marketing production metadata both identify revision `7ea39432409642b7256282159c97d33d4cd1797c`. Isolated worktree `/private/tmp/logly-rollout-ewatrade` on `codex/logly-portfolio-release` now contains its analytics package, web layout/route wiring and Turbo variables with Next SDK 0.2.1. Dependency installation is running under exec session 68313; log `/private/tmp/ewatrade-logly-install.log`. Validation and deployment pending. Original worktrees remain untouched by this release preparation.
