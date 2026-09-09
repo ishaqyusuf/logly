@@ -1,8 +1,8 @@
 "use client";
 
+import { BrandMark, BrandWordmark, brandColor } from "@logly/ui/brand";
 import { Button } from "@logly/ui/button";
 import { Input } from "@logly/ui/input";
-import { Activity } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { signIn } from "@/lib/auth-client";
@@ -40,10 +40,12 @@ export function SignInForm() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-sm">
-        <div className="mb-8 flex justify-center">
-          <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#17201b] text-white shadow-soft">
-            <Activity className="h-5 w-5" />
-          </div>
+        <div
+          className="mb-8 flex items-center justify-center gap-3"
+          style={{ color: brandColor }}
+        >
+          <BrandMark size={44} />
+          <BrandWordmark className="text-[42px]" />
         </div>
         <header className="mb-8 space-y-2 text-center">
           <h1 className="text-3xl font-semibold tracking-tight">Sign in</h1>

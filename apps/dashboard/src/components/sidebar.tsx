@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandMark, BrandWordmark, brandColor } from "@logly/ui/brand";
 import { cn } from "@logly/ui/cn";
 import type {
   AnalyticsOrganizationSummary,
@@ -14,7 +15,6 @@ import {
   Plus,
   Radio,
   Settings2,
-  Sparkles,
 } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
@@ -82,16 +82,15 @@ export function Sidebar({
         >
           <Link
             href={contextualHref("/overview")}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#17201b] text-white shadow-soft"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4"
+            style={{ background: brandColor }}
             aria-label="Logly home"
           >
-            <Sparkles className="h-[18px] w-[18px]" />
+            <BrandMark size={28} />
           </Link>
           {expanded ? (
             <div className="min-w-0">
-              <p className="truncate text-xl font-extrabold tracking-[-0.03em]">
-                Logly
-              </p>
+              <BrandWordmark className="block truncate text-2xl" />
               <p className="truncate text-[11px] font-medium text-muted-foreground">
                 First-party analytics
               </p>

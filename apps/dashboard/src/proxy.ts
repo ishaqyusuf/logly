@@ -4,7 +4,11 @@ import { type NextRequest, NextResponse } from "next/server";
 const PUBLIC_PATHS = ["/sign-in", "/api/auth", "/_next", "/favicon"];
 
 function isPublicPath(pathname: string) {
-  return PUBLIC_PATHS.some((path) => pathname.startsWith(path));
+  return (
+    pathname === "/icon" ||
+    pathname === "/apple-icon" ||
+    PUBLIC_PATHS.some((path) => pathname.startsWith(path))
+  );
 }
 
 export function proxy(request: NextRequest) {

@@ -1,5 +1,13 @@
 # Implementation Plan
 
+## Proposed: project event registry — 2026-09-08
+
+User requested a plan for making untriggered events available to filters and
+funnels. Source audit and phased proposal are recorded in
+`.brain/tasks/event-registry-plan.md`. Proposed approach: optional build-time
+manifest synchronization plus automatic observed-event discovery, independent
+of occurrence counts. Planning only; no implementation or release started.
+
 ## Status
 
 MVP complete. Production-trustworthiness follow-on is active.
@@ -293,3 +301,34 @@ Portfolio checkpoint: five production namespaces created; three consumer source 
 Implemented per `.brain/tasks/country-map/plan.md` and ADR 0007. Country ingestion, scoped report, mobile interactions and local SQL retry validation pass. Full test/typecheck/lint/build pass. Dashboard deployment and screenshot evidence are tracked in `.brain/tasks/country-map/report.md`. Public Next SDK 0.2.1 publication was explicitly approved and accepted by npm; registry metadata and downloaded artifact are verified.
 
 Country heat map deployed as `7f9e1ab`; migration, health, authenticated empty/unknown production checks pass. SDK patch publication accepted by npm; registry artifact verified.
+
+## Git deployment check — 2026-09-08
+
+GitHub was three documentation commits behind local main. Pushed through
+`ab46086` and verified the automatic Vercel deployment reached Ready in 56 seconds
+and received the production domain. No Vercel configuration change was needed.
+Evidence: `.brain/tasks/vercel-git-deployment-check.md`.
+
+## Logo exploration — 2026-09-08
+
+- User requested five distinct Logly identity options with variants.
+- Using installed Agency Design / Brand Guardian and built-in Imagegen.
+- Preparing Signal Notch, Event Thread, Aperture, Event Ledger, and Beacon boards in `.design/brand-options/`; selection pending.
+- Scope is brand concept exploration; production UI remains as currently implemented.
+- Completed: five PNG identity boards, exact prompts and responsive comparison gallery. Desktop/mobile browser checks passed. Selection and production vector refinement remain pending; see `.brain/tasks/logo-exploration.md`.
+
+## Logo originality review — 2026-09-09
+
+- Completed preliminary web screening of five original concepts and three replacement boards.
+- Provisional design recommendation: A — Offset Register. Existing exact/near-name software businesses make the Logly name unresolved.
+- Evidence, limitations, artwork and ranking: `.design/brand-options/revision-2/REVIEW.md`; Brain record: `.brain/tasks/logo-exploration.md`.
+- No production identity change; no worldwide uniqueness or legal clearance claimed.
+
+## Offset Register implementation — 2026-09-09
+
+- [x] User selected A — Offset Register; retain the Logly working name.
+- [x] Shared vector/wordmark in @logly/ui; sidebar, mobile header, sign-in, favicon and Apple icon integrated.
+- [x] UI package compilation and focused lint pass.
+- [x] Public sign-in desktop/mobile and icon QA completed; brand contract recorded in `.brain/features/brand-identity.md`. Authenticated sidebar QA remains unverified because Docker is unavailable.
+
+Production dashboard build passed, including static generation of both icon routes (2026-09-09).

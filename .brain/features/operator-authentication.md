@@ -55,3 +55,7 @@ Implement the full Afterservice-style system as a separate project slice:
 - in-app notification storage, preferences, delivery logs, retries, and
   dead-letter/operational visibility;
 - development/preview safe routing and production canaries.
+
+## Public brand assets — 2026-09-09
+
+The exact `/icon` and `/apple-icon` paths are public so generated brand images load before sign-in. Dashboard session enforcement is unchanged. See `brand-identity.md`.

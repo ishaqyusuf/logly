@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@logly/ui/badge";
+import { BrandMark, brandColor } from "@logly/ui/brand";
 import { Button } from "@logly/ui/button";
 import type { AnalyticsProjectSummary } from "@logly/utils";
 import { CircleHelp } from "lucide-react";
@@ -54,6 +55,14 @@ export function Header({
       <div className="mx-auto flex h-[72px] max-w-[1500px] items-center justify-between">
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span
+              className="mr-1 shrink-0 md:hidden"
+              role="img"
+              aria-label="Logly"
+              style={{ color: brandColor }}
+            >
+              <BrandMark size={24} />
+            </span>
             {project ? (
               <>
                 <span className="hidden sm:inline">
