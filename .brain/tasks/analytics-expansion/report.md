@@ -73,3 +73,21 @@ Remote checkpoint: dashboard build log reports `2 successful` tasks and `Build C
 Vercel confirmed both staged Halaalvest deployments Ready. Explicit promotions succeeded for dashboard `dpl_ey3CgBPmf9ZrVWFX847ecqMaajRg` and marketing `dpl_6PDXnBzM3KGtHjNxDMJPQpujN8xi`. This releases the web providers and independently scoped mobile ingest endpoint, not a native client build. Consumer interactive acceptance remains deferred.
 
 Ewatrade dashboard and marketing production metadata both identify revision `7ea39432409642b7256282159c97d33d4cd1797c`. Isolated worktree `/private/tmp/logly-rollout-ewatrade` on `codex/logly-portfolio-release` now contains its analytics package, web layout/route wiring and Turbo variables with Next SDK 0.2.1. Dependency installation is running under exec session 68313; log `/private/tmp/ewatrade-logly-install.log`. Validation and deployment pending. Original worktrees remain untouched by this release preparation.
+
+## Portfolio release checkpoint — 2026-09-10
+
+Ewatrade isolated release `f5295dd8` passes both local Next production builds (including TypeScript), 12 analytics tests / 50 assertions and events-package typecheck. Production builds use an 8 GiB Node heap to avoid the baseline TypeScript memory limit. Marketing deployment `dpl_2SytsiCj9mt2GPtpLV3YXwwof66M` reached Ready and was promoted successfully. Dashboard deployment `dpl_AQs1vRHBnHw4D1xQ7cG3zgPJWnoB` is still Building; reuse this deployment handle.
+
+SchoolClerk marketing was isolated from its verified live revision `439507a` in `/private/tmp/logly-rollout-schoolclerk-marketing`, commit `eb66317`. Eight analytics tests / 33 assertions, events-package typecheck and its Next production build pass. Deployment `dpl_4BicXmGVkC4ZBhdgJgp8BwFXs2yA` reached Ready and was promoted successfully to the existing `schoolify` project.
+
+SchoolClerk dashboard has a different verified live revision, `caea67e`, isolated in `/private/tmp/logly-rollout-schoolclerk-dashboard`. Its eight analytics tests pass. A fresh production build exposed an undeclared `@tailwindcss/postcss` dependency in the existing dashboard CSS configuration. The dashboard now declares the already locked version 4.1.17; the build is being rerun. No dashboard deployment has been dispatched yet. No database schema changed or database connection was made during local Prisma generation/builds.
+
+These releases do not establish interactive runtime acceptance. Consumer website/native acceptance and any interactive authentication remain deferred. Native client releases and extra web apps without verified hosting targets remain outstanding. Original consumer worktrees and their unrelated changes remain untouched by this isolated release phase.
+
+Dashboard build follow-up: the sandboxed compiler stalled without output and was stopped. Running with subprocess permissions exposed the second implicit CSS dependency: dashboard CSS directly imports `tailwindcss`. Both `tailwindcss` and `@tailwindcss/postcss` are now explicitly declared at their existing locked 4.1.17 versions. Build session continues against this fix; no success or deployment is claimed yet.
+
+Ewatrade dashboard deployment `dpl_AQs1vRHBnHw4D1xQ7cG3zgPJWnoB` subsequently reached Ready and promotion succeeded. Five existing consumer web targets are now promoted. SchoolClerk dashboard production build passes after declaring both CSS dependencies; its baseline Next configuration skips type validation, so a separate full dashboard typecheck is now running. Events-package typecheck passes. No SchoolClerk dashboard deployment is claimed yet.
+
+SchoolClerk dashboard full TypeScript check now passes after declaring its two existing Radix imports at locked versions (dropdown-menu 2.1.16, primitive 2.1.3). Isolated release commit `8c00cd6` includes the analytics integration and four reproducible-build dependency declarations. Production staging was dispatched with `--skip-domain` against `schoolclerk-dashboard`; upload/build status remains to be verified from `/private/tmp/schoolclerk-dashboard-logly-deploy.log`. Its live domains have not been promoted by this step.
+
+SchoolClerk dashboard staged handle: `dpl_CWkhebEZA22q9QmXxUZ674ottP4u`, URL `https://schoolclerk-dashboard-lvnhqr2vr-ishaqyusufs-projects.vercel.app`. Reuse this deployment for readiness verification; upload success is not a readiness result.

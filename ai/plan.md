@@ -332,3 +332,9 @@ Evidence: `.brain/tasks/vercel-git-deployment-check.md`.
 - [x] Public sign-in desktop/mobile and icon QA completed; brand contract recorded in `.brain/features/brand-identity.md`. Authenticated sidebar QA remains unverified because Docker is unavailable.
 
 Production dashboard build passed, including static generation of both icon routes (2026-09-09).
+
+### 2026-09-10 consumer release continuation
+
+Four existing web targets have successful promotions: Halaalvest dashboard/marketing, Ewatrade marketing, SchoolClerk marketing. Ewatrade dashboard remote build is in progress. SchoolClerk dashboard uses its own verified live base and is rebuilding after an explicit locked Tailwind PostCSS dependency fix. See `.brain/tasks/analytics-expansion/report.md` for release IDs and validation. Native client releases and interactive acceptance remain outstanding; no visual UI changes in this release continuation.
+
+Latest checkpoint: Ewatrade dashboard promoted successfully. SchoolClerk dashboard full typecheck now passes; isolated commit `8c00cd6` is staging on its existing Vercel project. Confirm Ready before promotion; do not infer success from upload completion.
