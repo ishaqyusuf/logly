@@ -166,3 +166,9 @@ User-authorized world map implemented with country rankings, percentage readout,
 Halaalvest marketing/dashboard, Ewatrade marketing and SchoolClerk marketing have been promoted after successful remote builds. Ewatrade dashboard is building; SchoolClerk dashboard local validation continues after declaring its missing Tailwind PostCSS dependency. Exact release IDs and isolated commits are in `analytics-expansion/report.md`. Native client releases and owner-deferred interactive acceptance remain outstanding.
 
 Latest: Ewatrade dashboard is also promoted (five web targets released). SchoolClerk dashboard production build passes; separate TypeScript validation is running because its unchanged production config skips build-time types.
+
+## Native analytics release — 2026-09-12
+
+All six verified web targets are promoted. Ewatrade Android analytics update group `6f1125ea-6214-4583-a695-d5d35484074a` is published on production from the live binary base. Halaalvest Android initial production build `37b6d3b5-580d-4108-9aaf-6aa0b2736833` is pending after a prior Expo archive-transfer failure. Interactive acceptance remains the next owner-directed phase after native delivery completes.
+
+Release branches are pushed for all three consumer repositories. The Halaalvest retry is actively compiling in Gradle; keep using its existing build ID.

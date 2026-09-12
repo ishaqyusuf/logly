@@ -338,3 +338,7 @@ Production dashboard build passed, including static generation of both icon rout
 Four existing web targets have successful promotions: Halaalvest dashboard/marketing, Ewatrade marketing, SchoolClerk marketing. Ewatrade dashboard remote build is in progress. SchoolClerk dashboard uses its own verified live base and is rebuilding after an explicit locked Tailwind PostCSS dependency fix. See `.brain/tasks/analytics-expansion/report.md` for release IDs and validation. Native client releases and interactive acceptance remain outstanding; no visual UI changes in this release continuation.
 
 Latest checkpoint: Ewatrade dashboard promoted successfully. SchoolClerk dashboard full typecheck now passes; isolated commit `8c00cd6` is staging on its existing Vercel project. Confirm Ready before promotion; do not infer success from upload completion.
+
+### 2026-09-12 native release checkpoint
+
+SchoolClerk dashboard is promoted, completing all six verified web releases. Ewatrade Android OTA is published from an analytics-only branch rooted at its live binary commit. Halaalvest has no earlier production build, so its clean analytics branch is producing the initial Android binary; continue from build `37b6d3b5-580d-4108-9aaf-6aa0b2736833`. After native delivery, preserve the owner's separate interactive acceptance phase.
