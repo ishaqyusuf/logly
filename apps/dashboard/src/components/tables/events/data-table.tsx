@@ -64,14 +64,19 @@ export function DataTable({
     setColumnOrder,
   } = useTableSettings("events", COLUMN_IDS);
   const sources = filter.sources?.filter(
-    (source): source is "browser" | "server" =>
-      source === "browser" || source === "server",
+    (source): source is "browser" | "server" | "mobile" =>
+      source === "browser" || source === "server" || source === "mobile",
+  );
+  const platforms = filter.platforms?.filter(
+    (platform): platform is "web" | "ios" | "android" =>
+      platform === "web" || platform === "ios" || platform === "android",
   );
   const query = useMemo<AnalyticsEventQuery>(
     () => ({
       ...scope,
       names: filter.names ?? undefined,
       sources,
+      platforms,
       q: filter.q ?? undefined,
       start: filter.start ?? undefined,
       end: filter.end ?? undefined,
@@ -86,6 +91,7 @@ export function DataTable({
       filter.start,
       scope,
       sources,
+      platforms,
     ],
   );
   const initialQuery = useRef(JSON.stringify(query)).current;

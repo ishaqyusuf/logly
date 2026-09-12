@@ -34,19 +34,32 @@ export function EventAnalytics({
 }) {
   const { filter } = useEventFilterParams();
   const sources = filter.sources?.filter(
-    (source): source is "browser" | "server" =>
-      source === "browser" || source === "server",
+    (source): source is "browser" | "server" | "mobile" =>
+      source === "browser" || source === "server" || source === "mobile",
+  );
+  const platforms = filter.platforms?.filter(
+    (platform): platform is "web" | "ios" | "android" =>
+      platform === "web" || platform === "ios" || platform === "android",
   );
   const query = useMemo<AnalyticsEventQuery>(
     () => ({
       ...scope,
       names: filter.names ?? undefined,
       sources,
+      platforms,
       q: filter.q ?? undefined,
       start: filter.start ?? undefined,
       end: filter.end ?? undefined,
     }),
-    [filter.end, filter.names, filter.q, filter.start, scope, sources],
+    [
+      filter.end,
+      filter.names,
+      filter.q,
+      filter.start,
+      platforms,
+      scope,
+      sources,
+    ],
   );
   const initialQuery = useRef(JSON.stringify(query)).current;
   const summaryQuery = useQuery({

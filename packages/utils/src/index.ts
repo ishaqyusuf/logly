@@ -5,7 +5,10 @@ export type AnalyticsEventRow = {
   id: string;
   name: string;
   project: string;
-  source: "browser" | "server";
+  source: "browser" | "server" | "mobile";
+  platform?: "web" | "ios" | "android" | null;
+  appVersion?: string | null;
+  appBuild?: string | null;
   visitorKey: string | null;
   visitKind: "new" | "returning" | null;
   route: string | null;
@@ -27,7 +30,8 @@ export type AnalyticsEventQuery = {
   project?: string;
   projects?: string[];
   names?: string[];
-  sources?: Array<"browser" | "server">;
+  sources?: Array<"browser" | "server" | "mobile">;
+  platforms?: Array<"web" | "ios" | "android">;
   q?: string;
   start?: string;
   end?: string;
@@ -44,7 +48,8 @@ export type AnalyticsEventPage = {
 export type AnalyticsEventFilterOptions = {
   projects: string[];
   names: string[];
-  sources: Array<"browser" | "server">;
+  sources: Array<"browser" | "server" | "mobile">;
+  platforms: Array<"web" | "ios" | "android">;
 };
 
 export type AnalyticsTrendPoint = {
@@ -66,8 +71,31 @@ export type AnalyticsEventNameSummary = {
 };
 
 export type AnalyticsEventSourceSummary = {
-  source: "browser" | "server";
+  source: "browser" | "server" | "mobile";
   count: number;
+};
+
+export type AnalyticsMobilePlatformSummary = {
+  platform: "ios" | "android";
+  sessions: number;
+  events: number;
+  installations: number;
+};
+
+export type AnalyticsMobileVersionSummary = {
+  platform: "ios" | "android";
+  version: string;
+  build: string | null;
+  sessions: number;
+  events: number;
+};
+
+export type AnalyticsMobileSummary = {
+  totalSessions: number;
+  totalEvents: number;
+  uniqueInstallations: number;
+  platforms: AnalyticsMobilePlatformSummary[];
+  versions: AnalyticsMobileVersionSummary[];
 };
 
 export type AnalyticsEventRouteSummary = {
@@ -83,6 +111,7 @@ export type AnalyticsEventSummary = {
   routes: AnalyticsEventRouteSummary[];
   acquisition: AnalyticsAcquisitionSummary;
   geography: CountryVisits;
+  mobile: AnalyticsMobileSummary;
   trend: AnalyticsTrendPoint[];
 };
 
@@ -189,6 +218,10 @@ function matchesEventQuery(
     (!query.projects?.length || query.projects.includes(event.project)) &&
     (!query.names?.length || query.names.includes(event.name)) &&
     (!query.sources?.length || query.sources.includes(event.source)) &&
+    (!query.platforms?.length ||
+      (event.platform !== null &&
+        event.platform !== undefined &&
+        query.platforms.includes(event.platform))) &&
     (!query.q || searchable.includes(query.q.toLowerCase())) &&
     (!start || occurredAt >= start) &&
     (!end || occurredAt <= end)
@@ -275,10 +308,13 @@ export function summarizeAnalyticsEvents(
     geography: summarizeCountries(
       current
         .filter(
-          (event) => event.source === "browser" && event.name === "site_visit",
+          (event) =>
+            (event.source === "browser" && event.name === "site_visit") ||
+            (event.source === "mobile" && event.name === "app_session"),
         )
         .map((event) => ({ country: event.country ?? null, count: 1 })),
     ),
+    mobile: summarizeMobileAnalytics(current),
     uniqueEventNames: eventNames.length,
     eventNames,
     sources,
@@ -290,6 +326,66 @@ export function summarizeAnalyticsEvents(
         events: bucket.events,
         visitors: bucket.visitors.size,
       })),
+  };
+}
+
+export function summarizeMobileAnalytics(
+  events: AnalyticsEventRow[],
+): AnalyticsMobileSummary {
+  const mobile = events.filter(
+    (event): event is AnalyticsEventRow & { platform: "ios" | "android" } =>
+      event.source === "mobile" &&
+      (event.platform === "ios" || event.platform === "android"),
+  );
+  const sessions = mobile.filter((event) => event.name === "app_session");
+  const platforms = (["ios", "android"] as const).flatMap((platform) => {
+    const platformEvents = mobile.filter(
+      (event) => event.platform === platform,
+    );
+    if (!platformEvents.length) return [];
+    return [
+      {
+        platform,
+        sessions: platformEvents.filter((event) => event.name === "app_session")
+          .length,
+        events: platformEvents.length,
+        installations: new Set(
+          platformEvents.flatMap((event) =>
+            event.visitorKey ? [event.visitorKey] : [],
+          ),
+        ).size,
+      },
+    ];
+  });
+  const versions = new Map<string, AnalyticsMobileVersionSummary>();
+  for (const event of mobile) {
+    const version = event.appVersion ?? "Unknown version";
+    const key = `${event.platform}:${version}:${event.appBuild ?? ""}`;
+    const row = versions.get(key) ?? {
+      platform: event.platform,
+      version,
+      build: event.appBuild ?? null,
+      sessions: 0,
+      events: 0,
+    };
+    row.events += 1;
+    if (event.name === "app_session") row.sessions += 1;
+    versions.set(key, row);
+  }
+  return {
+    totalSessions: sessions.length,
+    totalEvents: mobile.length,
+    uniqueInstallations: new Set(
+      mobile.flatMap((event) => (event.visitorKey ? [event.visitorKey] : [])),
+    ).size,
+    platforms,
+    versions: [...versions.values()].sort(
+      (left, right) =>
+        right.sessions - left.sessions ||
+        right.events - left.events ||
+        left.platform.localeCompare(right.platform) ||
+        left.version.localeCompare(right.version),
+    ),
   };
 }
 

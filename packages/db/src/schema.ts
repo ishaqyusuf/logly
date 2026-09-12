@@ -208,6 +208,9 @@ export const analyticsEvents = pgTable(
     name: text("name").notNull(),
     version: integer("version").notNull().default(1),
     source: text("source").notNull(),
+    platform: text("platform"),
+    appVersion: text("app_version"),
+    appBuild: text("app_build"),
     occurredAt: timestamp("occurred_at", { withTimezone: true }).notNull(),
     receivedAt: timestamp("received_at", { withTimezone: true })
       .notNull()

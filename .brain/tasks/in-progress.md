@@ -1,5 +1,8 @@
 # In Progress
 
+### [GND Mobile Platform Analytics And OpenPanel Replacement](2026-09-12-gnd-mobile-platform-analytics.md)
+- Status: In Progress
+
 ## Production Trustworthiness And Afterservice Pilot
 
 - Status: in progress.

@@ -9,7 +9,7 @@
   size. The dashboard always supplies a project.
 - `GET /v1/dashboard/event-summary?project=<slug>`: complete-window filtered
   total, discovered event-name counts and prior-window momentum, daily trend,
-  source mix, and top routes. A project is required.
+  source mix, top routes, mobile platform/version usage, and geography. A project is required.
 - `GET /v1/dashboard/events/:eventId?project=<slug>`: one event detail, returned
   only when the event belongs to the required project.
 - `GET /v1/dashboard/event-options`: distinct project, discovered event-name,
@@ -33,4 +33,4 @@
   complete-window ordered visitor-day funnel; optional organization/start/end,
   two to five steps, maximum 90-day range. See contracts for counting rules.
 
-- Event-summary endpoints now include the additive `geography` country-visit aggregate. `POST /v1/events` accepts country only through authenticated proxy request metadata; see country contract.
+- Event list, options and summary reads accept `platforms`. Event-summary endpoints include the additive `mobile` platform/version aggregate and `geography` country-visit aggregate. `POST /v1/events` accepts mobile platform/app release metadata and country only through authenticated proxy request metadata; see the contracts.

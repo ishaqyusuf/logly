@@ -1,5 +1,17 @@
 # Implementation Plan
 
+## Active Implementation: GND Mobile Platform Analytics — 2026-09-12
+
+- [x] Add first-class `mobile` event source and bounded platform/app metadata.
+- [x] Add complete-window Android/iOS visit and event aggregates plus dashboard filters.
+- [ ] Add a responsive mobile-platform report to Insights.
+- [ ] Build a reusable Expo adapter and validate stable privacy-safe delivery.
+- [ ] Replace GND OpenPanel tracking across web and Expo mobile.
+- [ ] Provision distinct `gnd-web` and `gnd-mobile` projects and verify production traffic.
+- [ ] Capture responsive QA evidence, update Brain contracts, review and commit.
+
+Canonical task: [GND Mobile Platform Analytics And OpenPanel Replacement](../.brain/tasks/2026-09-12-gnd-mobile-platform-analytics.md).
+
 ## Proposed: project event registry — 2026-09-08
 
 User requested a plan for making untriggered events available to filters and

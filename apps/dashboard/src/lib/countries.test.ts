@@ -42,6 +42,9 @@ test("country summary excludes pageviews, server events and foreign project/date
     project: "alpha",
     name: "site_visit",
     source: "browser",
+    platform: "web",
+    appVersion: null,
+    appBuild: null,
     visitorKey: "visitor",
     visitKind: "new",
     route: "/",
@@ -54,7 +57,7 @@ test("country summary excludes pageviews, server events and foreign project/date
     [
       event,
       { ...event, id: "2", name: "page_view" },
-      { ...event, id: "3", source: "server" },
+      { ...event, id: "3", source: "server", platform: null },
       { ...event, id: "4", project: "beta" },
       { ...event, id: "5", occurredAt: "2026-08-01T00:00:00Z" },
     ],
@@ -70,5 +73,33 @@ test("country summary excludes pageviews, server events and foreign project/date
     totalVisits: 0,
     unknownVisits: 0,
     countries: [],
+  });
+});
+
+test("country summary includes native app sessions and excludes screen views", () => {
+  const session: AnalyticsEventRow = {
+    id: "mobile-1",
+    project: "gnd-mobile",
+    name: "app_session",
+    source: "mobile",
+    platform: "android",
+    appVersion: "1.0.0",
+    appBuild: "1",
+    visitorKey: "installation",
+    visitKind: "new",
+    route: "/jobs",
+    referrerHost: null,
+    country: "US",
+    occurredAt: "2026-09-12T12:00:00Z",
+    properties: {},
+  };
+  const result = summarizeAnalyticsEvents(
+    [session, { ...session, id: "mobile-2", name: "screen_view" }],
+    { project: "gnd-mobile" },
+  );
+  expect(result.geography).toEqual({
+    totalVisits: 1,
+    unknownVisits: 0,
+    countries: [{ code: "US", name: "United States", count: 1 }],
   });
 });

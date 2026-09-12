@@ -13,6 +13,9 @@ function event(
     project,
     occurredAt,
     source: "browser",
+    platform: "web",
+    appVersion: null,
+    appBuild: null,
     visitorKey: id,
     visitKind: "new",
     route: "/",
@@ -45,4 +48,70 @@ describe("summarizeAnalyticsEvents", () => {
     });
     expect(summary.routes).toEqual([{ route: "/", count: 3 }]);
   });
+});
+
+test("summarizes mobile sessions, platforms, installations, and versions", () => {
+  const base = event(
+    "m1",
+    "app_session",
+    "gnd-mobile",
+    "2026-09-12T10:00:00.000Z",
+  );
+  const events: AnalyticsEventRow[] = [
+    {
+      ...base,
+      source: "mobile",
+      platform: "android",
+      appVersion: "1.4.0",
+      appBuild: "104",
+      visitorKey: "a",
+    },
+    {
+      ...base,
+      id: "m2",
+      name: "screen_view",
+      source: "mobile",
+      platform: "android",
+      appVersion: "1.4.0",
+      appBuild: "104",
+      visitorKey: "a",
+    },
+    {
+      ...base,
+      id: "m3",
+      source: "mobile",
+      platform: "ios",
+      appVersion: "1.3.0",
+      appBuild: "99",
+      visitorKey: "b",
+      country: "NG",
+    },
+  ];
+  const summary = summarizeAnalyticsEvents(events, { project: "gnd-mobile" });
+  expect(summary.mobile).toEqual({
+    totalSessions: 2,
+    totalEvents: 3,
+    uniqueInstallations: 2,
+    platforms: [
+      { platform: "ios", sessions: 1, events: 1, installations: 1 },
+      { platform: "android", sessions: 1, events: 2, installations: 1 },
+    ],
+    versions: [
+      {
+        platform: "android",
+        version: "1.4.0",
+        build: "104",
+        sessions: 1,
+        events: 2,
+      },
+      {
+        platform: "ios",
+        version: "1.3.0",
+        build: "99",
+        sessions: 1,
+        events: 1,
+      },
+    ],
+  });
+  expect(summary.geography).toMatchObject({ totalVisits: 2, unknownVisits: 1 });
 });

@@ -214,7 +214,7 @@ describe("analytics client", () => {
     expect(batches[0]?.events[0]?.name).toBe("new_product_event");
     expect(batches[0]?.sdk).toEqual({
       name: "@ishaqyusuf/logly-core",
-      version: "0.2.0",
+      version: "0.3.0",
     });
     client.destroy();
   });

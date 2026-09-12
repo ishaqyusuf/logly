@@ -5,6 +5,7 @@ export const eventFilterParamsSchema = {
   q: parseAsString,
   names: parseAsArrayOf(parseAsString),
   sources: parseAsArrayOf(parseAsString),
+  platforms: parseAsArrayOf(parseAsString),
   start: parseAsString,
   end: parseAsString,
   sort: parseAsString.withDefault("occurred_at:desc"),

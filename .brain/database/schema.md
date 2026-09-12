@@ -43,4 +43,8 @@
 
 ## Country visit metadata
 
-`analytics_events.country` is nullable text, storing normalized ISO alpha-2 country codes for browser events. Existing rows remain null. The write boundary enforces the whitelist; server rows always receive null. The existing unique project/event ID constraint preserves country on retries. Complete-window country counts reuse the scoped acquisition aggregation; no additional index or retention contract is introduced.
+`analytics_events.country` is nullable text, storing normalized ISO alpha-2 country codes for browser visits and mobile app sessions. Existing rows remain null. The write boundary enforces the whitelist; server rows always receive null. The existing unique project/event ID constraint preserves country on retries. Complete-window country counts reuse the scoped visit aggregation; no additional index or retention contract is introduced.
+
+## Mobile release metadata
+
+`analytics_events.platform`, `analytics_events.app_version`, and `analytics_events.app_build` are nullable text columns. Mobile events require `ios` or `android` at validation; browser events may record `web`; server events remain nullable. Version/build values are bounded opaque release labels. Complete-window mobile session, installation, platform and version aggregates operate within the existing project, organization, date, event, source, platform and search scopes.

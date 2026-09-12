@@ -11,8 +11,12 @@ export async function GET(request: Request) {
   const params = new URL(request.url).searchParams;
   const split = (key: string) => params.get(key)?.split(",").filter(Boolean);
   const sources = split("sources")?.filter(
-    (source): source is "browser" | "server" =>
-      source === "browser" || source === "server",
+    (source): source is "browser" | "server" | "mobile" =>
+      source === "browser" || source === "server" || source === "mobile",
+  );
+  const platforms = split("platforms")?.filter(
+    (platform): platform is "web" | "ios" | "android" =>
+      platform === "web" || platform === "ios" || platform === "android",
   );
   const query: AnalyticsEventQuery = {
     organization: params.get("organization") ?? undefined,
@@ -20,6 +24,7 @@ export async function GET(request: Request) {
     projects: split("projects"),
     names: split("names"),
     sources,
+    platforms,
     q: params.get("q") ?? undefined,
     start: params.get("start") ?? undefined,
     end: params.get("end") ?? undefined,

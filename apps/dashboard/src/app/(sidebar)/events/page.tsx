@@ -39,14 +39,19 @@ export default async function EventsPage({
   }
   const params = await loadEventFilterParams(rawSearchParams);
   const sources = params.sources?.filter(
-    (source): source is "browser" | "server" =>
-      source === "browser" || source === "server",
+    (source): source is "browser" | "server" | "mobile" =>
+      source === "browser" || source === "server" || source === "mobile",
+  );
+  const platforms = params.platforms?.filter(
+    (platform): platform is "web" | "ios" | "android" =>
+      platform === "web" || platform === "ios" || platform === "android",
   );
   const query: AnalyticsEventQuery = {
     organization: workspace.organization?.slug,
     project: workspace.project.slug,
     names: params.names ?? undefined,
     sources,
+    platforms,
     q: params.q ?? undefined,
     start: params.start ?? undefined,
     end: params.end ?? undefined,

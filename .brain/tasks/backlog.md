@@ -6,7 +6,6 @@
 - Add the daily operator digest after rollups and health measurements are trusted.
 - Integrate a second product with different event semantics before changing the
   shared tracking interface.
-- Evaluate a React Native adapter only through a real mobile pilot.
 - Build the full Afterservice-style notification platform: notifications and
   jobs packages, Trigger.dev tasks/schedules, Resend delivery, safe environment
   routing, verification/reset/welcome/security email, in-app notifications,

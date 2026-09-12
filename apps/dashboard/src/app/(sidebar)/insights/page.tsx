@@ -5,6 +5,7 @@ import type { SearchParams } from "nuqs/server";
 import { AcquisitionReport } from "@/components/acquisition-report";
 import { CountryReport } from "@/components/country-report";
 import { FunnelReport } from "@/components/funnel-report";
+import { MobilePlatformReport } from "@/components/mobile-platform-report";
 import { ScrollableContent } from "@/components/scrollable-content";
 import {
   getDashboardEventSummary,
@@ -78,6 +79,7 @@ export default async function InsightsPage({
           key={workspace.project.slug}
           summary={summary.geography}
         />
+        <MobilePlatformReport summary={summary.mobile} />
         <AcquisitionReport summary={summary.acquisition} />
         <FunnelReport
           project={workspace.project.slug}
@@ -109,7 +111,7 @@ export default async function InsightsPage({
           <div className="mb-5">
             <p className="text-sm font-semibold">Source mix</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Browser and trusted server instrumentation
+              Browser, mobile, and trusted server instrumentation
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">

@@ -1,6 +1,13 @@
 import type { AnalyticsEventRow } from "@logly/utils";
 import { format } from "date-fns";
-import { Braces, Clock3, Fingerprint, Globe2, Route } from "lucide-react";
+import {
+  Braces,
+  Clock3,
+  Fingerprint,
+  Globe2,
+  Route,
+  Smartphone,
+} from "lucide-react";
 import { EventSheetHeader } from "@/components/event-sheet-header";
 
 export function EventContent({
@@ -48,6 +55,17 @@ export function EventContent({
               label="Route"
               value={event.route ?? "Server event"}
             />
+            {event.platform ? (
+              <Detail
+                icon={Smartphone}
+                label="Platform"
+                value={
+                  event.appVersion
+                    ? `${event.platform} · ${event.appVersion}${event.appBuild ? ` (${event.appBuild})` : ""}`
+                    : event.platform
+                }
+              />
+            ) : null}
             <Detail
               icon={Fingerprint}
               label="Visitor"

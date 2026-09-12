@@ -1,13 +1,11 @@
 {
-  "name": "@ishaqyusuf/logly-core",
-  "version": "0.3.0",
-  "description": "Privacy-safe browser analytics contracts, durable delivery, and batching for Logly.",
+  "name": "@ishaqyusuf/logly-native",
+  "version": "0.1.0",
+  "description": "Privacy-safe Expo and React Native analytics delivery for Logly.",
   "license": "MIT",
   "sideEffects": false,
   "type": "module",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -22,15 +20,12 @@
     "test": "bun test src",
     "typecheck": "tsc --noEmit"
   },
-  "publishConfig": {
-    "access": "public"
-  },
+  "publishConfig": { "access": "public" },
   "dependencies": {
-    "zod": "^4.3.5"
+    "@ishaqyusuf/logly-core": "^0.3.0"
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/node": "^25.2.3",
     "typescript": "^5.9.3"
   }
 }

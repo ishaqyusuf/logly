@@ -58,7 +58,7 @@ export type AnalyticsClient = {
   destroy: () => void;
 };
 
-const SDK_VERSION = "0.2.0";
+const SDK_VERSION = "0.3.0";
 const DEFAULT_FLUSH_AT = 25;
 const DEFAULT_FLUSH_INTERVAL_MS = 60_000;
 const DEFAULT_MAX_QUEUE_EVENTS = 250;

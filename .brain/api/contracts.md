@@ -46,19 +46,19 @@ selected-project workspace before rendering analytics.
 ## Dashboard Event Reads
 
 Event-list reads accept optional `organization`, `project`, comma-separated
-`projects`, `names`, and `sources`, plus `q`, ISO `start`/`end`, `sort`,
+`projects`, `names`, `sources`, and `platforms`, plus `q`, ISO `start`/`end`, `sort`,
 `cursor`, and `pageSize`. Supported sort fields are `occurred_at`,
 `event_name`, `project`, and `source`, with `asc` or `desc` direction. Page size
 is clamped to 10–100 and defaults to 50. Responses use
 `{ data: AnalyticsEventRow[], meta: { cursor: string | null } }`.
 
-Filter-option reads return distinct project slugs, discovered event names, and
-valid sources for the selected organization/project scope. Dashboard browser
+Filter-option reads return distinct project slugs, discovered event names,
+valid sources, and discovered platforms for the selected organization/project scope. Dashboard browser
 code calls the authenticated same-origin `/api/dashboard/events` proxy; the
 server-only read credential never enters the browser bundle.
 
 Event-summary reads require `project` and accept the same `organization`,
-`names`, `sources`, `q`, `start`, and `end` filters as the event list. They
+`names`, `sources`, `platforms`, `q`, `start`, and `end` filters as the event list. They
 return totals and breakdowns for the complete matching window, independently
 of page size or cursor. The comparison window immediately precedes the current
 window with equal duration and does not overlap it.
@@ -104,6 +104,10 @@ and dropOff is the count lost from the preceding stage. No cross-day joining.
 
 ### Country visit summary
 
-Event-summary responses add `geography: { totalVisits, unknownVisits, countries: [{ code, name, count }] }`. Codes are ISO 3166-1 alpha-2; names use English display names. Rows sort by count descending then name. Only browser `site_visit` events contribute, across the complete matching project/organization/date/name/source/search scope, independent of pagination. Unknown locations stay in the denominator. No event-body location field is introduced.
+Event-summary responses add `geography: { totalVisits, unknownVisits, countries: [{ code, name, count }] }`. Codes are ISO 3166-1 alpha-2; names use English display names. Rows sort by count descending then name. Browser `site_visit` and mobile `app_session` events contribute, across the complete matching project/organization/date/name/source/platform/search scope, independent of pagination. Unknown locations stay in the denominator. No event-body location field is introduced.
 
-After existing client-ingest authentication and origin checks, the collector accepts `x-logly-country` from the credential-authenticated product proxy. The Next adapter reads only Vercel's product-edge `x-vercel-ip-country` when `VERCEL=1`. It ignores browser `x-logly-country` overrides. The collector validates the exact country whitelist and ignores its own geographic edge header; server-write requests never supply country. Country records the delivery network, not residence. No IP/GPS/city is persisted; retries retain the first accepted location.
+After existing client-ingest authentication and origin checks, the collector accepts `x-logly-country` from the credential-authenticated product proxy. Web and mobile product proxies may read only their trusted hosting edge's country header. They ignore direct client country overrides. The collector validates the exact country whitelist and ignores its own geographic edge header; server-write requests never supply country. Country records the delivery network, not residence. No IP/GPS/city is persisted; retries retain the first accepted location.
+
+### Mobile platform summary
+
+Client-ingest batches accept `source: mobile` only with `platform: ios | android`; browser events may use `platform: web`. Mobile rows may include bounded `appVersion` and `appBuild` strings. The dashboard summary returns complete-window `mobile: { sessions, installations, events, platforms, versions }`, where sessions count `app_session`, installations count distinct project-scoped visitor hashes, and platform/version rows include counts and shares. Event detail exposes platform, version, and build. The dashboard can filter event lists and summaries by platform without mixing those filters into acquisition reporting.

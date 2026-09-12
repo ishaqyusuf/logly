@@ -25,7 +25,7 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useEventFilterParams } from "@/hooks/use-event-filter-params";
 
-type FilterKey = "names" | "sources";
+type FilterKey = "names" | "sources" | "platforms";
 
 export function EventSearchFilter({ eventNames }: { eventNames: string[] }) {
   const { filter, setFilter } = useEventFilterParams();
@@ -59,6 +59,7 @@ export function EventSearchFilter({ eventNames }: { eventNames: string[] }) {
   const selectedCount =
     (filter.names?.length ?? 0) +
     (filter.sources?.length ?? 0) +
+    (filter.platforms?.length ?? 0) +
     (filter.start || filter.end ? 1 : 0);
 
   return (
@@ -157,10 +158,18 @@ export function EventSearchFilter({ eventNames }: { eventNames: string[] }) {
           </FilterSubmenu>
           <FilterSubmenu icon={RadioTower} label="Source">
             <Options
-              items={["browser", "server"]}
+              items={["browser", "mobile", "server"]}
               selected={filter.sources ?? []}
               onToggle={(value) => toggle("sources", value)}
               empty="No sources found"
+            />
+          </FilterSubmenu>
+          <FilterSubmenu icon={RadioTower} label="Platform">
+            <Options
+              items={["web", "ios", "android"]}
+              selected={filter.platforms ?? []}
+              onToggle={(value) => toggle("platforms", value)}
+              empty="No platforms found"
             />
           </FilterSubmenu>
         </DropdownMenuContent>
@@ -179,6 +188,13 @@ export function EventSearchFilter({ eventNames }: { eventNames: string[] }) {
             key={`source-${value}`}
             label={value}
             onRemove={() => toggle("sources", value)}
+          />
+        ))}
+        {filter.platforms?.map((value) => (
+          <FilterChip
+            key={`platform-${value}`}
+            label={value}
+            onRemove={() => toggle("platforms", value)}
           />
         ))}
         {(filter.start || filter.end) && (

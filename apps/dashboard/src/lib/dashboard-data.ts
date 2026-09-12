@@ -124,6 +124,11 @@ export async function getDashboardEventOptions(
       projects: [...new Set(events.map((event) => event.project))].sort(),
       names: [...new Set(events.map((event) => event.name))].sort(),
       sources: [...new Set(events.map((event) => event.source))].sort(),
+      platforms: [
+        ...new Set(
+          events.flatMap((event) => (event.platform ? [event.platform] : [])),
+        ),
+      ].sort(),
     };
   }
   return client.read<AnalyticsEventFilterOptions>(

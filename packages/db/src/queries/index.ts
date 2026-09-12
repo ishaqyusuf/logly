@@ -247,6 +247,9 @@ export async function ingestEventBatch(
     name: event.name,
     version: event.version,
     source: event.source,
+    platform: event.platform ?? (event.source === "browser" ? "web" : null),
+    appVersion: event.appVersion ?? null,
+    appBuild: event.appBuild ?? null,
     occurredAt: new Date(event.occurredAt),
     visitorKey: event.visitorId
       ? createHmac("sha256", `${hashSecret}:${project.id}`)
@@ -261,7 +264,10 @@ export async function ingestEventBatch(
     visitKind: event.visitKind ?? null,
     route: event.route ?? null,
     referrerHost: event.referrerHost ?? null,
-    country: event.source === "browser" ? normalizeCountry(country) : null,
+    country:
+      event.source === "browser" || event.source === "mobile"
+        ? normalizeCountry(country)
+        : null,
     properties: event.properties,
     campaign: event.campaign,
   }));
@@ -308,11 +314,16 @@ export async function listDashboardEvents(
     id: event.eventId,
     name: event.name,
     project,
-    source: event.source as "browser" | "server",
+    source: event.source as "browser" | "server" | "mobile",
+    platform: event.platform as "web" | "ios" | "android" | null,
+    appVersion: event.appVersion,
+    appBuild: event.appBuild,
     visitorKey: event.visitorKey ? `v_${event.visitorKey.slice(0, 6)}` : null,
     visitKind: event.visitKind as "new" | "returning" | null,
     route: event.route,
     referrerHost: event.referrerHost,
+    country: event.country,
+    campaign: event.campaign,
     occurredAt: event.occurredAt.toISOString(),
     properties: event.properties,
   }));
@@ -334,6 +345,9 @@ function eventConditions(query: AnalyticsEventQuery) {
       : undefined,
     query.sources?.length
       ? inArray(analyticsEvents.source, query.sources)
+      : undefined,
+    query.platforms?.length
+      ? inArray(analyticsEvents.platform, query.platforms)
       : undefined,
     start && !Number.isNaN(start.getTime())
       ? gte(analyticsEvents.occurredAt, start)
@@ -363,11 +377,16 @@ function mapDashboardEvent({
     id: event.eventId,
     name: event.name,
     project,
-    source: event.source as "browser" | "server",
+    source: event.source as "browser" | "server" | "mobile",
+    platform: event.platform as "web" | "ios" | "android" | null,
+    appVersion: event.appVersion,
+    appBuild: event.appBuild,
     visitorKey: event.visitorKey ? `v_${event.visitorKey.slice(0, 6)}` : null,
     visitKind: event.visitKind as "new" | "returning" | null,
     route: event.route,
     referrerHost: event.referrerHost,
+    country: event.country,
+    campaign: event.campaign,
     occurredAt: event.occurredAt.toISOString(),
     properties: event.properties,
   };
@@ -488,6 +507,9 @@ export async function getDashboardEventSummary(
     sources,
     routes,
     acquisitionRows,
+    geographyRows,
+    mobilePlatformRows,
+    mobileVersionRows,
   ] = await Promise.all([
     db
       .select({ count: sql<number>`count(*)::int` })
@@ -591,7 +613,6 @@ export async function getDashboardEventSummary(
       .limit(10),
     db
       .select({
-        country: analyticsEvents.country,
         referrer: sql<string>`coalesce(nullif(${analyticsEvents.referrerHost}, ''), 'Direct / unknown')`,
         campaignSource: sql<string>`coalesce(nullif(${analyticsEvents.campaign}->>'source', ''), 'Unattributed')`,
         count: sql<number>`count(*)::int`,
@@ -613,9 +634,97 @@ export async function getDashboardEventSummary(
         ),
       )
       .groupBy(
-        analyticsEvents.country,
         sql`coalesce(nullif(${analyticsEvents.referrerHost}, ''), 'Direct / unknown')`,
         sql`coalesce(nullif(${analyticsEvents.campaign}->>'source', ''), 'Unattributed')`,
+      ),
+    db
+      .select({
+        country: analyticsEvents.country,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(analyticsEvents)
+      .innerJoin(
+        analyticsProjects,
+        eq(analyticsEvents.projectId, analyticsProjects.id),
+      )
+      .innerJoin(
+        analyticsOrganizations,
+        eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+      )
+      .where(
+        and(
+          eventConditions(query),
+          or(
+            and(
+              eq(analyticsEvents.name, "site_visit"),
+              eq(analyticsEvents.source, "browser"),
+            ),
+            and(
+              eq(analyticsEvents.name, "app_session"),
+              eq(analyticsEvents.source, "mobile"),
+            ),
+          ),
+        ),
+      )
+      .groupBy(analyticsEvents.country),
+    db
+      .select({
+        platform: analyticsEvents.platform,
+        sessions: sql<number>`count(*) filter (where ${analyticsEvents.name} = 'app_session')::int`,
+        events: sql<number>`count(*)::int`,
+        installations: sql<number>`count(distinct ${analyticsEvents.visitorKey})::int`,
+      })
+      .from(analyticsEvents)
+      .innerJoin(
+        analyticsProjects,
+        eq(analyticsEvents.projectId, analyticsProjects.id),
+      )
+      .innerJoin(
+        analyticsOrganizations,
+        eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+      )
+      .where(
+        and(
+          eventConditions(query),
+          eq(analyticsEvents.source, "mobile"),
+          inArray(analyticsEvents.platform, ["ios", "android"]),
+        ),
+      )
+      .groupBy(analyticsEvents.platform),
+    db
+      .select({
+        platform: analyticsEvents.platform,
+        version: analyticsEvents.appVersion,
+        build: analyticsEvents.appBuild,
+        sessions: sql<number>`count(*) filter (where ${analyticsEvents.name} = 'app_session')::int`,
+        events: sql<number>`count(*)::int`,
+      })
+      .from(analyticsEvents)
+      .innerJoin(
+        analyticsProjects,
+        eq(analyticsEvents.projectId, analyticsProjects.id),
+      )
+      .innerJoin(
+        analyticsOrganizations,
+        eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+      )
+      .where(
+        and(
+          eventConditions(query),
+          eq(analyticsEvents.source, "mobile"),
+          inArray(analyticsEvents.platform, ["ios", "android"]),
+        ),
+      )
+      .groupBy(
+        analyticsEvents.platform,
+        analyticsEvents.appVersion,
+        analyticsEvents.appBuild,
+      )
+      .orderBy(
+        desc(
+          sql`count(*) filter (where ${analyticsEvents.name} = 'app_session')`,
+        ),
+        desc(sql`count(*)`),
       ),
   ]);
   const acquisitionGroups = (key: "referrer" | "campaignSource") => {
@@ -633,11 +742,43 @@ export async function getDashboardEventSummary(
 
   return {
     totalEvents: totals[0]?.count ?? 0,
-    geography: summarizeCountries(acquisitionRows),
+    geography: summarizeCountries(geographyRows),
     acquisition: {
       totalVisits: acquisitionRows.reduce((total, row) => total + row.count, 0),
       referrers: acquisitionGroups("referrer"),
       campaignSources: acquisitionGroups("campaignSource"),
+    },
+    mobile: {
+      totalSessions: mobilePlatformRows.reduce(
+        (total, row) => total + row.sessions,
+        0,
+      ),
+      totalEvents: mobilePlatformRows.reduce(
+        (total, row) => total + row.events,
+        0,
+      ),
+      uniqueInstallations: mobilePlatformRows.reduce(
+        (total, row) => total + row.installations,
+        0,
+      ),
+      platforms: mobilePlatformRows.flatMap((row) =>
+        row.platform === "ios" || row.platform === "android"
+          ? [{ ...row, platform: row.platform }]
+          : [],
+      ),
+      versions: mobileVersionRows.flatMap((row) =>
+        row.platform === "ios" || row.platform === "android"
+          ? [
+              {
+                platform: row.platform,
+                version: row.version || "Unknown version",
+                build: row.build,
+                sessions: row.sessions,
+                events: row.events,
+              },
+            ]
+          : [],
+      ),
     },
     uniqueEventNames: names.length,
     trend,
@@ -650,8 +791,15 @@ export async function getDashboardEventSummary(
       };
     }),
     sources: sources.filter(
-      (event): event is { source: "browser" | "server"; count: number } =>
-        event.source === "browser" || event.source === "server",
+      (
+        event,
+      ): event is {
+        source: "browser" | "server" | "mobile";
+        count: number;
+      } =>
+        event.source === "browser" ||
+        event.source === "server" ||
+        event.source === "mobile",
     ),
     routes: routes.flatMap((event) =>
       event.route ? [{ route: event.route, count: event.count }] : [],
@@ -700,6 +848,11 @@ export async function getDashboardEventFilterOptions(
       projects: [...new Set(events.map((event) => event.project))].sort(),
       names: [...new Set(events.map((event) => event.name))].sort(),
       sources: [...new Set(events.map((event) => event.source))].sort(),
+      platforms: [
+        ...new Set(
+          events.flatMap((event) => (event.platform ? [event.platform] : [])),
+        ),
+      ].sort(),
     };
   }
   const rows = await db
@@ -707,6 +860,7 @@ export async function getDashboardEventFilterOptions(
       project: analyticsProjects.slug,
       name: analyticsEvents.name,
       source: analyticsEvents.source,
+      platform: analyticsEvents.platform,
     })
     .from(analyticsEvents)
     .innerJoin(
@@ -730,8 +884,14 @@ export async function getDashboardEventFilterOptions(
     names: [...new Set(rows.map((row) => row.name))].sort(),
     sources: [...new Set(rows.map((row) => row.source))]
       .filter(
-        (source): source is "browser" | "server" =>
-          source === "browser" || source === "server",
+        (source): source is "browser" | "server" | "mobile" =>
+          source === "browser" || source === "server" || source === "mobile",
+      )
+      .sort(),
+    platforms: [...new Set(rows.map((row) => row.platform))]
+      .filter(
+        (platform): platform is "web" | "ios" | "android" =>
+          platform === "web" || platform === "ios" || platform === "android",
       )
       .sort(),
   };

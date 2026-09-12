@@ -161,8 +161,12 @@ export function createCollectorApp() {
   app.get("/v1/dashboard/events", async (context) => {
     const split = (value?: string) => value?.split(",").filter(Boolean);
     const sources = split(context.req.query("sources"))?.filter(
-      (source): source is "browser" | "server" =>
-        source === "browser" || source === "server",
+      (source): source is "browser" | "server" | "mobile" =>
+        source === "browser" || source === "server" || source === "mobile",
+    );
+    const platforms = split(context.req.query("platforms"))?.filter(
+      (platform): platform is "web" | "ios" | "android" =>
+        platform === "web" || platform === "ios" || platform === "android",
     );
     const query: AnalyticsEventQuery = {
       organization: context.req.query("organization"),
@@ -170,6 +174,7 @@ export function createCollectorApp() {
       projects: split(context.req.query("projects")),
       names: split(context.req.query("names")),
       sources,
+      platforms,
       q: context.req.query("q"),
       start: context.req.query("start"),
       end: context.req.query("end"),
@@ -200,14 +205,19 @@ export function createCollectorApp() {
   app.get("/v1/dashboard/event-summary", async (context) => {
     const split = (value?: string) => value?.split(",").filter(Boolean);
     const sources = split(context.req.query("sources"))?.filter(
-      (source): source is "browser" | "server" =>
-        source === "browser" || source === "server",
+      (source): source is "browser" | "server" | "mobile" =>
+        source === "browser" || source === "server" || source === "mobile",
+    );
+    const platforms = split(context.req.query("platforms"))?.filter(
+      (platform): platform is "web" | "ios" | "android" =>
+        platform === "web" || platform === "ios" || platform === "android",
     );
     const query: AnalyticsEventQuery = {
       organization: context.req.query("organization"),
       project: context.req.query("project"),
       names: split(context.req.query("names")),
       sources,
+      platforms,
       q: context.req.query("q"),
       start: context.req.query("start"),
       end: context.req.query("end"),

@@ -3,6 +3,7 @@ import {
   type AnalyticsBatch,
   analyticsBatchSchema,
   LOGLY_CORE_PACKAGE_NAME,
+  LOGLY_CORE_VERSION,
   sanitizeProperties,
 } from "@ishaqyusuf/logly-core";
 
@@ -28,7 +29,7 @@ export function createServerAnalytics(config: ServerAnalyticsConfig) {
     ) {
       const batch = analyticsBatchSchema.parse({
         sentAt: new Date().toISOString(),
-        sdk: { name: LOGLY_CORE_PACKAGE_NAME, version: "0.2.0" },
+        sdk: { name: LOGLY_CORE_PACKAGE_NAME, version: LOGLY_CORE_VERSION },
         events: [
           {
             eventId: randomUUID(),

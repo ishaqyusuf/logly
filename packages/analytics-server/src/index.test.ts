@@ -38,7 +38,7 @@ describe("server analytics", () => {
     };
     expect(batch.sdk).toEqual({
       name: "@ishaqyusuf/logly-core",
-      version: "0.2.0",
+      version: "0.3.0",
     });
     expect(batch.events[0]?.properties).toEqual({ safe: true });
   });
