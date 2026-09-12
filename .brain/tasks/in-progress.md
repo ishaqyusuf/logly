@@ -169,6 +169,6 @@ Latest: Ewatrade dashboard is also promoted (five web targets released). SchoolC
 
 ## Native analytics release — 2026-09-12
 
-All six verified web targets are promoted. Ewatrade Android analytics update group `6f1125ea-6214-4583-a695-d5d35484074a` is published on production from the live binary base. Halaalvest Android initial production build `37b6d3b5-580d-4108-9aaf-6aa0b2736833` is pending after a prior Expo archive-transfer failure. Interactive acceptance remains the next owner-directed phase after native delivery completes.
+All six verified web targets are promoted. Ewatrade Android analytics update group `6f1125ea-6214-4583-a695-d5d35484074a` is published on production from the live binary base. Halaalvest Android initial production build `37b6d3b5-580d-4108-9aaf-6aa0b2736833` finished successfully and produced the versionCode 9/runtime 0.1.0 production AAB. Interactive acceptance remains the next owner-directed phase.
 
-Release branches are pushed for all three consumer repositories. The Halaalvest retry is actively compiling in Gradle; keep using its existing build ID.
+Release branches are pushed for all three consumer repositories. The requested implementation and release-artifact phase is complete; store submission and interactive consumer acceptance remain outside this phase.
