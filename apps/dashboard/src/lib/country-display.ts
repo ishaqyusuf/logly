@@ -13,3 +13,7 @@ export function countryHeatOpacity(count: number, maximum: number) {
   );
   return 0.3 + 0.7 * intensity;
 }
+
+export function formatVisitCount(count: number) {
+  return `${count.toLocaleString("en-US")} ${count === 1 ? "visit" : "visits"}`;
+}

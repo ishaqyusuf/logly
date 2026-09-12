@@ -13,7 +13,11 @@ import {
 import type { CountryVisits } from "@logly/utils";
 import { useState } from "react";
 import countries from "@/data/world-map.json";
-import { countryFlag, countryHeatOpacity } from "@/lib/country-display";
+import {
+  countryFlag,
+  countryHeatOpacity,
+  formatVisitCount,
+} from "@/lib/country-display";
 
 export function CountryReport({ summary }: { summary: CountryVisits }) {
   const [selected, setSelected] = useState<string | null>(null);
@@ -80,7 +84,9 @@ export function CountryReport({ summary }: { summary: CountryVisits }) {
                     role="button"
                     aria-disabled={!data}
                     aria-label={
-                      data ? `${data.name}: ${data.count} visits` : undefined
+                      data
+                        ? `${data.name}: ${formatVisitCount(data.count)}`
+                        : undefined
                     }
                     style={
                       data
@@ -95,7 +101,7 @@ export function CountryReport({ summary }: { summary: CountryVisits }) {
                     }
                   >
                     <title>
-                      {`${data?.name ?? country.name}: ${data ? `${data.count.toLocaleString("en-US")} visits` : "No recorded country visits"}`}
+                      {`${data?.name ?? country.name}: ${data ? formatVisitCount(data.count) : "No recorded country visits"}`}
                     </title>
                   </path>
                 );
@@ -117,7 +123,7 @@ export function CountryReport({ summary }: { summary: CountryVisits }) {
             </div>
             <p aria-live="polite" className="min-h-6 text-sm">
               {active
-                ? `${active.name}: ${active.count.toLocaleString("en-US")} visits (${((active.count / Math.max(1, summary.totalVisits)) * 100).toFixed(1)}% of all visits)`
+                ? `${active.name}: ${formatVisitCount(active.count)} (${((active.count / Math.max(1, summary.totalVisits)) * 100).toFixed(1)}% of all visits)`
                 : "Select a country from the list to inspect its visits."}
             </p>
           </div>
@@ -161,8 +167,7 @@ export function CountryReport({ summary }: { summary: CountryVisits }) {
                           </span>
                         </span>
                         <span className="shrink-0 tabular-nums">
-                          {country.count.toLocaleString("en-US")}{" "}
-                          {country.count === 1 ? "visit" : "visits"}
+                          {formatVisitCount(country.count)}
                           <span className="text-muted-foreground">
                             {" "}
                             ·{" "}
