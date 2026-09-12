@@ -342,3 +342,7 @@ Latest checkpoint: Ewatrade dashboard promoted successfully. SchoolClerk dashboa
 ### 2026-09-12 native release checkpoint
 
 SchoolClerk dashboard is promoted, completing all six verified web releases. Ewatrade Android OTA is published from an analytics-only branch rooted at its live binary commit. Halaalvest Android production build `37b6d3b5-580d-4108-9aaf-6aa0b2736833` finished successfully from the clean analytics branch and produced the versionCode 9/runtime 0.1.0 AAB. The requested implementation and release-artifact phase is complete; preserve the owner's separate interactive acceptance phase.
+
+### 2026-09-12 country analytics production acceptance
+
+A Chrome visit to Halaalvest marketing reached Logly as a United States arrival in `halaalvest-web`. Production Insights now shows the country flag, explicit `1 visit · 100.0%`, a fewer-to-more heat legend and count-relative map shading. Desktop and 390px mobile QA, selection behavior, console checks, focused tests, repository validation and deployment `dpl_CjsARB4jVyf5NKiKMFYRHk7inKJf` pass. Evidence: `.brain/tasks/country-map/production-qa-2026-09-12.md`.

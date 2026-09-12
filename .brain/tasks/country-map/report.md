@@ -4,6 +4,8 @@
 
 Country-shaded world map, ranked visit counts, percentage selection, explicit unknown count, and desktop/mobile layouts in Insights. Scope is the selected project and last 30 days. Metric is daily browser `site_visit` arrivals, not pageviews or cross-day unique people. The first accepted country survives retries. Locations reflect the delivery network; historical data stays unknown.
 
+Production follow-up on 2026-09-12 added country flags, explicit singular/plural visit counts, a labeled ranked section and a visible heat scale. A real Halaalvest marketing visit reached `halaalvest-web` as United States, 1 visit, 100.0%; the US polygon rendered at full heat and zero-visit countries remained muted. Desktop/mobile evidence and the complete acceptance record are in [production QA](production-qa-2026-09-12.md).
+
 ## Validation
 
 - `bun run test`, `bun run typecheck`, `bun run lint`, `bun run build:dashboard`: pass. Source suite: 52 tests.

@@ -172,3 +172,7 @@ Latest: Ewatrade dashboard is also promoted (five web targets released). SchoolC
 All six verified web targets are promoted. Ewatrade Android analytics update group `6f1125ea-6214-4583-a695-d5d35484074a` is published on production from the live binary base. Halaalvest Android initial production build `37b6d3b5-580d-4108-9aaf-6aa0b2736833` finished successfully and produced the versionCode 9/runtime 0.1.0 production AAB. Interactive acceptance remains the next owner-directed phase.
 
 Release branches are pushed for all three consumer repositories. The requested implementation and release-artifact phase is complete; store submission and interactive consumer acceptance remain outside this phase.
+
+## Country analytics production QA — 2026-09-12
+
+Halaalvest production generated a located browser arrival and Logly displayed United States, 1 visit, 100.0% with the correct active heat-map polygon. Country flags, explicit visit labels and the fewer-to-more heat legend are deployed in `dpl_CjsARB4jVyf5NKiKMFYRHk7inKJf`. Desktop and 390px mobile QA pass without overflow or console errors. See `country-map/production-qa-2026-09-12.md`.
