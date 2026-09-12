@@ -13,6 +13,7 @@ import {
 import type { CountryVisits } from "@logly/utils";
 import { useState } from "react";
 import countries from "@/data/world-map.json";
+import { countryFlag, countryHeatOpacity } from "@/lib/country-display";
 
 export function CountryReport({ summary }: { summary: CountryVisits }) {
   const [selected, setSelected] = useState<string | null>(null);
@@ -90,7 +91,7 @@ export function CountryReport({ summary }: { summary: CountryVisits }) {
                         : undefined
                     }
                     opacity={
-                      data ? 0.3 + 0.7 * Math.sqrt(data.count / maximum) : 0.15
+                      data ? countryHeatOpacity(data.count, maximum) : 0.15
                     }
                   >
                     <title>
@@ -100,8 +101,15 @@ export function CountryReport({ summary }: { summary: CountryVisits }) {
                 );
               })}
             </svg>
-            <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
-              <span>Darker countries have more visits</span>
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <span>Fewer</span>
+                <span className="size-2 rounded-sm bg-primary opacity-30" />
+                <span className="size-2 rounded-sm bg-primary opacity-50" />
+                <span className="size-2 rounded-sm bg-primary opacity-75" />
+                <span className="size-2 rounded-sm bg-primary" />
+                <span>More visits</span>
+              </div>
               <span>
                 {known.toLocaleString("en-US")} located ·{" "}
                 {summary.unknownVisits.toLocaleString("en-US")} unknown
@@ -115,34 +123,62 @@ export function CountryReport({ summary }: { summary: CountryVisits }) {
           </div>
           <div className="min-w-0">
             {summary.countries.length ? (
-              <ol
-                aria-label="Countries ranked by visits"
-                className="flex max-h-80 flex-col gap-1 overflow-y-auto"
-              >
-                {summary.countries.map((country) => (
-                  <li key={country.code}>
-                    <Button
-                      variant={selected === country.code ? "outline" : "ghost"}
-                      className="h-auto min-h-11 w-full justify-between gap-3 whitespace-normal text-left"
-                      aria-pressed={selected === country.code}
-                      onClick={() => setSelected(country.code)}
-                    >
-                      <span className="min-w-0">{country.name}</span>
-                      <span className="shrink-0 tabular-nums">
-                        {country.count.toLocaleString("en-US")}{" "}
-                        <span className="text-muted-foreground">
-                          ·{" "}
-                          {(
-                            (country.count / Math.max(1, summary.totalVisits)) *
-                            100
-                          ).toFixed(1)}
-                          %
+              <div className="flex flex-col gap-3">
+                <div className="flex items-end justify-between gap-3 px-3">
+                  <div>
+                    <h4 className="text-sm font-medium">Visits by country</h4>
+                    <p className="text-xs text-muted-foreground">
+                      Ranked by daily visit arrivals
+                    </p>
+                  </div>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Visits
+                  </span>
+                </div>
+                <ol
+                  aria-label="Countries ranked by visits"
+                  className="flex max-h-80 flex-col gap-1 overflow-y-auto"
+                >
+                  {summary.countries.map((country) => (
+                    <li key={country.code}>
+                      <Button
+                        variant={
+                          selected === country.code ? "outline" : "ghost"
+                        }
+                        className="h-auto min-h-12 w-full justify-between gap-3 whitespace-normal text-left"
+                        aria-pressed={selected === country.code}
+                        onClick={() => setSelected(country.code)}
+                      >
+                        <span className="flex min-w-0 items-center gap-2.5">
+                          <span
+                            aria-hidden="true"
+                            className="flex size-7 shrink-0 items-center justify-center rounded-full border bg-muted/50 text-base leading-none"
+                          >
+                            {countryFlag(country.code)}
+                          </span>
+                          <span className="min-w-0 truncate">
+                            {country.name}
+                          </span>
                         </span>
-                      </span>
-                    </Button>
-                  </li>
-                ))}
-              </ol>
+                        <span className="shrink-0 tabular-nums">
+                          {country.count.toLocaleString("en-US")}{" "}
+                          {country.count === 1 ? "visit" : "visits"}
+                          <span className="text-muted-foreground">
+                            {" "}
+                            ·{" "}
+                            {(
+                              (country.count /
+                                Math.max(1, summary.totalVisits)) *
+                              100
+                            ).toFixed(1)}
+                            %
+                          </span>
+                        </span>
+                      </Button>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             ) : (
               <p className="py-6 text-sm text-muted-foreground">
                 {summary.totalVisits
