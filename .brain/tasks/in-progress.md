@@ -1,7 +1,7 @@
 # In Progress
 
 ### [GND Mobile Platform Analytics And OpenPanel Replacement](2026-09-12-gnd-mobile-platform-analytics.md)
-- Status: In Progress
+- Status: Complete. Production web and mobile canaries, country map/list/flag QA, Android/iOS usage QA, responsive screenshots, deployments and scoped GND branches are recorded in [the report](gnd-mobile-platform-analytics/production-qa-2026-09-13.md).
 
 ## Production Trustworthiness And Afterservice Pilot
 
