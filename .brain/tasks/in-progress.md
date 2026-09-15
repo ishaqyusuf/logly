@@ -1,5 +1,18 @@
 # In Progress
 
+## Overview date presets — 2026-09-15
+
+- Status: implemented locally.
+- The selected-project Overview now offers URL-backed 24h, 7d (default), and
+  30d presets. Complete-window KPIs, prior-window comparison, trend, top events,
+  and recent-event preview follow the chosen range. Collection health keeps its
+  independent 24-hour receipt window.
+- The full workspace typecheck and test suite and diff check pass. The date
+  control and low-traffic KPI state were visually checked in the app's real
+  styles at desktop and 390px, including all selected states and no phone-width
+  overflow. The normal local launch was unavailable because Docker Engine did
+  not start; the isolated preview route was removed after QA.
+
 ### [GND Mobile Platform Analytics And OpenPanel Replacement](2026-09-12-gnd-mobile-platform-analytics.md)
 - Status: Complete. Production web and mobile canaries, country map/list/flag QA, Android/iOS usage QA, responsive screenshots, deployments and scoped GND branches are recorded in [the report](gnd-mobile-platform-analytics/production-qa-2026-09-13.md).
 

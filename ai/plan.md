@@ -1,5 +1,17 @@
 # Implementation Plan
 
+## Overview date presets — 2026-09-15
+
+- [x] Inspect the Events presets, Overview read path, and Midday filter reference.
+- [x] Add URL-backed 24h, 7d, and 30d choices to the Overview header.
+- [x] Apply the selected window to complete SQL totals, prior-window change,
+  trend, top events, and recent rows while preserving 24h receipt health.
+- [x] Update Brain API, feature, and task contracts.
+- [x] Pass workspace typecheck and tests; inspect the control and low-traffic
+  cards with real app styles on desktop and 390px mobile. Normal local launch
+  was blocked by Docker Engine startup; the temporary public preview route was
+  removed after responsive QA.
+
 ## Active Implementation: GND Mobile Platform Analytics — 2026-09-12
 
 - [x] Add first-class `mobile` event source and bounded platform/app metadata.

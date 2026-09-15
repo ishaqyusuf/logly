@@ -9,6 +9,7 @@ import {
   type AnalyticsFunnelQuery,
   type AnalyticsOrganizationSummary,
   type AnalyticsOverview,
+  type AnalyticsOverviewRange,
   type AnalyticsProjectSummary,
   getDemoAnalytics,
   summarizeAnalyticsEvents,
@@ -25,12 +26,16 @@ export type DashboardData = {
 };
 
 const getDashboardDataCached = cache(
-  async (organization?: string, project?: string): Promise<DashboardData> => {
+  async (
+    organization?: string,
+    project?: string,
+    range?: AnalyticsOverviewRange,
+  ): Promise<DashboardData> => {
     const collectorUrl = process.env.NEXT_PUBLIC_API_URL;
     const readKey = process.env.LOGLY_READ_KEY;
     const demoMode = process.env.NODE_ENV !== "production";
     if (!collectorUrl || !readKey) {
-      if (demoMode) return { ...getDemoAnalytics(), mode: "demo" };
+      if (demoMode) return { ...getDemoAnalytics(range), mode: "demo" };
       throw new Error(
         "NEXT_PUBLIC_API_URL and LOGLY_READ_KEY are required in production",
       );
@@ -42,13 +47,13 @@ const getDashboardDataCached = cache(
         readKey,
       }).read<DashboardData>(
         `/v1/dashboard/overview?${new URLSearchParams(
-          Object.entries({ organization, project }).filter(
+          Object.entries({ organization, project, range }).filter(
             (entry): entry is [string, string] => Boolean(entry[1]),
           ),
         )}`,
       );
     } catch (error) {
-      if (demoMode) return { ...getDemoAnalytics(), mode: "demo" };
+      if (demoMode) return { ...getDemoAnalytics(range), mode: "demo" };
       throw error;
     }
   },
@@ -57,8 +62,13 @@ const getDashboardDataCached = cache(
 export function getDashboardData(filters?: {
   organization?: string;
   project?: string;
+  range?: AnalyticsOverviewRange;
 }) {
-  return getDashboardDataCached(filters?.organization, filters?.project);
+  return getDashboardDataCached(
+    filters?.organization,
+    filters?.project,
+    filters?.range,
+  );
 }
 
 function dashboardClient() {

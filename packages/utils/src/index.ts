@@ -178,10 +178,12 @@ export type AnalyticsOverview = {
   totalEvents: number;
   deliveryRate: number | null;
   collectionHealth: AnalyticsCollectionHealth;
-  change: { visitors: number; events: number };
+  change: { visitors: number | null; events: number | null };
   trend?: AnalyticsTrendPoint[];
   topEvents?: AnalyticsTopEvent[];
 };
+
+export type AnalyticsOverviewRange = "24h" | "7d" | "30d";
 
 export function formatCompactNumber(value: number) {
   return new Intl.NumberFormat("en", {
@@ -389,7 +391,7 @@ export function summarizeMobileAnalytics(
   };
 }
 
-export function getDemoAnalytics() {
+export function getDemoAnalytics(range?: AnalyticsOverviewRange) {
   const now = Date.now();
   const ago = (minutes: number) =>
     new Date(now - minutes * 60_000).toISOString();
@@ -529,7 +531,7 @@ export function getDemoAnalytics() {
       lastEventAt: ago(61),
     },
   ];
-  return {
+  const demo = {
     organizations: [
       {
         id: "org_01",
@@ -572,6 +574,36 @@ export function getDemoAnalytics() {
     } satisfies AnalyticsOverview,
     events,
     projects,
+  };
+  if (!range) return demo;
+
+  const hours = range === "24h" ? 24 : range === "7d" ? 168 : 720;
+  const start = new Date(now - hours * 3_600_000).toISOString();
+  const visibleEvents = events.filter((event) => event.occurredAt >= start);
+  const summary = summarizeAnalyticsEvents(visibleEvents, { start });
+  const visitorEvents = visibleEvents.filter((event) => event.visitorKey);
+  return {
+    ...demo,
+    events: visibleEvents,
+    overview: {
+      ...demo.overview,
+      uniqueVisitors: new Set(visitorEvents.map((event) => event.visitorKey))
+        .size,
+      newVisitors: visibleEvents.filter(
+        (event) => event.name === "site_visit" && event.visitKind === "new",
+      ).length,
+      returningVisitors: visibleEvents.filter(
+        (event) =>
+          event.name === "site_visit" && event.visitKind === "returning",
+      ).length,
+      totalEvents: visibleEvents.length,
+      change: { visitors: null, events: null },
+      trend: summary.trend,
+      topEvents: summary.eventNames.slice(0, 5).map(({ name, count }) => ({
+        name,
+        count,
+      })),
+    },
   };
 }
 

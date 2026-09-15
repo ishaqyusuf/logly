@@ -43,6 +43,15 @@ both applies both boundaries, and the project must belong to the organization.
 Dashboard page routing resolves these optional API inputs into one mandatory
 selected-project workspace before rendering analytics.
 
+Overview reads accept optional `range=24h|7d|30d`. The Overview page defaults
+to `7d`, keeps the choice in its URL, and applies it to complete-window visitor
+and event totals, top events, trend, and the recent-event preview. KPI change
+compares against the immediately preceding equal window; zero-denominator
+comparisons return null and display as no prior-period data. Without `range`, the
+collector retains its existing all-history totals and 14-day trend for other
+dashboard shell reads. `collectionHealth` always measures receipts in the last
+24 hours, independently of the selected overview range.
+
 ## Dashboard Event Reads
 
 Event-list reads accept optional `organization`, `project`, comma-separated

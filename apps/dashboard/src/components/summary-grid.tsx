@@ -62,7 +62,7 @@ export function SummaryGrid({ overview }: { overview: AnalyticsOverview }) {
                 <p className="text-[28px] font-medium tracking-[-0.04em] tabular-nums">
                   {card.value.toLocaleString()}
                 </p>
-                {card.change !== undefined ? (
+                {card.change !== undefined && card.change !== null ? (
                   <p
                     className={`mt-2 flex items-center gap-1 text-[11px] ${positive ? "text-emerald-700" : "text-red-600"}`}
                   >
@@ -75,7 +75,9 @@ export function SummaryGrid({ overview }: { overview: AnalyticsOverview }) {
                   </p>
                 ) : (
                   <p className="mt-2 text-[11px] text-muted-foreground">
-                    {card.suffix} of visitors
+                    {card.suffix
+                      ? `${card.suffix} of visitors`
+                      : "No prior-period data"}
                   </p>
                 )}
               </div>

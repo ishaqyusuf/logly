@@ -29,6 +29,11 @@
 - Use Signal Studio as the implemented project-workspace direction: a dedicated Overview
   for visitors, new/returning mix, total events, trend, top events, recent
   signals, and collection health; Events remains a separate investigation page.
+- Overview provides URL-backed 24-hour, 7-day, and 30-day presets, defaulting
+  to 7 days. KPI totals and prior-window change, event trend, top events, and
+  recent signals follow the selected window. Observed collection health retains
+  its independent 24-hour receipt window. A KPI comparison without prior-window
+  data displays an explicit unavailable state rather than a fabricated 0% change.
 - Compute summaries over the complete requested project and time window; never
   derive totals from a paginated or truncated event list.
 - Provide URL-driven search, mandatory project scope, source, event-name,

@@ -1,4 +1,4 @@
-import { Badge } from "@logly/ui/badge";
+import type { AnalyticsOverviewRange } from "@logly/utils";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Activity, ArrowRight } from "lucide-react";
 import type { Metadata } from "next";
@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { SearchParams } from "nuqs/server";
 import { CollectionHealth } from "@/components/collection-health";
 import { OverviewChart } from "@/components/overview-chart";
+import { OverviewRangeFilter } from "@/components/overview-range-filter";
 import { ScrollableContent } from "@/components/scrollable-content";
 import { SummaryGrid } from "@/components/summary-grid";
 import { loadProjectWorkspace } from "@/lib/project-workspace-server";
@@ -19,9 +20,12 @@ export default async function OverviewPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
+  const range: AnalyticsOverviewRange =
+    params.range === "24h" || params.range === "30d" ? params.range : "7d";
   const workspace = await loadProjectWorkspace({
     pathname: "/overview",
     searchParams: params,
+    overviewRange: range,
   });
   if (!workspace.project) throw new Error("A project workspace is required");
   const { data } = workspace;
@@ -32,16 +36,19 @@ export default async function OverviewPage({
   return (
     <ScrollableContent>
       <div className="space-y-6">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
-            Project overview
-          </p>
-          <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">
-            {workspace.project.name}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            A focused view of this project’s traffic and product signals.
-          </p>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+              Project overview
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-[-0.03em]">
+              {workspace.project.name}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              A focused view of this project’s traffic and product signals.
+            </p>
+          </div>
+          <OverviewRangeFilter range={range} query={query} />
         </div>
         <SummaryGrid overview={data.overview} />
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1.65fr)_minmax(320px,.75fr)]">
@@ -50,10 +57,9 @@ export default async function OverviewPage({
               <div>
                 <p className="text-sm font-semibold">Event volume</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Signals received over the last 14 days
+                  Signals recorded in the selected {range} window
                 </p>
               </div>
-              <Badge variant="outline">14 days</Badge>
             </div>
             <OverviewChart data={data.overview.trend ?? []} />
           </section>

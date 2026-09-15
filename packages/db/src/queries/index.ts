@@ -11,6 +11,7 @@ import {
   type AnalyticsEventQuery,
   type AnalyticsEventRow,
   type AnalyticsEventSummary,
+  type AnalyticsOverviewRange,
   getDemoAnalytics,
   normalizeCountry,
   summarizeAnalyticsEvents,
@@ -286,6 +287,7 @@ export async function ingestEventBatch(
 export async function listDashboardEvents(
   projectSlug?: string,
   organizationSlug?: string,
+  start?: Date,
 ): Promise<AnalyticsEventRow[]> {
   const db = getDatabase();
   if (!db) return getDemoAnalytics().events;
@@ -306,6 +308,7 @@ export async function listDashboardEvents(
         organizationSlug
           ? eq(analyticsOrganizations.slug, organizationSlug)
           : undefined,
+        start ? gte(analyticsEvents.occurredAt, start) : undefined,
       ),
     )
     .orderBy(desc(analyticsEvents.occurredAt))
@@ -900,7 +903,14 @@ export async function getDashboardEventFilterOptions(
 export async function getDashboardData(
   projectSlug?: string,
   organizationSlug?: string,
+  range?: AnalyticsOverviewRange,
 ) {
+  const rangeHours =
+    range === "24h" ? 24 : range === "7d" ? 168 : range === "30d" ? 720 : null;
+  const rangeStart =
+    rangeHours === null
+      ? undefined
+      : new Date(Date.now() - rangeHours * 3_600_000);
   const db = getDatabase();
   if (!db) {
     const demo = getDemoAnalytics();
@@ -915,7 +925,8 @@ export async function getDashboardData(
         .map((project) => project.slug),
     );
     const events = demo.events.filter((event) =>
-      allowedProjects.has(event.project),
+      allowedProjects.has(event.project) &&
+      (!rangeStart || new Date(event.occurredAt) >= rangeStart),
     );
     const summary = summarizeAnalyticsEvents(events, {});
     const visitorEvents = events.filter((event) => event.visitorKey);
@@ -941,7 +952,7 @@ export async function getDashboardData(
           averageLagSeconds: null,
           clockSkewEvents: 0,
         },
-        change: { visitors: 0, events: 0 },
+        change: { visitors: null, events: null },
         trend: summary.trend,
         topEvents: summary.eventNames.slice(0, 5).map(({ name, count }) => ({
           name,
@@ -950,7 +961,7 @@ export async function getDashboardData(
       },
     };
   }
-  const events = await listDashboardEvents(projectSlug, organizationSlug);
+  const events = await listDashboardEvents(projectSlug, organizationSlug, rangeStart);
   const projectFilter = and(
     projectSlug ? eq(analyticsProjects.slug, projectSlug) : undefined,
     organizationSlug
@@ -995,11 +1006,47 @@ export async function getDashboardData(
       analyticsOrganizations,
       eq(analyticsProjects.organizationId, analyticsOrganizations.id),
     )
-    .where(projectFilter);
+    .where(
+      and(
+        projectFilter,
+        rangeStart ? gte(analyticsEvents.occurredAt, rangeStart) : undefined,
+      ),
+    );
 
-  const trendStart = new Date();
-  trendStart.setUTCHours(0, 0, 0, 0);
-  trendStart.setUTCDate(trendStart.getUTCDate() - 13);
+  const previousStart =
+    rangeStart && rangeHours !== null
+      ? new Date(rangeStart.getTime() - rangeHours * 3_600_000)
+      : undefined;
+  const [previous] =
+    previousStart && rangeStart
+      ? await db
+          .select({
+            uniqueVisitors: sql<number>`count(distinct ${analyticsEvents.visitorKey})::int`,
+            totalEvents: sql<number>`count(*)::int`,
+          })
+          .from(analyticsEvents)
+          .innerJoin(
+            analyticsProjects,
+            eq(analyticsEvents.projectId, analyticsProjects.id),
+          )
+          .innerJoin(
+            analyticsOrganizations,
+            eq(analyticsProjects.organizationId, analyticsOrganizations.id),
+          )
+          .where(
+            and(
+              projectFilter,
+              gte(analyticsEvents.occurredAt, previousStart),
+              sql`${analyticsEvents.occurredAt} < ${rangeStart}`,
+            ),
+          )
+      : [undefined];
+
+  const trendStart = rangeStart ?? new Date();
+  if (!rangeStart) {
+    trendStart.setUTCHours(0, 0, 0, 0);
+    trendStart.setUTCDate(trendStart.getUTCDate() - 13);
+  }
   const [trend, topEvents] = await Promise.all([
     db
       .select({
@@ -1030,7 +1077,12 @@ export async function getDashboardData(
         analyticsOrganizations,
         eq(analyticsProjects.organizationId, analyticsOrganizations.id),
       )
-      .where(projectFilter)
+      .where(
+        and(
+          projectFilter,
+          rangeStart ? gte(analyticsEvents.occurredAt, rangeStart) : undefined,
+        ),
+      )
       .groupBy(analyticsEvents.name)
       .orderBy(desc(sql`count(*)`))
       .limit(5),
@@ -1093,7 +1145,22 @@ export async function getDashboardData(
         averageLagSeconds: health?.averageLagSeconds ?? null,
         clockSkewEvents: health?.clockSkewEvents ?? 0,
       },
-      change: { visitors: 0, events: 0 },
+      change: {
+        visitors: previous?.uniqueVisitors
+          ? Math.round(
+              (((overview?.uniqueVisitors ?? 0) - previous.uniqueVisitors) /
+                previous.uniqueVisitors) *
+                1000,
+            ) / 10
+          : null,
+        events: previous?.totalEvents
+          ? Math.round(
+              (((overview?.totalEvents ?? 0) - previous.totalEvents) /
+                previous.totalEvents) *
+                1000,
+            ) / 10
+          : null,
+      },
       trend,
       topEvents,
     },

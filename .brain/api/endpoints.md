@@ -2,8 +2,9 @@
 
 - `GET /health`: collector health.
 - `POST /v1/events`: validated client or server event batch ingestion.
-- `GET /v1/dashboard/overview?organization=<slug>&project=<slug>`:
-  organization- and/or project-scoped dashboard summary.
+- `GET /v1/dashboard/overview?organization=<slug>&project=<slug>&range=<24h|7d|30d>`:
+  organization- and/or project-scoped dashboard summary. Optional range limits
+  overview totals, trend, top events, and recent rows to the selected window.
 - `GET /v1/dashboard/events`: cursor-paged event list with organization/project
   scope, search, event-name/source/date filters, sorting, and a clamped page
   size. The dashboard always supplies a project.

@@ -155,6 +155,9 @@ export function createCollectorApp() {
       await getDashboardData(
         context.req.query("project"),
         context.req.query("organization"),
+        (["24h", "7d", "30d"] as const).find(
+          (range) => range === context.req.query("range"),
+        ),
       ),
     ),
   );
