@@ -1,5 +1,8 @@
 # Done
 
+### [GND Dashboard And Mobile Analytics Cutover](2026-09-21-gnd-dashboard-mobile-cutover.md)
+- Status: Done
+
 - Selected standalone platform boundaries from the original analytics recommendation.
 - Selected Midday invoice workspace as the primary dashboard implementation reference.
 - Initialized the Logly Project Brain and repository index.

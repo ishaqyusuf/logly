@@ -3,6 +3,14 @@
 ## Status
 Complete
 
+## Superseded Project Naming
+
+On 2026-09-21, the owner approved deleting `gnd-web` and discarding its
+historical data. The current production workspaces are `gnd-dashboard` and
+`gnd-mobile`; the September 13 `gnd-web` evidence below is retained only as
+historical rollout evidence. See
+[the completed cutover task](2026-09-21-gnd-dashboard-mobile-cutover.md).
+
 ## Priority
 High
 
