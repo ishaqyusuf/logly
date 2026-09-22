@@ -28,6 +28,7 @@ import {
   inArray,
   isNotNull,
   isNull,
+  lt,
   lte,
   or,
   sql,
@@ -1037,7 +1038,7 @@ export async function getDashboardData(
             and(
               projectFilter,
               gte(analyticsEvents.occurredAt, previousStart),
-              sql`${analyticsEvents.occurredAt} < ${rangeStart}`,
+              lt(analyticsEvents.occurredAt, rangeStart),
             ),
           )
       : [undefined];

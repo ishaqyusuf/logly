@@ -1,5 +1,16 @@
 # Implementation Plan
 
+## Portfolio integration completion — 2026-09-22
+
+- [x] Dispatch separate EwaTrade and Halaalvest project tasks with prior evidence.
+- [x] Repair the shared Overview previous-period Date serialization regression;
+  all eight database tests and package typecheck pass.
+- [ ] Verify the shared repair in production and notify both product tasks.
+- [ ] Verify three surfaces per product: Dashboard, Marketing, and Android.
+- [ ] Verify project isolation, production releases, and local/GitHub main integration.
+
+Task ledger: [portfolio integration completion](../.brain/tasks/2026-09-22-portfolio-integration-completion.md).
+
 ## Overview date presets — 2026-09-15
 
 - [x] Inspect the Events presets, Overview read path, and Midday filter reference.

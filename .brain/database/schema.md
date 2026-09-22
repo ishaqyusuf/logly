@@ -24,6 +24,9 @@
   slug before credential verification.
 - Dashboard totals and unique-visitor counts aggregate the complete requested
   project/time window, never the bounded event-detail page.
+- Date bounds use typed Drizzle comparisons so timestamps are serialized for
+  postgres-js. Overview comparison windows have an exclusive upper bound;
+  the 2026-09-22 repair replaces a raw Date interpolation without schema changes.
 - Event-detail queries apply organization/project/search/name/source/date/sort
   conditions in SQL and return cursor metadata for 10–100 row pages (50 by
   default). Filter options are discovered from stored event rows, not a manual

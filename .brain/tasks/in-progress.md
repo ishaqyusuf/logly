@@ -1,5 +1,11 @@
 # In Progress
 
+### [EwaTrade and Halaalvest integration completion](2026-09-22-portfolio-integration-completion.md)
+
+- Status: two project tasks dispatched; worktree setup pending. Each owns
+  Dashboard, Marketing, and Android integration, Logly project separation,
+  production verification, and local/GitHub main integration.
+
 ## Overview date presets — 2026-09-15
 
 - Status: implemented locally.
