@@ -2,9 +2,11 @@
 
 ### [EwaTrade and Halaalvest integration completion](2026-09-22-portfolio-integration-completion.md)
 
-- Status: two project tasks dispatched; worktree setup pending. Each owns
+- Status: both project tasks active. Each owns
   Dashboard, Marketing, and Android integration, Logly project separation,
   production verification, and local/GitHub main integration.
+- Shared Overview Date serialization failure repaired in `82b1eb5`, deployed,
+  and authenticated Chrome verified across 24h, 7d, and 30d.
 
 ## Overview date presets — 2026-09-15
 

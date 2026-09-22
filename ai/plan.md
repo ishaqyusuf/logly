@@ -5,7 +5,7 @@
 - [x] Dispatch separate EwaTrade and Halaalvest project tasks with prior evidence.
 - [x] Repair the shared Overview previous-period Date serialization regression;
   all eight database tests and package typecheck pass.
-- [ ] Verify the shared repair in production and notify both product tasks.
+- [x] Verify the shared repair in production and notify both product tasks.
 - [ ] Verify three surfaces per product: Dashboard, Marketing, and Android.
 - [ ] Verify project isolation, production releases, and local/GitHub main integration.
 

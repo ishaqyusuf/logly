@@ -1,6 +1,6 @@
 # EwaTrade and Halaalvest integration completion
 
-Status: Dispatched; Halaalvest active, EwaTrade setup resolution pending.
+Status: Both project tasks active; shared Overview blocker repaired and deployed.
 
 ## Authorized outcome
 
@@ -19,11 +19,11 @@ and POS are outside this follow-up's named surfaces.
 
 | Task | Project | Creation handle | State |
 | --- | --- | --- | --- |
-| A-E-W01: Complete EwaTrade Logly integration | ewatrade | client-new-thread:0296a14b-90a1-454d-8c09-479980d1789c | Pending setup |
+| A-E-W01: Complete EwaTrade Logly integration | ewatrade | 01a0c810-5934-7da3-9ad0-71e7726b5337 | Active on local host |
 | A-H-W01: Complete Halaalvest Logly integration | halaal-coperative | 01a0c810-7187-7e43-9b64-e423c130a314 | Active on local host |
 
-Handles beginning `client-new-thread:` are not resolved thread IDs. Do not pass
-them to task read/wait/message tools. Resolve unique titles through the task listing.
+Both thread IDs are resolved by direct task progress messages and accepted
+thread tool calls. Task-list discovery did not surface the worktree threads.
 Configured default models were retained.
 
 ## Acceptance checklist per product
@@ -56,5 +56,13 @@ The query now uses Drizzle's typed `lt` comparison, preserving the half-open
 window and project/organization filters while applying timestamp serialization.
 Regression tests exercise the actual Overview query encoder for 24h, 7d, and
 30d. All three failed before the fix and pass after it; all eight DB tests and
-DB typecheck pass. Production release verification is pending. No schema,
-API, or credential change is required.
+DB typecheck pass. Commit `82b1eb5` was pushed to main and deployment
+`dpl_ZoyK4Lou9jKrcsyDgSvKwpUKc3az` is Ready on the canonical production alias.
+Authenticated Chrome verified Halaalvest Mobile Overview for 7d, 24h, and 30d;
+metrics and collection health render successfully. Both product tasks were
+notified. No schema, API, or credential change was required.
+
+The product tasks are coordinating access to the same physical Android device.
+EwaTrade reported scoped release-account authentication working; Halaalvest was
+directed to coordinate the existing authentication method without sending secrets.
+Product integration, merges, and installed-app acceptance remain in progress.
