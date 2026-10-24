@@ -1,3 +1,12 @@
+import { countryName, normalizeCountry } from "@logly/utils";
+
+export function formatCountry(value?: string | null) {
+  const code = normalizeCountry(value);
+  return code
+    ? `${countryFlag(code)} ${countryName(code)} (${code})`
+    : "Unknown";
+}
+
 export function countryFlag(code: string) {
   const normalized = code.trim().toUpperCase();
   if (!/^[A-Z]{2}$/.test(normalized)) return "🌐";
