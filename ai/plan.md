@@ -381,3 +381,16 @@ SchoolClerk dashboard is promoted, completing all six verified web releases. Ewa
 ### 2026-09-12 country analytics production acceptance
 
 A Chrome visit to Halaalvest marketing reached Logly as a United States arrival in `halaalvest-web`. Production Insights now shows the country flag, explicit `1 visit · 100.0%`, a fewer-to-more heat legend and count-relative map shading. Desktop and 390px mobile QA, selection behavior, console checks, focused tests, repository validation and deployment `dpl_CjsARB4jVyf5NKiKMFYRHk7inKJf` pass. Evidence: `.brain/tasks/country-map/production-qa-2026-09-12.md`.
+
+## Afterservice visitor country — 2026-10-24
+
+- [x] Diagnose missing consumer forwarding (Next adapter 0.2.0).
+- [x] Add explicit Cloudflare preference, preserving unknown metadata.
+- [x] Upgrade/patch Afterservice without publishing unrelated SDK changes.
+- [x] Expose country in event table/details and retain pinned action order.
+- [x] Validate actual local proxy/collector/DB/reads, SQL retry semantics,
+  96 tests, both workspace typechecks, production build, desktop/390px UI.
+- [x] Deploy consumer website/dashboard and Logly; fresh production `/` and
+  `/sign-in` visits both display Nigeria (NG) in Logly.
+
+Evidence: `.brain/tasks/country-map/afterservice-2026-10-24.md`.

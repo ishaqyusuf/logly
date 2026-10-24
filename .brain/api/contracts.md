@@ -120,3 +120,18 @@ After existing client-ingest authentication and origin checks, the collector acc
 ### Mobile platform summary
 
 Client-ingest batches accept `source: mobile` only with `platform: ios | android`; browser events may use `platform: web`. Mobile rows may include bounded `appVersion` and `appBuild` strings. The dashboard summary returns complete-window `mobile: { sessions, installations, events, platforms, versions }`, where sessions count `app_session`, installations count distinct project-scoped visitor hashes, and platform/version rows include counts and shares. Event detail exposes platform, version, and build. The dashboard can filter event lists and summaries by platform without mixing those filters into acquisition reporting.
+
+### Cloudflare country forwarding option — 2026-10-24
+
+The Next route adapter accepts optional `trustCloudflareCountry` (default
+false). On Vercel, opted-in product proxies prefer normalized `cf-ipcountry`
+when it or `cf-ray` is present. Missing/invalid Cloudflare location stays
+unknown; direct Vercel traffic uses its existing country header. No IP is
+forwarded. The deployment must supply/overwrite these headers at trusted
+ingress. Existing collector credential/origin checks, country whitelist,
+nullable row field and country-summary contract are unchanged.
+
+Country now appears in Events/Live table columns and event Context details
+as flag + English name + code, or Unknown. Saved table layouts keep the
+actions column last when new columns are introduced. No migration or
+historical backfill is required.

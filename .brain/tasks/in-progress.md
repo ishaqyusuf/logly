@@ -200,3 +200,12 @@ Release branches are pushed for all three consumer repositories. The requested i
 ## Country analytics production QA — 2026-09-12
 
 Halaalvest production generated a located browser arrival and Logly displayed United States, 1 visit, 100.0% with the correct active heat-map polygon. Country flags, explicit visit labels and the fewer-to-more heat legend are deployed in `dpl_CjsARB4jVyf5NKiKMFYRHk7inKJf`. Desktop and 390px mobile QA pass without overflow or console errors. See `country-map/production-qa-2026-09-12.md`.
+
+## Afterservice visit countries — 2026-10-24
+
+Completed and production-verified. Fresh Afterservice website and dashboard
+visits both show Nigeria (NG) in Logly.
+Added opt-in Cloudflare SDK forwarding and event table/detail country labels.
+Afterservice uses published 0.2.1 plus a tracked Bun patch. Existing country
+schema/Insights reports are reused. Validation and rollout notes:
+`country-map/afterservice-2026-10-24.md`.

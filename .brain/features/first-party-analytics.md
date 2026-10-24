@@ -146,3 +146,19 @@ Insights shows country-shaded daily visit arrivals for the selected project's la
 ### Mobile platform analytics
 
 First-party client ingestion now distinguishes browser, iOS, and Android traffic. Mobile adapters emit one privacy-safe `app_session` per installation per UTC day, deduplicated screen views, and allowlisted explicit product events with stable retry IDs. The collector persists bounded platform, app version, and build labels and derives country from the authenticated product proxy; it never requests GPS or stores IP addresses. Insights uses the existing responsive card system to show mobile sessions, installations, total events, Android/iOS shares, and release adoption. Event rows and detail support platform filtering and release metadata. World-map counts include mobile app sessions alongside browser site visits while acquisition remains browser-only.
+
+### Afterservice country integration — 2026-10-24
+
+Afterservice's old Next 0.2.0 proxy did not forward country. It now installs
+0.2.1 with a reproducible Bun patch for the explicit Cloudflare country option
+implemented in this repository. Cloudflare visitor location precedes Vercel
+proxy geography. Missing country remains unknown; no event-body override or
+visitor IP is forwarded.
+
+Events and Live tables now display country flags/names/codes and Unknown;
+event detail includes Country. Existing Insights map/list, SQL scope and
+first-write retry semantics are reused. Local pipeline/SQL checks and
+desktop/mobile UI checks pass. All three surfaces are now deployed. Fresh
+website `/` and dashboard `/sign-in` visits both show Nigeria (NG) in
+production event rows/details. See
+`../tasks/country-map/afterservice-2026-10-24.md`.
