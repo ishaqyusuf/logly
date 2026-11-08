@@ -6,6 +6,8 @@ import {
 } from "node:crypto";
 import type { AnalyticsBatch } from "@ishaqyusuf/logly-core";
 import {
+  actorReadFields,
+  matchesActorRead,
   type AnalyticsEventFilterOptions,
   type AnalyticsEventPage,
   type AnalyticsEventQuery,
@@ -337,6 +339,7 @@ function eventConditions(query: AnalyticsEventQuery) {
   const start = query.start ? new Date(query.start) : null;
   const end = query.end ? new Date(query.end) : null;
   return and(
+    query.actor ? eq(analyticsEvents.actorId, query.actor) : undefined,
     query.project ? eq(analyticsProjects.slug, query.project) : undefined,
     query.organization
       ? eq(analyticsOrganizations.slug, query.organization)
@@ -378,6 +381,7 @@ function mapDashboardEvent({
   project: string;
 }): AnalyticsEventRow {
   return {
+    ...actorReadFields(event),
     id: event.eventId,
     name: event.name,
     project,
@@ -414,6 +418,7 @@ export async function listDashboardEventPage(
         .join(" ")
         .toLowerCase();
       return (
+        matchesActorRead(event, query) &&
         (!query.project || event.project === query.project) &&
         (!query.projects?.length || query.projects.includes(event.project)) &&
         (!query.names?.length || query.names.includes(event.name)) &&

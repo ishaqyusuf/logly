@@ -1,7 +1,13 @@
+import {
+  type ActorReadContext,
+  type ActorReadQuery,
+  matchesActorRead,
+} from "./actor-read";
 import { type CountryVisits, summarizeCountries } from "./countries";
 
+export * from "./actor-read";
 export * from "./countries";
-export type AnalyticsEventRow = {
+export type AnalyticsEventRow = ActorReadContext & {
   id: string;
   name: string;
   project: string;
@@ -25,7 +31,7 @@ export type AnalyticsEventSort =
   | "project"
   | "source";
 
-export type AnalyticsEventQuery = {
+export type AnalyticsEventQuery = ActorReadQuery & {
   organization?: string;
   project?: string;
   projects?: string[];
@@ -216,6 +222,7 @@ function matchesEventQuery(
   const end = includeDate ? validDate(query.end) : null;
   const occurredAt = new Date(event.occurredAt);
   return (
+    matchesActorRead(event, query) &&
     (!query.project || event.project === query.project) &&
     (!query.projects?.length || query.projects.includes(event.project)) &&
     (!query.names?.length || query.names.includes(event.name)) &&

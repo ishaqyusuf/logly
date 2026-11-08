@@ -10,7 +10,11 @@ import {
   listDashboardEventPage,
   verifyProjectCredential,
 } from "@logly/db/queries";
-import { type AnalyticsEventQuery, normalizeFunnelQuery } from "@logly/utils";
+import {
+  type AnalyticsEventQuery,
+  normalizeFunnelQuery,
+  parseActorReadQuery,
+} from "@logly/utils";
 import { Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
 import {
@@ -147,6 +151,11 @@ export function createCollectorApp() {
     if (!globallyAuthorized && !projectAuthorized && !demoRead) {
       return context.json({ error: "Unauthorized" }, 401);
     }
+    try {
+      parseActorReadQuery(context.req.query("actor"));
+    } catch {
+      return context.json({ error: "Invalid event actor" }, 400);
+    }
     await next();
   });
 
@@ -172,6 +181,7 @@ export function createCollectorApp() {
         platform === "web" || platform === "ios" || platform === "android",
     );
     const query: AnalyticsEventQuery = {
+      ...parseActorReadQuery(context.req.query("actor")),
       organization: context.req.query("organization"),
       project: context.req.query("project"),
       projects: split(context.req.query("projects")),
@@ -216,6 +226,7 @@ export function createCollectorApp() {
         platform === "web" || platform === "ios" || platform === "android",
     );
     const query: AnalyticsEventQuery = {
+      ...parseActorReadQuery(context.req.query("actor")),
       organization: context.req.query("organization"),
       project: context.req.query("project"),
       names: split(context.req.query("names")),

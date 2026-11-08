@@ -381,3 +381,12 @@ SchoolClerk dashboard is promoted, completing all six verified web releases. Ewa
 ### 2026-09-12 country analytics production acceptance
 
 A Chrome visit to Halaalvest marketing reached Logly as a United States arrival in `halaalvest-web`. Production Insights now shows the country flag, explicit `1 visit · 100.0%`, a fewer-to-more heat legend and count-relative map shading. Desktop and 390px mobile QA, selection behavior, console checks, focused tests, repository validation and deployment `dpl_CjsARB4jVyf5NKiKMFYRHk7inKJf` pass. Evidence: `.brain/tasks/country-map/production-qa-2026-09-12.md`.
+
+
+## Oversight actor-read compatibility — 2026-11-08
+
+Production event rows omitted already-stored actors. The isolated read contract
+now adds nullable pseudonymous actorId and validated actor filters to event
+rows and complete summaries. No migration or generic-group rollout. Source
+typecheck and focused tests pass; deployment/live acceptance are tracked in
+`.brain/tasks/2026-11-08-oversight-actor-reads.md`.
