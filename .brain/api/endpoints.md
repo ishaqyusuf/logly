@@ -35,3 +35,11 @@
   two to five steps, maximum 90-day range. See contracts for counting rules.
 
 - Event list, options and summary reads accept `platforms`. Event-summary endpoints include the additive `mobile` platform/version aggregate and `geography` country-visit aggregate. `POST /v1/events` accepts mobile platform/app release metadata and country only through authenticated proxy request metadata; see the contracts.
+
+## Breakdown — 2026-11-12 (local)
+
+- `GET /v1/dashboard/breakdown?project=<slug>&start=<iso>&end=<iso>&by=<dims>`:
+  read-key authenticated complete-window breakdown by 1–2 dimensions with
+  event/distinct-actor/distinct-group metrics, optional UTC daily series,
+  top-N plus `(other)`/`(none)` buckets, and optional p50/p95 of a numeric
+  property. Invalid input returns 400. See the contracts.

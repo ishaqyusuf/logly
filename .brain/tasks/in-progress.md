@@ -200,3 +200,8 @@ Release branches are pushed for all three consumer repositories. The requested i
 ## Country analytics production QA — 2026-09-12
 
 Halaalvest production generated a located browser arrival and Logly displayed United States, 1 visit, 100.0% with the correct active heat-map polygon. Country flags, explicit visit labels and the fewer-to-more heat legend are deployed in `dpl_CjsARB4jVyf5NKiKMFYRHk7inKJf`. Desktop and 390px mobile QA pass without overflow or console errors. See `country-map/production-qa-2026-09-12.md`.
+
+## Breakdown read endpoint — 2026-11-12
+
+Implemented locally; see [task](2026-11-12-breakdown-endpoint.md). Release waits
+on the generic-groups release plus user approval for migration, deploy, and npm.

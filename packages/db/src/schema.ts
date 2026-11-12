@@ -237,6 +237,16 @@ export const analyticsEvents = pgTable(
       table.occurredAt,
     ),
     index("analytics_events_project_name_idx").on(table.projectId, table.name),
+    // Breakdown reads: name-filtered windows and JSON property containment.
+    index("analytics_events_project_name_occurred_idx").on(
+      table.projectId,
+      table.name,
+      table.occurredAt,
+    ),
+    index("analytics_events_properties_idx").using(
+      "gin",
+      table.properties.op("jsonb_path_ops"),
+    ),
   ],
 );
 

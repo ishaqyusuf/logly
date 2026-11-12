@@ -51,3 +51,14 @@
 ## Mobile release metadata
 
 `analytics_events.platform`, `analytics_events.app_version`, and `analytics_events.app_build` are nullable text columns. Mobile events require `ios` or `android` at validation; browser events may record `web`; server events remain nullable. Version/build values are bounded opaque release labels. Complete-window mobile session, installation, platform and version aggregates operate within the existing project, organization, date, event, source, platform and search scopes.
+
+## Breakdown indexes — 2026-11-12 (local)
+
+- `analytics_events_project_name_occurred_idx` btree
+  `(project_id, name, occurred_at)` serves name-filtered breakdown windows.
+- `analytics_events_properties_idx` GIN `(properties jsonb_path_ops)` serves
+  property-equality containment filters; the planner can combine it with the
+  existing `(project_id, occurred_at)` index.
+- Property breakdown dimensions and duration percentiles read
+  `properties ->> key` per row inside the project/time window; no per-key
+  expression indexes are created.

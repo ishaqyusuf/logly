@@ -6,6 +6,13 @@ import {
   LOGLY_CORE_VERSION,
   sanitizeProperties,
 } from "@ishaqyusuf/logly-core";
+import {
+  breakdownSearchParams,
+  type LoglyBreakdownQuery,
+  type LoglyBreakdownResult,
+} from "./breakdown";
+
+export * from "./breakdown";
 
 type ServerAnalyticsConfig = {
   project: string;
@@ -84,5 +91,13 @@ export function createAdminClient(config: {
       throw new Error(`Logly read API returned ${response.status}`);
     return response.json() as Promise<T>;
   }
-  return { read };
+  return {
+    read,
+    /** Complete-window aggregates from GET /v1/dashboard/breakdown. */
+    breakdown(query: LoglyBreakdownQuery) {
+      return read<LoglyBreakdownResult>(
+        `/v1/dashboard/breakdown?${breakdownSearchParams(query)}`,
+      );
+    },
+  };
 }

@@ -1194,4 +1194,5 @@ export async function getDashboardData(
   };
 }
 
+export { getDashboardBreakdown } from "./breakdown";
 export { getDashboardFunnel } from "./funnel";

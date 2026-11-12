@@ -120,3 +120,45 @@ After existing client-ingest authentication and origin checks, the collector acc
 ### Mobile platform summary
 
 Client-ingest batches accept `source: mobile` only with `platform: ios | android`; browser events may use `platform: web`. Mobile rows may include bounded `appVersion` and `appBuild` strings. The dashboard summary returns complete-window `mobile: { sessions, installations, events, platforms, versions }`, where sessions count `app_session`, installations count distinct project-scoped visitor hashes, and platform/version rows include counts and shares. Event detail exposes platform, version, and build. The dashboard can filter event lists and summaries by platform without mixing those filters into acquisition reporting.
+
+## Breakdown reads — 2026-11-12 (local)
+
+`GET /v1/dashboard/breakdown` returns complete-window aggregates computed in one
+SQL statement (`packages/db/src/queries/breakdown.ts`), never derived from the
+paged event list. Authentication is the same `/v1/dashboard/*` read middleware:
+a project-scoped `read` key for the requested `project` (or the global read key).
+
+Parsing is strict (`parseBreakdownQuery` in `packages/utils/src/breakdown.ts`);
+any invalid parameter returns `400 { error }` instead of being ignored.
+
+- Required: `project`, `start`, `end` (ISO 8601 date-times with a zone). The
+  window is half-open `[start, end)` and at most 366 days.
+- `by`: one or two of `name | source | platform | property:<snake_case_key>`.
+- `metrics` ⊆ `events | actors | groups` (default `events`). `actors` counts
+  distinct hashed `actorId`; `groups` counts distinct hashed group keys of
+  `metricGroupType` (snake_case, default `business`).
+- `limit` 1–20 (default 10): top values per dimension by event count over the
+  whole window, ties alphabetical. Remaining values fold into `(other)`. Null
+  platform, a missing property, or a JSON-null property become `(none)`, which
+  is always explicit and never folded into `(other)`.
+- `durationProperty=<snake_case_key>`: `percentile_cont` p50/p95 and sample
+  count over numeric values only; non-numeric values are ignored.
+- `interval=day`: adds a UTC daily `series` containing every day of the window
+  (zero totals on empty days). Output is bounded: days × (limit + 2)^dimensions
+  ≤ 50,000 or the request is rejected.
+- Filters: `organization`, comma-separated `names` (≤50), `sources`,
+  `platforms`, `actor` (64-hex hashed reference), `groupType`/`groupKey`,
+  `propertyKey`/`propertyValue` (JSON scalar, as event-summary).
+
+Response: `{ project, start, end, by, metrics, metricGroupType, interval, limit,
+durationProperty, totals, buckets[], series? }`. Each bucket is
+`{ dimensions: { "<dimension>": "<value>" }, events?, actors?, groups?,
+duration?: { p50, p95, samples } }`; only requested metrics appear. Totals and
+day totals are computed with grouping sets, so distinct counts are exact rather
+than sums of buckets. Without a database the endpoint returns 503 (no demo
+fallback). The `groups` metric and group filters require the generic-groups
+migration `0005`.
+
+`@ishaqyusuf/logly-server` exposes `createAdminClient(...).breakdown(query)`
+with matching `LoglyBreakdownQuery`/`LoglyBreakdownResult` types (unpublished).
+No dashboard same-origin proxy exists yet; add one when a dashboard view needs it.

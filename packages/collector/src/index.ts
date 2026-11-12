@@ -1,5 +1,6 @@
 import { analyticsBatchSchema } from "@ishaqyusuf/logly-core";
 import {
+  getDashboardBreakdown,
   getDashboardData,
   getDashboardEventById,
   getDashboardEventFilterOptions,
@@ -12,8 +13,10 @@ import {
 } from "@logly/db/queries";
 import {
   type AnalyticsEventQuery,
+  BreakdownQueryError,
   normalizeFunnelQuery,
   parseActorReadQuery,
+  parseBreakdownQuery,
 } from "@logly/utils";
 import { Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
@@ -240,6 +243,25 @@ export function createCollectorApp() {
       return context.json({ error: "Project is required" }, 400);
     }
     return context.json(await getDashboardEventSummary(query));
+  });
+  app.get("/v1/dashboard/breakdown", async (context) => {
+    let query: ReturnType<typeof parseBreakdownQuery>;
+    try {
+      query = parseBreakdownQuery({
+        get: (key) => context.req.query(key) ?? null,
+      });
+    } catch (error) {
+      if (error instanceof BreakdownQueryError)
+        return context.json({ error: error.message }, 400);
+      throw error;
+    }
+    const result = await getDashboardBreakdown(query);
+    return result
+      ? context.json(result)
+      : context.json(
+          { error: "Breakdown requires the analytics database" },
+          503,
+        );
   });
   app.get("/v1/dashboard/events/:eventId", async (context) => {
     const project = context.req.query("project");

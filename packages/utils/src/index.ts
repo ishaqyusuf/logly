@@ -6,6 +6,7 @@ import {
 import { type CountryVisits, summarizeCountries } from "./countries";
 
 export * from "./actor-read";
+export * from "./breakdown";
 export * from "./countries";
 export type AnalyticsEventRow = ActorReadContext & {
   id: string;

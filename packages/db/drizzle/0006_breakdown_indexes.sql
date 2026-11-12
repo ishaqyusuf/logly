@@ -1,0 +1,2 @@
+CREATE INDEX "analytics_events_project_name_occurred_idx" ON "analytics_events" USING btree ("project_id","name","occurred_at");--> statement-breakpoint
+CREATE INDEX "analytics_events_properties_idx" ON "analytics_events" USING gin ("properties" jsonb_path_ops);
