@@ -36,6 +36,20 @@
       "when": 1789251315666,
       "tag": "0004_long_warbird",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790852857798,
+      "tag": "0005_friendly_celestials",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794502423144,
+      "tag": "0006_breakdown_indexes",
+      "breakpoints": true
     }
   ]
 }
