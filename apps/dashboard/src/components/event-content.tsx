@@ -5,10 +5,12 @@ import {
   Clock3,
   Fingerprint,
   Globe2,
+  MapPin,
   Route,
   Smartphone,
 } from "lucide-react";
 import { EventSheetHeader } from "@/components/event-sheet-header";
+import { formatCountry } from "@/lib/country-display";
 
 export function EventContent({
   event,
@@ -54,6 +56,11 @@ export function EventContent({
               icon={Route}
               label="Route"
               value={event.route ?? "Server event"}
+            />
+            <Detail
+              icon={MapPin}
+              label="Country"
+              value={formatCountry(event.country)}
             />
             {event.platform ? (
               <Detail

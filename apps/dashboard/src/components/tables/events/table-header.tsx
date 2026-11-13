@@ -28,6 +28,7 @@ const LABELS: Record<string, string> = {
   identity: "Identity",
   route: "Route",
   source: "Source",
+  country: "Country",
   time: "Received",
   actions: "",
 };

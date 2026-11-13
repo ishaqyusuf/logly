@@ -6,6 +6,7 @@ import type { AnalyticsEventRow } from "@logly/utils";
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatDistanceToNowStrict } from "date-fns";
 import { CircleDot, Server, UserRound } from "lucide-react";
+import { formatCountry } from "@/lib/country-display";
 import { ActionsMenu } from "./actions-menu";
 
 export const columns: ColumnDef<AnalyticsEventRow>[] = [
@@ -92,6 +93,22 @@ export const columns: ColumnDef<AnalyticsEventRow>[] = [
     cell: ({ row }) => (
       <span className="block max-w-[180px] truncate font-mono text-[11px] text-muted-foreground">
         {row.original.route ?? "—"}
+      </span>
+    ),
+  },
+  {
+    id: "country",
+    accessorKey: "country",
+    size: 220,
+    minSize: 160,
+    meta: { skeleton: { type: "text", width: "w-28" }, headerLabel: "Country" },
+    header: "Country",
+    cell: ({ row }) => (
+      <span
+        className="block truncate text-xs"
+        title={formatCountry(row.original.country)}
+      >
+        {formatCountry(row.original.country)}
       </span>
     ),
   },

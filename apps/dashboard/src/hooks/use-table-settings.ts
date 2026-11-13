@@ -31,12 +31,14 @@ export function useTableSettings(tableId: string, columnIds: string[]) {
           ...current,
           ...parsed,
           columnOrder: [
-            ...(parsed.columnOrder ?? []).filter((id) =>
-              columnIds.includes(id),
+            ...(parsed.columnOrder ?? []).filter(
+              (id) => columnIds.includes(id) && id !== "actions",
             ),
             ...columnIds.filter(
-              (id) => !(parsed.columnOrder ?? []).includes(id),
+              (id) =>
+                id !== "actions" && !(parsed.columnOrder ?? []).includes(id),
             ),
+            ...(columnIds.includes("actions") ? ["actions"] : []),
           ],
         }));
       } catch {

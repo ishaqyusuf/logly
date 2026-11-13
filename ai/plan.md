@@ -391,6 +391,19 @@ rows and complete summaries. No migration or generic-group rollout. Source
 typecheck and focused tests pass; deployment/live acceptance are tracked in
 `.brain/tasks/2026-11-08-oversight-actor-reads.md`.
 
+## Afterservice visitor country — 2026-10-24
+
+- [x] Diagnose missing consumer forwarding (Next adapter 0.2.0).
+- [x] Add explicit Cloudflare preference, preserving unknown metadata.
+- [x] Upgrade/patch Afterservice without publishing unrelated SDK changes.
+- [x] Expose country in event table/details and retain pinned action order.
+- [x] Validate actual local proxy/collector/DB/reads, SQL retry semantics,
+  96 tests, both workspace typechecks, production build, desktop/390px UI.
+- [x] Deploy consumer website/dashboard and Logly; fresh production `/` and
+  `/sign-in` visits both display Nigeria (NG) in Logly.
+
+Evidence: `.brain/tasks/country-map/afterservice-2026-10-24.md`.
+
 
 ## Overview redesign (Pulse) — 2026-11-13
 
