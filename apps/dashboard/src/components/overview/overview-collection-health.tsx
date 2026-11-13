@@ -1,6 +1,7 @@
 import { cn } from "@logly/ui/cn";
 import type { AnalyticsCollectionHealth } from "@logly/utils";
 import { formatDistanceToNowStrict } from "date-fns";
+import { formatLagDuration } from "@/lib/lag-duration";
 
 function formatUtc(value: string) {
   return new Date(value)
@@ -19,6 +20,10 @@ export function OverviewCollectionHealth({
   className?: string;
 }) {
   const observed = mode === "database" ? health.lastReceivedAt : null;
+  const lag =
+    mode === "database" && health.averageLagSeconds !== null
+      ? formatLagDuration(health.averageLagSeconds)
+      : null;
   // Only a receipt inside the 24-hour window counts as currently arriving.
   const arriving = Boolean(observed) && health.recentEvents > 0;
   const status =
@@ -83,11 +88,11 @@ export function OverviewCollectionHealth({
               Average arrival lag
             </dt>
             <dd className="mt-1 text-xl font-medium tracking-[-0.03em] tabular-nums">
-              {mode === "database" && health.averageLagSeconds !== null ? (
+              {lag ? (
                 <>
-                  {health.averageLagSeconds.toFixed(1)}
-                  <span className="ml-0.5 text-xs tracking-normal text-muted-foreground">
-                    seconds
+                  {lag.value}
+                  <span className="ml-1 text-xs tracking-normal text-muted-foreground">
+                    {lag.unit}
                   </span>
                 </>
               ) : (
