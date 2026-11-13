@@ -61,3 +61,16 @@ Older adapters and deployments without trusted geographic metadata produce
 unknown locations. The collector stores only validated ISO country codes,
 never IP addresses or GPS coordinates. Update and deploy your product proxy
 to enable country counts for new visits; historical visits remain unknown.
+
+### Visitor country behind Cloudflare on Vercel
+
+The same-origin route reads `x-vercel-ip-country` only in Vercel runtime.
+Set `trustCloudflareCountry: true` when your deployment's trusted ingress
+supplies/overwrites Cloudflare visitor headers. It then prefers `cf-ipcountry`
+if that header or `cf-ray` is present. Missing/invalid Cloudflare metadata
+stays unknown instead of using Vercel's proxy geography. Direct Vercel traffic
+retains the default country behavior. Other runtimes send no country.
+
+Only the normalized two-letter country is forwarded as `x-logly-country`;
+incoming browser overrides and forwarded IPs are ignored. The collector
+applies its ISO country whitelist. No location is added to the event body.

@@ -7,6 +7,8 @@ type RouteOptions = {
   collectorUrl?: string;
   projectKey?: string;
   serverKey?: string;
+  /** Trust Cloudflare visitor headers supplied by the product deployment. */
+  trustCloudflareCountry?: boolean;
   onBatch?: (batch: AnalyticsBatch, request: Request) => Promise<void>;
 };
 
@@ -39,9 +41,18 @@ export function createAnalyticsRoute(options: RouteOptions) {
 
     const origin = request.headers.get("origin");
     // Read location only at the product edge, never at the remote collector.
+    const cloudflareCountry = request.headers.get("cf-ipcountry");
+    const usesCloudflare =
+      options.trustCloudflareCountry &&
+      (cloudflareCountry !== null || request.headers.has("cf-ray"));
     const country =
       process.env.VERCEL === "1"
-        ? request.headers.get("x-vercel-ip-country")
+        ? (usesCloudflare
+            ? cloudflareCountry
+            : request.headers.get("x-vercel-ip-country")
+          )
+            ?.trim()
+            .toUpperCase()
         : null;
     const response = await fetch(
       `${options.collectorUrl.replace(/\/$/, "")}/v1/events`,

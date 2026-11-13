@@ -205,3 +205,12 @@ Halaalvest production generated a located browser arrival and Logly displayed Un
 
 Implemented locally; see [task](2026-11-12-breakdown-endpoint.md). Release waits
 on the generic-groups release plus user approval for migration, deploy, and npm.
+
+## Afterservice visit countries — 2026-10-24
+
+Completed and production-verified. Fresh Afterservice website and dashboard
+visits both show Nigeria (NG) in Logly.
+Added opt-in Cloudflare SDK forwarding and event table/detail country labels.
+Afterservice uses published 0.2.1 plus a tracked Bun patch. Existing country
+schema/Insights reports are reused. Validation and rollout notes:
+`country-map/afterservice-2026-10-24.md`.
