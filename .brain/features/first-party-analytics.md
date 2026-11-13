@@ -34,6 +34,16 @@
   recent signals follow the selected window. Observed collection health retains
   its independent 24-hour receipt window. A KPI comparison without prior-window
   data displays an explicit unavailable state rather than a fabricated 0% change.
+- Overview layout is the Workshop-selected **02 Pulse** direction
+  (`https://workshop.localhost/logly/dashboard/overview-redesign`, revision
+  `fe34711a`, selected 2026-11-13): the four KPIs (unique visitors, new,
+  returning, events) are tabs that drive one chart with a dashed
+  previous-period overlay; the tab is URL state (`metric=visitors|new|returning|events`,
+  shallow) and survives range changes. 24h reads hourly buckets. Below the chart:
+  top events with prior-window change ("New" when the prior count is zero),
+  recent events, and collection health. Collection health shows "Arrival data
+  available" only when receipts exist in the last 24 hours; an older last
+  receipt reads "No arrivals in 24 hours".
 - Compute summaries over the complete requested project and time window; never
   derive totals from a paginated or truncated event list.
 - Provide URL-driven search, mandatory project scope, source, event-name,

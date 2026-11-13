@@ -390,3 +390,14 @@ now adds nullable pseudonymous actorId and validated actor filters to event
 rows and complete summaries. No migration or generic-group rollout. Source
 typecheck and focused tests pass; deployment/live acceptance are tracked in
 `.brain/tasks/2026-11-08-oversight-actor-reads.md`.
+
+
+## Overview redesign (Pulse) — 2026-11-13
+
+- [x] Workshop four Overview directions; user selected 02 Pulse.
+- [x] Additive overview read fields: hourly 24h buckets, zero-filled aligned
+  previous window, per-bucket new/returning, top-event prior counts.
+- [x] Rebuild `/overview` from `components/overview/*` and
+  `components/charts/overview-trend-chart.tsx`; URL-backed metric tab.
+- [x] Tests, typecheck, production build, local desktop/mobile browser QA.
+- [ ] Deploy collector then dashboard; verify on production data.

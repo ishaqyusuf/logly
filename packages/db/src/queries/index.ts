@@ -36,6 +36,7 @@ import {
   sql,
 } from "drizzle-orm";
 import { getDatabase } from "../client";
+import { getOverviewTopEvents, getOverviewTrend } from "./overview-trend";
 import {
   analyticsEvents,
   analyticsOrganizations,
@@ -1048,50 +1049,13 @@ export async function getDashboardData(
           )
       : [undefined];
 
-  const trendStart = rangeStart ?? new Date();
-  if (!rangeStart) {
-    trendStart.setUTCHours(0, 0, 0, 0);
-    trendStart.setUTCDate(trendStart.getUTCDate() - 13);
-  }
   const [trend, topEvents] = await Promise.all([
-    db
-      .select({
-        date: sql<string>`to_char(date_trunc('day', ${analyticsEvents.occurredAt}), 'YYYY-MM-DD')`,
-        events: sql<number>`count(*)::int`,
-        visitors: sql<number>`count(distinct ${analyticsEvents.visitorKey})::int`,
-      })
-      .from(analyticsEvents)
-      .innerJoin(
-        analyticsProjects,
-        eq(analyticsEvents.projectId, analyticsProjects.id),
-      )
-      .innerJoin(
-        analyticsOrganizations,
-        eq(analyticsProjects.organizationId, analyticsOrganizations.id),
-      )
-      .where(and(projectFilter, gte(analyticsEvents.occurredAt, trendStart)))
-      .groupBy(sql`date_trunc('day', ${analyticsEvents.occurredAt})`)
-      .orderBy(sql`date_trunc('day', ${analyticsEvents.occurredAt})`),
-    db
-      .select({ name: analyticsEvents.name, count: sql<number>`count(*)::int` })
-      .from(analyticsEvents)
-      .innerJoin(
-        analyticsProjects,
-        eq(analyticsEvents.projectId, analyticsProjects.id),
-      )
-      .innerJoin(
-        analyticsOrganizations,
-        eq(analyticsProjects.organizationId, analyticsOrganizations.id),
-      )
-      .where(
-        and(
-          projectFilter,
-          rangeStart ? gte(analyticsEvents.occurredAt, rangeStart) : undefined,
-        ),
-      )
-      .groupBy(analyticsEvents.name)
-      .orderBy(desc(sql`count(*)`))
-      .limit(5),
+    getOverviewTrend(db, projectFilter, {
+      range,
+      rangeStart,
+      previousStart,
+    }),
+    getOverviewTopEvents(db, projectFilter, { rangeStart, previousStart }),
   ]);
 
   const startOfToday = new Date();
@@ -1167,7 +1131,9 @@ export async function getDashboardData(
             ) / 10
           : null,
       },
-      trend,
+      trend: trend.trend,
+      trendGranularity: trend.trendGranularity,
+      previousTrend: trend.previousTrend,
       topEvents,
     },
     events,

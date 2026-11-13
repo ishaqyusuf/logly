@@ -60,14 +60,23 @@ export type AnalyticsEventFilterOptions = {
 };
 
 export type AnalyticsTrendPoint = {
+  /** `YYYY-MM-DD` for day buckets, `YYYY-MM-DDTHH:00:00Z` for hour buckets (UTC). */
   date: string;
   events: number;
   visitors: number;
+  /** `site_visit` events marked new in this bucket (same definition as the KPI). */
+  newVisitors?: number;
+  /** `site_visit` events marked returning in this bucket (same definition as the KPI). */
+  returningVisitors?: number;
 };
+
+export type AnalyticsTrendGranularity = "hour" | "day";
 
 export type AnalyticsTopEvent = {
   name: string;
   count: number;
+  /** Count in the immediately preceding equal window; absent without a range. */
+  previousCount?: number;
 };
 
 export type AnalyticsEventNameSummary = {
@@ -187,6 +196,10 @@ export type AnalyticsOverview = {
   collectionHealth: AnalyticsCollectionHealth;
   change: { visitors: number | null; events: number | null };
   trend?: AnalyticsTrendPoint[];
+  /** Bucket size of `trend` and `previousTrend`; absent responses use day buckets. */
+  trendGranularity?: AnalyticsTrendGranularity;
+  /** Gap-filled buckets for the preceding equal window, index-aligned with `trend`. */
+  previousTrend?: AnalyticsTrendPoint[];
   topEvents?: AnalyticsTopEvent[];
 };
 

@@ -52,6 +52,23 @@ collector retains its existing all-history totals and 14-day trend for other
 dashboard shell reads. `collectionHealth` always measures receipts in the last
 24 hours, independently of the selected overview range.
 
+Ranged overview responses also carry these additive, optional fields (added
+2026-11-13 for the Pulse Overview; older collectors omit them and the
+dashboard degrades to an unavailable-series state):
+
+- `trendGranularity`: `hour` for `24h`, otherwise `day`. Buckets are UTC.
+  Day keys are `YYYY-MM-DD`; hour keys are `YYYY-MM-DDTHH:00:00Z`.
+- `trend[]` is zero-filled from the bucket containing the window start through
+  the bucket containing now. Each point adds `newVisitors` and
+  `returningVisitors`, counted as `site_visit` events with that `visitKind`
+  (the same definition as the KPI totals).
+- `previousTrend[]`: the immediately preceding equal window, zero-filled with
+  the same bucket size and index-aligned with `trend[]` (same length).
+- `topEvents[].previousCount`: that event name's count in the preceding window.
+
+Without `range`, the trend stays the 14-day daily series (now zero-filled and
+with visitor-kind counts) and `previousTrend`/`previousCount` are omitted.
+
 ## Dashboard Event Reads
 
 Event-list reads accept optional `organization`, `project`, comma-separated

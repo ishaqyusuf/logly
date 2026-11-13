@@ -1,5 +1,21 @@
 # In Progress
 
+## Overview redesign — Pulse — 2026-11-13
+
+- Status: implemented locally; not deployed.
+- Workshop `logly/dashboard/overview-redesign` compared four directions; the
+  user selected 02 Pulse (revision `fe34711a`). Metric tabs drive one chart with
+  a previous-period overlay; top events, recent events, and collection health
+  sit below.
+- Additive optional overview read fields (`trendGranularity`, `previousTrend`,
+  per-bucket `newVisitors`/`returningVisitors`, top-event `previousCount`) are
+  documented in `../api/contracts.md`. Deploy the collector before relying on
+  them; the dashboard tolerates their absence.
+- Workspace tests, typecheck, and dashboard production build pass. Browser QA
+  against the local stack covered desktop and 375px, tab/keyboard/URL state,
+  range switching, tooltip, and empty states. Hourly 24h buckets were verified
+  through the collector response, but not visually with live hourly traffic.
+
 ### [EwaTrade and Halaalvest integration completion](2026-09-22-portfolio-integration-completion.md)
 
 - Status: both project tasks active. Each owns
