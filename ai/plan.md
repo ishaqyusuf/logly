@@ -413,4 +413,5 @@ Evidence: `.brain/tasks/country-map/afterservice-2026-10-24.md`.
 - [x] Rebuild `/overview` from `components/overview/*` and
   `components/charts/overview-trend-chart.tsx`; URL-backed metric tab.
 - [x] Tests, typecheck, production build, local desktop/mobile browser QA.
-- [ ] Deploy collector then dashboard; verify on production data.
+- [x] Released `a61d85e` to Vercel production (collector ships in the
+  dashboard deploy); verified Afterservice 7d/24h on production data.
