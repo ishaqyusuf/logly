@@ -2,19 +2,24 @@
 
 ## Overview redesign — Pulse — 2026-11-13
 
-- Status: implemented locally; not deployed.
+- Status: released 2026-11-13. GitHub `main` `a61d85e` (merge of `0f05664`
+  with origin's visitor-country work); Vercel production deploy succeeded. The
+  collector ships inside the dashboard (`app/v1/[...path]`), so one deploy
+  carried both. Production QA on Afterservice: 7d and 24h ranges, Events tab,
+  previous-period overlay, top-event changes, and live hourly buckets render
+  with no console errors.
 - Workshop `logly/dashboard/overview-redesign` compared four directions; the
   user selected 02 Pulse (revision `fe34711a`). Metric tabs drive one chart with
   a previous-period overlay; top events, recent events, and collection health
   sit below.
 - Additive optional overview read fields (`trendGranularity`, `previousTrend`,
   per-bucket `newVisitors`/`returningVisitors`, top-event `previousCount`) are
-  documented in `../api/contracts.md`. Deploy the collector before relying on
-  them; the dashboard tolerates their absence.
+  documented in `../api/contracts.md`; the dashboard tolerates their absence.
 - Workspace tests, typecheck, and dashboard production build pass. Browser QA
   against the local stack covered desktop and 375px, tab/keyboard/URL state,
-  range switching, tooltip, and empty states. Hourly 24h buckets were verified
-  through the collector response, but not visually with live hourly traffic.
+  range switching, tooltip, and empty states.
+- Arrival lag now shows in the largest readable unit (`29769` seconds reads
+  as `8.3 hours`); released with commit `2161615`.
 
 ### [EwaTrade and Halaalvest integration completion](2026-09-22-portfolio-integration-completion.md)
 
@@ -221,3 +226,12 @@ Halaalvest production generated a located browser arrival and Logly displayed Un
 
 Implemented locally; see [task](2026-11-12-breakdown-endpoint.md). Release waits
 on the generic-groups release plus user approval for migration, deploy, and npm.
+
+## Afterservice visit countries — 2026-10-24
+
+Completed and production-verified. Fresh Afterservice website and dashboard
+visits both show Nigeria (NG) in Logly.
+Added opt-in Cloudflare SDK forwarding and event table/detail country labels.
+Afterservice uses published 0.2.1 plus a tracked Bun patch. Existing country
+schema/Insights reports are reused. Validation and rollout notes:
+`country-map/afterservice-2026-10-24.md`.

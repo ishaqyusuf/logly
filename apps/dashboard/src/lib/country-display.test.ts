@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import {
   countryFlag,
   countryHeatOpacity,
+  formatCountry,
   formatVisitCount,
 } from "./country-display";
 
@@ -22,4 +23,12 @@ test("visit counts use the correct singular and plural labels", () => {
   expect(formatVisitCount(1)).toBe("1 visit");
   expect(formatVisitCount(2)).toBe("2 visits");
   expect(formatVisitCount(1234)).toBe("1,234 visits");
+});
+
+test("event country labels preserve unknown and invalid locations", () => {
+  expect(formatCountry("NG")).toBe("🇳🇬 Nigeria (NG)");
+  expect(formatCountry("gb")).toBe("🇬🇧 United Kingdom (GB)");
+  expect(formatCountry(null)).toBe("Unknown");
+  expect(formatCountry("XX")).toBe("Unknown");
+  expect(formatCountry("ZZ")).toBe("Unknown");
 });
