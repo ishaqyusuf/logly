@@ -112,11 +112,9 @@ export default async function SettingsPage({
               </p>
             </div>
             <Badge
-              variant={
-                workspace.data.mode === "database" ? "success" : "warning"
-              }
+              variant={workspace.mode === "database" ? "success" : "warning"}
             >
-              {workspace.data.mode}
+              {workspace.mode}
             </Badge>
           </div>
           <div className="space-y-5 p-5">

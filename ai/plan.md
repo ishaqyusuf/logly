@@ -415,3 +415,14 @@ Evidence: `.brain/tasks/country-map/afterservice-2026-10-24.md`.
 - [x] Tests, typecheck, production build, local desktop/mobile browser QA.
 - [x] Released `a61d85e` to Vercel production (collector ships in the
   dashboard deploy); verified Afterservice 7d/24h on production data.
+
+## Vercel runtime optimization — 2026-11-14
+
+- [x] Trace collector reads, polling, retries, and the dashboard build graph.
+- [x] Remove unused scoped overview reads and bound Live refreshes.
+- [x] Compare local request counts and latency, test auth and project isolation,
+  and audit dashboard build scope.
+- [ ] Verify protected preview, production route attribution, and rollback
+  compatibility once provider access and release authorization are available.
+
+Evidence: [Vercel runtime optimization](../.brain/tasks/2026-11-14-vercel-runtime-optimization.md).
