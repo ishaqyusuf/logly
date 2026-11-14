@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import type { AnalyticsOverviewRange } from "@logly/utils";
 import { getDashboardData } from "@/lib/dashboard-data";
 import {
   projectWorkspaceHref,
@@ -12,7 +11,6 @@ export async function loadProjectWorkspace(input: {
   pathname: string;
   searchParams: SearchParams;
   allowEmpty?: boolean;
-  overviewRange?: AnalyticsOverviewRange;
 }) {
   const shell = await getDashboardData();
   const requestedOrganization =
@@ -39,7 +37,7 @@ export async function loadProjectWorkspace(input: {
         }),
       );
     }
-    return { data: shell, ...workspace };
+    return { mode: shell.mode, ...workspace };
   }
 
   if (
@@ -51,10 +49,5 @@ export async function loadProjectWorkspace(input: {
     );
   }
 
-  const data = await getDashboardData({
-    organization: workspace.organization?.slug,
-    project: workspace.project.slug,
-    range: input.overviewRange,
-  });
-  return { data, ...workspace };
+  return { mode: shell.mode, ...workspace };
 }

@@ -15,9 +15,6 @@ export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const hasSession = Boolean(getSessionCookie(request));
 
-  if (hasSession && pathname === "/sign-in") {
-    return NextResponse.redirect(new URL("/events", request.url));
-  }
   if (hasSession || isPublicPath(pathname)) return NextResponse.next();
 
   const signInUrl = new URL("/sign-in", request.url);

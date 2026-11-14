@@ -401,3 +401,14 @@ typecheck and focused tests pass; deployment/live acceptance are tracked in
   `components/charts/overview-trend-chart.tsx`; URL-backed metric tab.
 - [x] Tests, typecheck, production build, local desktop/mobile browser QA.
 - [ ] Deploy collector then dashboard; verify on production data.
+
+## Vercel runtime optimization — 2026-11-14
+
+- [x] Trace collector reads, polling, retries, and the dashboard build graph.
+- [x] Remove unused scoped overview reads and bound Live refreshes.
+- [x] Compare local request counts and latency, test auth and project isolation,
+  and audit dashboard build scope.
+- [ ] Verify protected preview, production route attribution, and rollback
+  compatibility once provider access and release authorization are available.
+
+Evidence: [Vercel runtime optimization](../.brain/tasks/2026-11-14-vercel-runtime-optimization.md).

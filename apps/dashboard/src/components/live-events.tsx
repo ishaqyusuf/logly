@@ -5,7 +5,9 @@ import type { AnalyticsEventPage } from "@logly/utils";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNowStrict } from "date-fns";
 import { Activity, Radio } from "lucide-react";
+import Link from "next/link";
 import { useEventParams } from "@/hooks/use-event-params";
+import { isLiveSessionExpired, liveEventsQuery } from "@/lib/live-events-query";
 
 export function LiveEvents({
   initialPage,
@@ -17,34 +19,43 @@ export function LiveEvents({
   project: string;
 }) {
   const { setParams } = useEventParams();
-  const eventsQuery = useQuery({
-    queryKey: ["dashboard-live-events", project],
-    queryFn: async () => {
-      const params = new URLSearchParams({
-        project,
-        pageSize: "50",
-        start: new Date(Date.now() - 15 * 60_000).toISOString(),
-      });
-      if (organization) params.set("organization", organization);
-      const response = await fetch(`/api/dashboard/events?${params}`);
-      if (!response.ok) throw new Error("Could not refresh live events");
-      return response.json() as Promise<AnalyticsEventPage>;
-    },
-    initialData: initialPage,
-    refetchInterval: 10_000,
-  });
+  const eventsQuery = useQuery(
+    liveEventsQuery({ initialPage, organization, project }),
+  );
+  const sessionExpired = isLiveSessionExpired(eventsQuery.error);
+  const workspace = new URLSearchParams({ project });
+  if (organization) workspace.set("organization", organization);
+  const signIn = new URLSearchParams({ return_to: `/live?${workspace}` });
   return (
     <section className="overflow-hidden rounded-xl border bg-white shadow-soft">
       <div className="flex items-center justify-between border-b p-5">
         <div>
           <p className="text-sm font-semibold">Live stream</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Automatically refreshes every 10 seconds
+            {sessionExpired ? (
+              <>
+                Session expired.{" "}
+                <Link
+                  className="underline"
+                  href={`/sign-in?${signIn}`}
+                  prefetch={false}
+                >
+                  Sign in to resume.
+                </Link>
+              </>
+            ) : eventsQuery.isError ? (
+              "Could not refresh live events."
+            ) : (
+              "Refreshes every 10 seconds with events and every 30 seconds when empty."
+            )}
           </p>
         </div>
-        <Badge variant="success" className="gap-1.5">
+        <Badge
+          variant={eventsQuery.isError ? "outline" : "success"}
+          className="gap-1.5"
+        >
           <Radio className="size-3" />
-          Listening
+          {eventsQuery.isError ? "Refresh failed" : "Listening"}
         </Badge>
       </div>
       <div className="divide-y">

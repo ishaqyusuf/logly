@@ -61,10 +61,13 @@
 - Put the complete filtered event count, count by event name, trend, and
   previous-window momentum above the paginated event table. These summaries
   use complete-window queries and change with the same project and filter state.
-- Provide connected Live, Insights, and project Settings views. Live polls the
-  last 15 minutes for instrumentation checks; Insights summarizes 30-day event,
-  route, and source patterns; Settings shows only the selected project's
-  identity, collector state, and privacy boundaries.
+- Provide connected Live, Insights, and project Settings views. Live starts
+  with a server-rendered 15-minute window and polls in the foreground every
+  10 seconds with events or 30 seconds when empty. Each poll makes one attempt.
+  A transient failure returns to the slower cadence, and an expired session
+  pauses polling until sign-in. Insights summarizes 30-day event, route, and
+  source patterns. Settings shows the selected project's identity, collector
+  state, and privacy boundaries.
 
 ## Production Readiness
 

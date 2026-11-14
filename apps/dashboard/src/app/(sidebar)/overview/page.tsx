@@ -8,6 +8,7 @@ import { OverviewStatus } from "@/components/overview/overview-status";
 import { OverviewTopEvents } from "@/components/overview/overview-top-events";
 import { OverviewRangeFilter } from "@/components/overview-range-filter";
 import { ScrollableContent } from "@/components/scrollable-content";
+import { getDashboardData } from "@/lib/dashboard-data";
 import { loadProjectWorkspace } from "@/lib/project-workspace-server";
 
 export const metadata: Metadata = { title: "Overview" };
@@ -33,10 +34,14 @@ export default async function OverviewPage({
   const workspace = await loadProjectWorkspace({
     pathname: "/overview",
     searchParams: params,
-    overviewRange: range,
   });
-  if (!workspace.project) throw new Error("A project workspace is required");
-  const { data, project } = workspace;
+  const { project, organization } = workspace;
+  if (!project) throw new Error("A project workspace is required");
+  const data = await getDashboardData({
+    organization: organization?.slug,
+    project: project.slug,
+    range,
+  });
   const scope = new URLSearchParams();
   if (workspace.organization)
     scope.set("organization", workspace.organization.slug);
