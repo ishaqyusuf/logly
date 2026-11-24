@@ -13,7 +13,10 @@ import {
   type LoglyBreakdownResult,
 } from "./breakdown";
 
+import { type LoglyReleaseInput, sendRelease } from "./release";
+
 export * from "./breakdown";
+export * from "./release";
 
 type ServerAnalyticsConfig = {
   project: string;
@@ -79,6 +82,10 @@ export function createServerAnalytics(config: ServerAnalyticsConfig) {
       if (!response.ok)
         throw new Error(`Logly collector returned ${response.status}`);
       return response.json();
+    },
+    /** Record a deploy marker (`POST /v1/releases`); idempotent per version. */
+    release(input: LoglyReleaseInput) {
+      return sendRelease(config, input);
     },
   };
 }

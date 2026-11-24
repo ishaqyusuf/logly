@@ -12,6 +12,8 @@ import {
   ingestEventBatch,
   listDashboardEventPage,
   listDashboardGroups,
+  listReleases,
+  recordRelease,
   refreshTrackingAlerts,
   verifyProjectCredential,
 } from "@logly/db/queries";
@@ -22,6 +24,8 @@ import {
   parseActorReadQuery,
   parseBreakdownQuery,
   parsePageViewEvent,
+  parseReleaseInput,
+  RELEASE_MAX_BODY_BYTES,
   readContextFilters,
 } from "@logly/utils";
 import { Hono } from "hono";
@@ -51,6 +55,20 @@ export function createCollectorApp() {
     if (!window || window.resetAt < now) {
       windows.set(key, { count: 1, resetAt: now + 60_000 });
     } else if (++window.count > 120) {
+      return context.json({ error: "Rate limit exceeded" }, 429);
+    }
+    await next();
+  });
+
+  // Releases arrive from CI once per deploy; 30 a minute per client is ample.
+  const releaseWindows = new Map<string, { count: number; resetAt: number }>();
+  app.use("/v1/releases", async (context, next) => {
+    const key = context.req.header("x-forwarded-for") ?? "local";
+    const now = Date.now();
+    const window = releaseWindows.get(key);
+    if (!window || window.resetAt < now) {
+      releaseWindows.set(key, { count: 1, resetAt: now + 60_000 });
+    } else if (++window.count > 30) {
       return context.json({ error: "Rate limit exceeded" }, 429);
     }
     await next();
@@ -143,6 +161,69 @@ export function createCollectorApp() {
     }
   });
 
+  app.post("/v1/releases", async (context) => {
+    if (
+      Number(context.req.header("content-length") ?? 0) > RELEASE_MAX_BODY_BYTES
+    ) {
+      return context.json({ error: "Release body too large" }, 413);
+    }
+    const body = await context.req.text();
+    if (Buffer.byteLength(body) > RELEASE_MAX_BODY_BYTES) {
+      return context.json({ error: "Release body too large" }, 413);
+    }
+    const parsed = parseReleaseInput(
+      (() => {
+        try {
+          return JSON.parse(body);
+        } catch {
+          return null;
+        }
+      })(),
+    );
+    if (!parsed.ok) return context.json({ error: parsed.error }, 400);
+
+    // Same trusted-writer model as server ingest: a server-write project key
+    // (or the global server key) as the bearer, and an HMAC of the raw body.
+    const bearer = context.req
+      .header("authorization")
+      ?.replace(/^Bearer\s+/i, "");
+    const authenticated = Boolean(
+      bearer &&
+        ((process.env.LOGLY_SERVER_KEY &&
+          bearer === process.env.LOGLY_SERVER_KEY) ||
+          (await verifyProjectCredential(
+            parsed.data.project,
+            bearer,
+            "server-write",
+          ))),
+    );
+    if (!authenticated || !bearer) {
+      return context.json({ error: "Unauthorized" }, 401);
+    }
+    if (
+      !verifyBatchSignature(
+        body,
+        bearer,
+        context.req.header("x-logly-signature") ?? null,
+      )
+    ) {
+      return context.json({ error: "Invalid signature" }, 401);
+    }
+
+    try {
+      const result = await recordRelease({ ...parsed.data, source: "api" });
+      if (result.status === "project_not_found") {
+        return context.json({ error: "Project not found" }, 404);
+      }
+      return context.json(
+        { created: result.status === "created", release: result.release },
+        result.status === "created" ? 201 : 200,
+      );
+    } catch {
+      return context.json({ error: "Could not record the release" }, 503);
+    }
+  });
+
   app.use("/v1/dashboard/*", async (context, next) => {
     const configured = process.env.LOGLY_READ_KEY;
     const bearer = context.req
@@ -213,6 +294,35 @@ export function createCollectorApp() {
         view,
       }),
     );
+  });
+  app.get("/v1/dashboard/releases", async (context) => {
+    const project = context.req.query("project");
+    if (!project) return context.json({ error: "Project is required" }, 400);
+    const time = (key: string) => {
+      const value = context.req.query(key);
+      if (!value) return undefined;
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    };
+    const start = time("start");
+    const end = time("end");
+    const environment = context.req.query("environment");
+    if (
+      start === null ||
+      end === null ||
+      (environment && environment !== "production" && environment !== "preview")
+    ) {
+      return context.json({ error: "Invalid releases query" }, 400);
+    }
+    return context.json({
+      data: await listReleases({
+        project,
+        start,
+        end,
+        environment: environment as "production" | "preview" | undefined,
+        limit: Number(context.req.query("limit")) || undefined,
+      }),
+    });
   });
   app.get("/v1/dashboard/tracking-alerts", async (context) => {
     const project = context.req.query("project");

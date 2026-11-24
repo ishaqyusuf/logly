@@ -57,6 +57,13 @@
       "when": 1795509092387,
       "tag": "0007_tracking_quiet_alerts",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795509687564,
+      "tag": "0008_deploy_markers",
+      "breakpoints": true
     }
   ]
 }

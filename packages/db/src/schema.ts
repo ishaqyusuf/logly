@@ -333,3 +333,37 @@ export const analyticsTrackingAlerts = pgTable(
     ),
   ],
 );
+
+/**
+ * Product releases (deploy markers). One row per project, environment and
+ * version; re-posting the same release is a no-op, so CI retries are safe.
+ */
+export const analyticsReleases = pgTable(
+  "analytics_releases",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => analyticsProjects.id, { onDelete: "cascade" }),
+    environment: text("environment").notNull(),
+    version: text("version").notNull(),
+    deployedAt: timestamp("deployed_at", { withTimezone: true }).notNull(),
+    description: text("description"),
+    url: text("url"),
+    source: text("source").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("analytics_releases_unique_idx").on(
+      table.projectId,
+      table.environment,
+      table.version,
+    ),
+    index("analytics_releases_project_deployed_idx").on(
+      table.projectId,
+      table.deployedAt,
+    ),
+  ],
+);

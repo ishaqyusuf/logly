@@ -1,6 +1,6 @@
 {
   "name": "@ishaqyusuf/logly-server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Trusted server event and read client for the Logly collector.",
   "license": "MIT",
   "sideEffects": false,
@@ -14,6 +14,9 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     }
+  },
+  "bin": {
+    "logly-release": "./dist/cli.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

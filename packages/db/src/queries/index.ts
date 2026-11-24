@@ -1202,6 +1202,13 @@ export {
   issueAnalyticsProjectKey,
 } from "./project-key";
 export {
+  deleteRelease,
+  type ListReleasesQuery,
+  listReleases,
+  type RecordReleaseResult,
+  recordRelease,
+} from "./releases";
+export {
   evaluateTrackingAlerts,
   getTrackingAlertsReport,
   refreshTrackingAlerts,
