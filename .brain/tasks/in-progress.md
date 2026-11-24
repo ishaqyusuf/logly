@@ -3,7 +3,8 @@
 ## SDK route templates — 2026-11-24
 
 - Status: merged to main and in the 2026-11-24 production deploy (`7c81d51`).
-  npm publish of 0.3.0 pending (npm was not logged in on the release machine).
+  Published to npm 2026-11-24: logly-core, logly-next and logly-server 0.3.0,
+  logly-native 0.1.0 (first release).
   See [ADR 0012](../decisions/0012-sdk-route-templates.md).
 - `logly-core` and `logly-native` record routes as templates (`/orders/:id`)
   by default, with project rules through `routeTemplates`.
@@ -36,7 +37,7 @@
 ## Generic group analytics — 2026-10-01
 
 Deployed to production 2026-11-24 (`7c81d51`); migration 0005 was already
-applied by the 2026-11-13 release. SDK 0.3.0 npm publish pending. See
+applied by the 2026-11-13 release. SDKs published to npm the same day. See
 [delivery checklist](2026-10-01-generic-group-analytics.md). Logly provides
 generic group/user/property filtering; EwaTrade and Halaalvest derive trusted
 business context. Product signing-secret configuration and live traffic QA remain.

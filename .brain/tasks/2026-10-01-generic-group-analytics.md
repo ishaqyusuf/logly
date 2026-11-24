@@ -1,6 +1,6 @@
 # Generic group analytics delivery
 
-Status: deployed to production 2026-11-24 (`7c81d51`); SDK 0.3.0 npm publish pending.
+Status: deployed to production 2026-11-24 (`7c81d51`); SDK 0.3.0 (native 0.1.0) published to npm the same day.
 
 - [x] Generic SDK identity, group and metadata context with immutable snapshots.
 - [x] Collector validation, project/type-scoped hashing and generic JSONB storage.
