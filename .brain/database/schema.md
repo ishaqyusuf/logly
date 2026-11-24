@@ -1,5 +1,14 @@
 # Database Schema
 
+## Generic groups (local, 2026-10-01)
+
+`analytics_events.groups` is non-null JSONB defaulting to `{}`. Each group has a
+type, project/type-scoped HMAC key, and optional bounded scalar properties. Raw
+group references are not stored. A GIN index supports group containment/type
+queries; `(project_id, actor_id, occurred_at)` supports user investigations.
+Existing events remain unattributed. Event properties reuse the existing JSONB
+column, with exact scalar containment preserving null/missing/type semantics.
+
 ## Tables
 
 - `analytics_organizations`: operator-owned project grouping and navigation

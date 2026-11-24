@@ -5,7 +5,10 @@
   "license": "MIT",
   "sideEffects": false,
   "type": "module",
-  "files": ["dist"],
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -20,7 +23,9 @@
     "test": "bun test src",
     "typecheck": "tsc --noEmit"
   },
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@ishaqyusuf/logly-core": "^0.3.0"
   },

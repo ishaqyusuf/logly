@@ -106,3 +106,52 @@ test("only forwards edge country on Vercel, ignoring browser override headers", 
     );
   }
 });
+
+test.each([
+  [
+    "Cloudflare before Vercel",
+    true,
+    { "cf-ipcountry": "NG", "x-vercel-ip-country": "US" },
+    "NG",
+  ],
+  [
+    "Cloudflare opt-in required",
+    false,
+    { "cf-ipcountry": "NG", "x-vercel-ip-country": "US" },
+    "US",
+  ],
+  [
+    "missing Cloudflare country",
+    true,
+    { "cf-ray": "edge", "x-vercel-ip-country": "US" },
+    null,
+  ],
+  [
+    "invalid Cloudflare country",
+    true,
+    { "cf-ipcountry": "invalid", "x-vercel-ip-country": "US" },
+    null,
+  ],
+  ["normalized Cloudflare country", true, { "cf-ipcountry": " ng " }, "NG"],
+] as const)("product country forwarding: %s", async (_label, trustCloudflareCountry, edgeHeaders, expected) => {
+  process.env.VERCEL = "1";
+  let forwarded: Headers | undefined;
+  globalThis.fetch = (async (_url, init) => {
+    forwarded = new Headers(init?.headers);
+    return Response.json({ accepted: 1 }, { status: 202 });
+  }) as typeof fetch;
+  const handler = createAnalyticsRoute({
+    collectorUrl: "https://collector.test",
+    projectKey: "key",
+    trustCloudflareCountry,
+  });
+  const response = await handler(
+    new Request("https://product.test/api/analytics", {
+      method: "POST",
+      headers: { ...edgeHeaders, "x-logly-country": "FR" },
+      body: JSON.stringify(batch),
+    }),
+  );
+  expect(response.status).toBe(202);
+  expect(forwarded?.get("x-logly-country")).toBe(expected);
+});

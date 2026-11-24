@@ -434,3 +434,64 @@ describe("analytics client", () => {
     client.destroy();
   });
 });
+
+test("queued browser events preserve capture context and reset clears attribution and queue", async () => {
+  const batches: AnalyticsBatch[] = [];
+  const client = createAnalytics({
+    project: "test-project",
+    storage: createMemoryStorage(),
+    eventStore: createMemoryEventStore(),
+    createId: createIds(),
+    transport: async (batch) => {
+      batches.push(batch);
+    },
+    respectPrivacySignals: false,
+  });
+  client.identify("opaque-user");
+  client.group("business", "first");
+  client.track("first_event");
+  client.group("business", "second");
+  client.track("second_event");
+  await client.flush();
+  expect(
+    batches[0]?.events.map((event) => event.groups?.business?.key),
+  ).toEqual(["first", "second"]);
+  client.track("discard_on_logout");
+  client.reset();
+  client.track("anonymous_event");
+  await client.flush();
+  expect(batches.at(-1)?.events.map((event) => event.name)).toEqual([
+    "anonymous_event",
+  ]);
+  expect(batches.at(-1)?.events[0]?.actorId).toBeUndefined();
+  expect(batches.at(-1)?.events[0]?.groups).toBeUndefined();
+  client.destroy();
+});
+
+test("rejects oversized Unicode group context without blocking later browser events", async () => {
+  const batches: AnalyticsBatch[] = [];
+  const client = createAnalytics({
+    project: "test-project",
+    storage: createMemoryStorage(),
+    eventStore: createMemoryEventStore(),
+    createId: createIds(),
+    transport: async (batch) => {
+      batches.push(batch);
+    },
+    respectPrivacySignals: false,
+  });
+  const properties = Object.fromEntries(
+    Array.from({ length: 20 }, (_, i) => [`p${i}`, "界".repeat(256)]),
+  );
+  for (const type of ["one", "two", "three", "four", "five"])
+    client.group(type, "opaque", properties);
+  expect(client.track("oversized")).toBe(false);
+  for (const type of ["one", "two", "three", "four", "five"])
+    client.clearGroup(type);
+  expect(client.track("small")).toBe(true);
+  await client.flush();
+  expect(
+    batches.flatMap((batch) => batch.events).map((event) => event.name),
+  ).toEqual(["small"]);
+  client.destroy();
+});

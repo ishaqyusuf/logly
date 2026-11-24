@@ -11,8 +11,9 @@ billing platform.
 - Every project belongs to one organization.
 - Organization and project slugs are derived automatically from their names.
 - The desktop sidebar follows GND's compact `84px` rail and hover-expands to
-  `268px`, with the combined organization/project selector directly below the
-  Logly logo, navigation in the middle, and operator identity at the bottom.
+  `268px`, with navigation and operator identity. The combined team/project
+  selector sits in the sticky header on desktop and mobile. Its menu shows
+  teams beside the active team's projects.
 - The selector always resolves to one project. It can switch organizations,
   switch projects, create an organization, and open project creation in the
   selected context, but it does not expose an all-project analytics scope.
@@ -21,7 +22,7 @@ billing platform.
   replaces all page data and preserves the project in the URL so views are
   linkable and refresh-safe.
 - Projects is not a sidebar navigation item. Project switching and creation
-  live in the selector; project-specific configuration lives in Settings.
+  live in the header selector; project-specific configuration lives in Settings.
 - Project creation returns scoped credentials once; event names continue to be
   accepted automatically with no catalog setup.
 - Legacy `/projects` links redirect to project Settings. The selector is the
@@ -45,3 +46,7 @@ collector envelope and existing SDK configuration.
   and appeared under the selected Logly project without catalog registration.
 - Production migration and authenticated browser QA confirmed the existing
   Afterservice project under the seeded Personal organization.
+
+## Project keys — 7 October 2026
+
+An admin can issue a replacement credential from the selected project’s Settings without recreating the project or interrupting current integrations. Choose an existing scope and issue a credential. Its value is masked by default; Show/Hide controls reveal it only on explicit action, Copy transfers it, and Done clears the value and reveal state. The value is shown only in that response and stored only as a hash in Logly. Non-admins have no issuance control; the API separately enforces admin permission and organization/project matching.

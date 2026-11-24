@@ -62,3 +62,45 @@ describe("server analytics", () => {
     expect(request?.headers.get("authorization")).toBe("Bearer read-secret");
   });
 });
+
+test("concurrent server calls keep request-scoped group and retry identity", async () => {
+  const batches: Array<{
+    events: Array<{
+      eventId: string;
+      actorId: string;
+      occurredAt: string;
+      groups: { business: { key: string } };
+    }>;
+  }> = [];
+  globalThis.fetch = (async (_input, init) => {
+    batches.push(JSON.parse(String(init?.body)));
+    return Response.json({ accepted: 1 });
+  }) as typeof fetch;
+  const client = createServerAnalytics({
+    project: "test-project",
+    collectorUrl: "https://collector.test",
+    serverKey: "secret",
+  });
+  const occurredAt = "2026-10-01T00:00:00.000Z";
+  const eventId = "00000000-0000-4000-8000-000000000001";
+  await Promise.all([
+    client.track("first", {}, "user-one", {
+      groups: { business: { key: "first" } },
+      eventId,
+      occurredAt,
+    }),
+    client.track("second", {}, "user-two", {
+      groups: { business: { key: "second" } },
+    }),
+  ]);
+  expect(batches[0]?.events[0]).toMatchObject({
+    eventId,
+    occurredAt,
+    actorId: "user-one",
+    groups: { business: { key: "first" } },
+  });
+  expect(batches[1]?.events[0]).toMatchObject({
+    actorId: "user-two",
+    groups: { business: { key: "second" } },
+  });
+});

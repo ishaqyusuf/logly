@@ -47,11 +47,21 @@ export function EventAnalytics({
       names: filter.names ?? undefined,
       sources,
       platforms,
+      groupType: filter.groupType ?? undefined,
+      groupKey: filter.groupKey ?? undefined,
+      actor: filter.actor ?? undefined,
+      propertyKey: filter.propertyKey ?? undefined,
+      propertyValue: filter.propertyValue ?? undefined,
       q: filter.q ?? undefined,
       start: filter.start ?? undefined,
       end: filter.end ?? undefined,
     }),
     [
+      filter.groupType,
+      filter.groupKey,
+      filter.actor,
+      filter.propertyKey,
+      filter.propertyValue,
       filter.end,
       filter.names,
       filter.q,
@@ -74,7 +84,30 @@ export function EventAnalytics({
     initialData:
       initialQuery === JSON.stringify(query) ? initialSummary : undefined,
   });
-  const summary = summaryQuery.data ?? initialSummary;
+  if (!summaryQuery.data) {
+    return (
+      <div
+        className="rounded-xl border p-5"
+        role={summaryQuery.isError ? "alert" : "status"}
+      >
+        {summaryQuery.isError ? (
+          <p>
+            Could not load analytics for these filters.{" "}
+            <button
+              type="button"
+              className="underline"
+              onClick={() => void summaryQuery.refetch()}
+            >
+              Retry
+            </button>
+          </p>
+        ) : (
+          "Loading filtered analytics…"
+        )}
+      </div>
+    );
+  }
+  const summary = summaryQuery.data;
   const maximum = Math.max(
     ...summary.eventNames.map((event) => event.count),
     1,

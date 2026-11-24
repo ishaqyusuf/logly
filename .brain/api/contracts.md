@@ -1,5 +1,27 @@
 # API Contracts
 
+## Generic group context (local implementation, 2026-10-01)
+
+Events optionally accept `groups: Record<string, { key: string, properties?:
+Record<string, string | number | boolean | null> }>`. Maximum five group types,
+snake_case types up to 64 characters, nonempty keys up to 128, and up to 20
+bounded scalar properties per group. Existing optional actorId remains. Group
+and actor references are hashed at the collector within project scope; group
+hashing also includes type. Old clients without groups remain valid.
+
+Event list and summary accept `groupType`, `groupKey`, `actor`, `propertyKey`,
+and `propertyValue`. Group keys/actors are stored opaque references returned by
+reads. A key requires a type. Property key/value must occur together and value
+is JSON-encoded scalar, e.g. `"pos"`, `3`, `true`, `null`. Invalid filters
+return 400. All filters combine with AND and existing project/time scope.
+Event rows/details include actorId and groups. Summary filters cover every
+aggregate query including the previous comparison window.
+
+`GET /v1/dashboard/groups?project=...&q=...` returns
+`{ data: [{ type, key, name }], hasMore }`, up to 50 matches. The latest received
+group name is a label; matching always uses the full key. Search matches names,
+types and opaque keys case-insensitively. No current-profile traits are queried.
+
 ## Event Envelope
 
 Required: event ID, project slug, event name, event version, source, occurrence time. Browser events may include a project-local browser ID, pathname-only route, referrer host, campaign fields, and bounded registered properties.
@@ -137,6 +159,25 @@ After existing client-ingest authentication and origin checks, the collector acc
 ### Mobile platform summary
 
 Client-ingest batches accept `source: mobile` only with `platform: ios | android`; browser events may use `platform: web`. Mobile rows may include bounded `appVersion` and `appBuild` strings. The dashboard summary returns complete-window `mobile: { sessions, installations, events, platforms, versions }`, where sessions count `app_session`, installations count distinct project-scoped visitor hashes, and platform/version rows include counts and shares. Event detail exposes platform, version, and build. The dashboard can filter event lists and summaries by platform without mixing those filters into acquisition reporting.
+
+## Project key reissue — 7 October 2026
+
+`POST /api/project-keys` accepts `{ organization, project, scope }`, with bounded lowercase slugs and `client-ingest | server-write | read | admin`. Success is 201 `{ key: { scope, value } }`; failures are 400 invalid input, 401 unauthorized, 403 foreign origin, 404 unavailable project, or sanitized 500. All responses disable caching. Each request adds one credential and never rotates/revokes existing credentials. Plaintext remains only in the response/client memory until saved or dismissed.
+
+### Cloudflare country forwarding option — 2026-10-24
+
+The Next route adapter accepts optional `trustCloudflareCountry` (default
+false). On Vercel, opted-in product proxies prefer normalized `cf-ipcountry`
+when it or `cf-ray` is present. Missing/invalid Cloudflare location stays
+unknown; direct Vercel traffic uses its existing country header. No IP is
+forwarded. The deployment must supply/overwrite these headers at trusted
+ingress. Existing collector credential/origin checks, country whitelist,
+nullable row field and country-summary contract are unchanged.
+
+Country now appears in Events/Live table columns and event Context details
+as flag + English name + code, or Unknown. Saved table layouts keep the
+actions column last when new columns are introduced. No migration or
+historical backfill is required.
 
 ## Breakdown reads — 2026-11-12 (local)
 

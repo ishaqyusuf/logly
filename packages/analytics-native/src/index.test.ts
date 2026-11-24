@@ -87,3 +87,132 @@ describe("native analytics", () => {
     expect(sanitizeNativeRoute("/jobs/123?email=private")).toBe("/jobs/:id");
   });
 });
+
+test("native screen capture survives group switching during asynchronous storage and reset drops pending events", async () => {
+  const { storage, values } = memoryStorage();
+  const batches: AnalyticsBatch[] = [];
+  let fail = true;
+  const client = createNativeAnalytics({
+    project: "test-project",
+    endpoint: "https://test.invalid",
+    platform: "android",
+    storage,
+    createId: () => crypto.randomUUID(),
+    send: async (batch) => {
+      batches.push(batch);
+      if (fail) throw new Error("offline");
+    },
+  });
+  await client.init();
+  client.identify("opaque-user");
+  client.group("business", "first");
+  const capture = client.trackScreenView("/home");
+  client.group("business", "second");
+  await capture;
+  await client.flush();
+  const captured = JSON.parse(
+    values.get("logly:test-project:native-queue") ?? "[]",
+  );
+  expect(captured).toHaveLength(2);
+  expect(
+    captured.every(
+      (event: { groups: { business: { key: string } } }) =>
+        event.groups.business.key === "first",
+    ),
+  ).toBe(true);
+  await client.reset();
+  fail = false;
+  batches.splice(0);
+  await client.track("anonymous_event");
+  await client.flush();
+  expect(
+    batches.flatMap((batch) => batch.events).map((event) => event.name),
+  ).toEqual(["anonymous_event"]);
+  expect(batches[0]?.events[0]?.actorId).toBeUndefined();
+  expect(batches[0]?.events[0]?.groups).toBeUndefined();
+  await client.destroy();
+});
+
+test("rejects oversized Unicode events without stalling the native queue", async () => {
+  const { storage } = memoryStorage();
+  const batches: AnalyticsBatch[] = [];
+  const client = createNativeAnalytics({
+    project: "test-project",
+    endpoint: "https://test.invalid",
+    platform: "android",
+    storage,
+    createId: () => crypto.randomUUID(),
+    send: async (batch) => {
+      batches.push(batch);
+    },
+  });
+  await client.init();
+  const properties = Object.fromEntries(
+    Array.from({ length: 20 }, (_, i) => [`p${i}`, "界".repeat(256)]),
+  );
+  for (const type of ["one", "two", "three", "four", "five"])
+    client.group(type, "opaque", properties);
+  await client.track("oversized");
+  for (const type of ["one", "two", "three", "four", "five"])
+    client.clearGroup(type);
+  await client.track("small");
+  await client.flush();
+  expect(
+    batches.flatMap((batch) => batch.events).map((event) => event.name),
+  ).toEqual(["small"]);
+  await client.destroy();
+});
+
+test("reset invalidates pending native initialization and prevents old queue restoration", async () => {
+  const { storage, values } = memoryStorage();
+  const oldEvent = {
+    eventId: crypto.randomUUID(),
+    project: "test-project",
+    name: "before_logout",
+    version: 1,
+    source: "mobile",
+    platform: "android",
+    occurredAt: new Date().toISOString(),
+    visitorId: "old-visitor",
+    actorId: "old-user",
+    properties: {},
+  };
+  values.set("logly:test-project:native-queue", JSON.stringify([oldEvent]));
+  const reads: Array<() => void> = [];
+  const batches: AnalyticsBatch[] = [];
+  let pause = true;
+  const client = createNativeAnalytics({
+    project: "test-project",
+    endpoint: "https://test.invalid",
+    platform: "android",
+    storage: {
+      ...storage,
+      getItem: (key) =>
+        pause
+          ? new Promise((resolve) => {
+              const snapshot = values.get(key) ?? null;
+              reads.push(() => resolve(snapshot));
+            })
+          : storage.getItem(key),
+    },
+    createId: () => crypto.randomUUID(),
+    send: async (batch) => {
+      batches.push(batch);
+    },
+  });
+  const initializing = client.init();
+  await client.reset();
+  for (const resolve of reads) resolve();
+  await initializing;
+  await client.flush();
+  expect(batches).toHaveLength(0);
+  pause = false;
+  await client.init();
+  await client.track("after_logout");
+  await client.flush();
+  expect(
+    batches.flatMap((batch) => batch.events).map((event) => event.name),
+  ).toEqual(["after_logout"]);
+  expect(batches[0]?.events[0]?.actorId).toBeUndefined();
+  await client.destroy();
+});

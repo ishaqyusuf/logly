@@ -23,6 +23,31 @@ export const eventPropertySchema = z.union([
   z.null(),
 ]);
 
+export const actorIdSchema = z.string().min(3).max(128);
+export const analyticsGroupTypeSchema = z
+  .string()
+  .min(1)
+  .max(64)
+  .regex(/^[a-z][a-z0-9_]*$/);
+export const analyticsGroupSchema = z.object({
+  key: z.string().min(1).max(128),
+  properties: z
+    .record(z.string().min(1).max(64), eventPropertySchema)
+    .refine(
+      (value) => Object.keys(value).length <= 20,
+      "Groups may contain at most 20 properties",
+    )
+    .optional(),
+});
+export const analyticsGroupsSchema = z
+  .record(analyticsGroupTypeSchema, analyticsGroupSchema)
+  .refine(
+    (value) => Object.keys(value).length <= 5,
+    "Events may contain at most 5 groups",
+  );
+export type AnalyticsGroup = z.infer<typeof analyticsGroupSchema>;
+export type AnalyticsGroups = z.infer<typeof analyticsGroupsSchema>;
+
 export const eventNameSchema = z
   .string()
   .min(1)
@@ -45,7 +70,8 @@ export const analyticsEventSchema = z
     appBuild: z.string().min(1).max(64).optional(),
     occurredAt: z.string().datetime(),
     visitorId: z.string().min(8).max(128).optional(),
-    actorId: z.string().min(3).max(128).optional(),
+    actorId: actorIdSchema.optional(),
+    groups: analyticsGroupsSchema.optional(),
     visitKind: z.enum(["new", "returning"]).optional(),
     route: z.string().max(256).optional(),
     referrerHost: z.string().max(160).optional(),
@@ -64,6 +90,12 @@ export const analyticsEventSchema = z
       .optional(),
   })
   .superRefine((event, context) => {
+    if (!fitsAnalyticsEventBudget(event)) {
+      context.addIssue({
+        code: "custom",
+        message: "Event exceeds the 47 KiB byte budget",
+      });
+    }
     if (
       event.source === "mobile" &&
       event.platform !== "ios" &&
@@ -116,4 +148,13 @@ export function sanitizeProperties(
   }
 
   return output;
+}
+
+/** Leave room for the batch envelope and JSON separators inside 48 KiB. */
+export const MAX_ANALYTICS_EVENT_BYTES = 47 * 1024;
+export function fitsAnalyticsEventBudget(event: unknown) {
+  return (
+    new TextEncoder().encode(JSON.stringify(event)).byteLength <=
+    MAX_ANALYTICS_EVENT_BYTES
+  );
 }

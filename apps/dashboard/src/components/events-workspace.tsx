@@ -6,6 +6,7 @@ import type {
   AnalyticsEventSummary,
 } from "@logly/utils";
 import { EventAnalytics } from "./event-analytics";
+import { EventContextFilter } from "./event-context-filter";
 import { DataTable } from "./tables/events/data-table";
 
 export function EventsWorkspace({
@@ -23,6 +24,7 @@ export function EventsWorkspace({
 }) {
   return (
     <div className="space-y-6">
+      <EventContextFilter project={scope.project} />
       <EventAnalytics
         initialSummary={initialSummary}
         scope={scope}

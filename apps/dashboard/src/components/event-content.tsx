@@ -5,10 +5,13 @@ import {
   Clock3,
   Fingerprint,
   Globe2,
+  MapPin,
   Route,
   Smartphone,
 } from "lucide-react";
+import Link from "next/link";
 import { EventSheetHeader } from "@/components/event-sheet-header";
+import { formatCountry } from "@/lib/country-display";
 
 export function EventContent({
   event,
@@ -55,6 +58,11 @@ export function EventContent({
               label="Route"
               value={event.route ?? "Server event"}
             />
+            <Detail
+              icon={MapPin}
+              label="Country"
+              value={formatCountry(event.country)}
+            />
             {event.platform ? (
               <Detail
                 icon={Smartphone}
@@ -73,6 +81,38 @@ export function EventContent({
               last
             />
           </div>
+        </section>
+        <section>
+          <p className="mb-3 text-sm font-medium">Groups</p>
+          {Object.entries(event.groups ?? {}).length ? (
+            Object.entries(event.groups ?? {}).map(([type, group]) => (
+              <div key={type} className="mb-3 rounded-xl border p-4 text-sm">
+                <p className="font-medium">
+                  {String(group.properties?.name ?? group.key)}
+                </p>
+                <p className="mt-1 break-all text-xs text-muted-foreground">
+                  {type} · {group.key}
+                </p>
+                <pre className="mt-2 overflow-auto text-xs">
+                  {JSON.stringify(group.properties ?? {}, null, 2)}
+                </pre>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              No group attribution on this event.
+            </p>
+          )}
+          {event.actorId && (
+            <Link
+              className="block break-all text-xs text-muted-foreground underline"
+              href={
+                `/events?${new URLSearchParams({ project: event.project, actor: event.actorId })}` as import("next").Route
+              }
+            >
+              View events for this user: {event.actorId.slice(0, 12)}…
+            </Link>
+          )}
         </section>
         <section>
           <div className="mb-3 flex items-center justify-between">

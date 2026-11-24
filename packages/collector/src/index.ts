@@ -9,6 +9,7 @@ import {
   getProjectPolicy,
   ingestEventBatch,
   listDashboardEventPage,
+  listDashboardGroups,
   verifyProjectCredential,
 } from "@logly/db/queries";
 import {
@@ -17,6 +18,7 @@ import {
   normalizeFunnelQuery,
   parseActorReadQuery,
   parseBreakdownQuery,
+  readContextFilters,
 } from "@logly/utils";
 import { Hono } from "hono";
 import { secureHeaders } from "hono/secure-headers";
@@ -155,11 +157,24 @@ export function createCollectorApp() {
       return context.json({ error: "Unauthorized" }, 401);
     }
     try {
+      readContextFilters({ get: (key) => context.req.query(key) ?? null });
+    } catch {
+      return context.json({ error: "Invalid event context filter" }, 400);
+    }
+    try {
       parseActorReadQuery(context.req.query("actor"));
     } catch {
       return context.json({ error: "Invalid event actor" }, 400);
     }
     await next();
+  });
+
+  app.get("/v1/dashboard/groups", async (context) => {
+    const project = context.req.query("project");
+    if (!project) return context.json({ error: "Project is required" }, 400);
+    return context.json(
+      await listDashboardGroups({ project, q: context.req.query("q") }),
+    );
   });
 
   app.get("/v1/dashboard/overview", async (context) =>
@@ -185,6 +200,7 @@ export function createCollectorApp() {
     );
     const query: AnalyticsEventQuery = {
       ...parseActorReadQuery(context.req.query("actor")),
+      ...readContextFilters({ get: (key) => context.req.query(key) ?? null }),
       organization: context.req.query("organization"),
       project: context.req.query("project"),
       projects: split(context.req.query("projects")),
@@ -230,6 +246,7 @@ export function createCollectorApp() {
     );
     const query: AnalyticsEventQuery = {
       ...parseActorReadQuery(context.req.query("actor")),
+      ...readContextFilters({ get: (key) => context.req.query(key) ?? null }),
       organization: context.req.query("organization"),
       project: context.req.query("project"),
       names: split(context.req.query("names")),

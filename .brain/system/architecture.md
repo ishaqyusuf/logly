@@ -41,7 +41,7 @@ Record durable module and dependency boundaries.
   column order. This is the Midday table architecture adapted to Logly's REST
   boundary rather than a new tRPC dependency.
 - Dashboard analytics never render an all-project scope. Switching the project
-  in the sidebar replaces the workspace context for Overview, Events, Live,
+  in the header selector replaces the workspace context for Overview, Events, Live,
   Insights, and Settings and invalidates project-scoped reads before rendering
   the new data.
 - Complete-window event summaries and paginated event rows are separate query

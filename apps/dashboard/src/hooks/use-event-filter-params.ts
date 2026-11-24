@@ -2,6 +2,11 @@ import { useQueryStates } from "nuqs";
 import { createLoader, parseAsArrayOf, parseAsString } from "nuqs/server";
 
 export const eventFilterParamsSchema = {
+  groupType: parseAsString,
+  groupKey: parseAsString,
+  actor: parseAsString,
+  propertyKey: parseAsString,
+  propertyValue: parseAsString,
   q: parseAsString,
   names: parseAsArrayOf(parseAsString),
   sources: parseAsArrayOf(parseAsString),

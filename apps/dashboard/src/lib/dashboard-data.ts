@@ -12,6 +12,7 @@ import {
   type AnalyticsOverviewRange,
   type AnalyticsProjectSummary,
   getDemoAnalytics,
+  matchesEventContext,
   summarizeAnalyticsEvents,
   summarizeFunnel,
 } from "@logly/utils";
@@ -78,6 +79,20 @@ function dashboardClient() {
   return createAdminClient({ collectorUrl, readKey });
 }
 
+export async function getDashboardGroups(
+  project: string,
+  q?: string,
+): Promise<{
+  data: import("@logly/utils").AnalyticsGroupOption[];
+  hasMore: boolean;
+}> {
+  const client = dashboardClient();
+  if (!client) return { data: [], hasMore: false };
+  return client.read(
+    `/v1/dashboard/groups?${new URLSearchParams({ project, q: q ?? "" })}`,
+  );
+}
+
 function queryString(query: AnalyticsEventQuery) {
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
@@ -103,6 +118,7 @@ export async function getDashboardEventPage(
         .join(" ")
         .toLowerCase();
       return (
+        matchesEventContext(event, query) &&
         (!query.project || event.project === query.project) &&
         (!query.projects?.length || query.projects.includes(event.project)) &&
         (!query.names?.length || query.names.includes(event.name)) &&

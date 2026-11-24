@@ -1,3 +1,4 @@
+import { auth } from "@logly/auth";
 import { Badge } from "@logly/ui/badge";
 import { Input } from "@logly/ui/input";
 import {
@@ -8,8 +9,10 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import type { SearchParams } from "nuqs/server";
 import { OpenProjectSheet } from "@/components/open-project-sheet";
+import { ProjectKeySettings } from "@/components/project-key-settings";
 import { ScrollableContent } from "@/components/scrollable-content";
 import { loadProjectWorkspace } from "@/lib/project-workspace-server";
 
@@ -51,6 +54,7 @@ export default async function SettingsPage({
     );
   }
   const project = workspace.project;
+  const session = await auth.api.getSession({ headers: await headers() });
   return (
     <ScrollableContent>
       <div className="mx-auto max-w-4xl space-y-6">
@@ -140,6 +144,13 @@ export default async function SettingsPage({
             </SettingField>
           </div>
         </section>
+        {session?.user.role === "admin" && workspace.organization ? (
+          <ProjectKeySettings
+            key={project.slug}
+            organization={workspace.organization.slug}
+            project={project.slug}
+          />
+        ) : null}
         <section className="rounded-xl border bg-white shadow-soft">
           <div className="border-b p-5">
             <h3 className="text-sm font-semibold">Privacy defaults</h3>

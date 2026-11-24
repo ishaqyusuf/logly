@@ -1,5 +1,14 @@
 # API Permissions
 
+## Group-filter boundary
+
+Group discovery and filtered event reads retain existing operator session and
+project credential checks. Groups are analytics dimensions, not memberships or
+authorization rules. Merchant-facing reads must later derive and enforce tenant
+scope on the product server; never expose a Logly project read credential or
+trust a submitted group key as evidence of access. Consumer proxies derive
+actor/group snapshots from server-authorized identity and verify signed context.
+
 ## Key Scopes
 
 - `client-ingest`: same-origin browser proxy ingestion only.
@@ -42,3 +51,7 @@ The collector verifies `analytics_projects.allowed_origins` before accepting a
   must fail closed and expose collection health to the operator.
 - Demo mode requires an explicit non-production flag. It must not silently mask
   collector or credential failures.
+
+## Project key reissue — 7 October 2026
+
+Only a server-validated single-operator admin session can issue keys. The query binds both organization and enabled project before inserting only a SHA-256 hash. Existing keys are retained. Neither errors nor analytics include credential values; responses prohibit caching. Credential verification matches the requested hash directly rather than searching an arbitrary first ten keys.

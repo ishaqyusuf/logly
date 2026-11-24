@@ -1,5 +1,13 @@
 # Database Migrations
 
+## Generic groups migration (2026-10-01)
+
+`0005_friendly_celestials.sql` adds default-empty JSONB groups, its GIN index,
+and the project/actor/time index. Generated with `bun run db:generate --local`,
+reviewed and applied with `bun run db:migrate --local`. Local PostgreSQL fixture
+checks pass. Production application remains pending release; existing events
+receive empty groups and no identity backfill is attempted.
+
 ## Workflow
 
 - Generate migrations from the Drizzle schema.

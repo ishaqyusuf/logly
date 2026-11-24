@@ -2,13 +2,15 @@ import {
   type AnalyticsBatch,
   type AnalyticsEvent,
   type AnalyticsPlatform,
+  analyticsEventSchema,
+  createAnalyticsContext,
   createRouteNormalizer,
   type EventProperty,
   eventNameSchema,
+  fitsAnalyticsEventBudget,
   LOGLY_CORE_VERSION,
   normalizeRoute,
   type RouteTemplateOptions,
-  sanitizeProperties,
 } from "@ishaqyusuf/logly-core";
 
 export type NativeAnalyticsStorage = {
@@ -60,14 +62,36 @@ export function createNativeAnalytics(config: NativeAnalyticsConfig) {
   let visitor: NativeVisitor | null = null;
   let queue: AnalyticsEvent[] = [];
   let initialized = false;
+  let lifecycleGeneration = 0;
   let timer: ReturnType<typeof setInterval> | undefined;
   let inFlight: Promise<void> | undefined;
   let lastRoute: string | null = null;
+  const analyticsContext = createAnalyticsContext();
 
-  const persistQueue = async () => {
-    if (queue.length)
-      await config.storage.setItem(queueKey, JSON.stringify(queue));
-    else await config.storage.removeItem(queueKey);
+  let pendingQueueWrite = Promise.resolve();
+  const persistQueue = () => {
+    const serialized = queue.length ? JSON.stringify(queue) : null;
+    pendingQueueWrite = pendingQueueWrite
+      .catch(() => {})
+      .then(() =>
+        serialized
+          ? config.storage.setItem(queueKey, serialized)
+          : config.storage.removeItem(queueKey),
+      );
+    return pendingQueueWrite;
+  };
+
+  let pendingVisitorWrite = Promise.resolve();
+  const persistVisitor = () => {
+    const serialized = visitor ? JSON.stringify(visitor) : null;
+    pendingVisitorWrite = pendingVisitorWrite
+      .catch(() => {})
+      .then(() =>
+        serialized
+          ? config.storage.setItem(visitorKey, serialized)
+          : config.storage.removeItem(visitorKey),
+      );
+    return pendingVisitorWrite;
   };
 
   const send =
@@ -95,10 +119,20 @@ export function createNativeAnalytics(config: NativeAnalyticsConfig) {
       const current = now().getTime();
       queue = queue
         .filter(
-          (event) => current - Date.parse(event.occurredAt) < MAX_QUEUE_AGE_MS,
+          (event) =>
+            fitsAnalyticsEventBudget(event) &&
+            current - Date.parse(event.occurredAt) < MAX_QUEUE_AGE_MS,
         )
         .slice(-MAX_QUEUE_EVENTS);
-      const events = queue.slice(0, 25);
+      const events: AnalyticsEvent[] = [];
+      let bytes = 512;
+      for (const event of queue.slice(0, 25)) {
+        const eventBytes =
+          new TextEncoder().encode(JSON.stringify(event)).byteLength + 1;
+        if (bytes + eventBytes > 48 * 1024) break;
+        events.push(event);
+        bytes += eventBytes;
+      }
       if (!events.length) {
         await persistQueue();
         return;
@@ -126,6 +160,7 @@ export function createNativeAnalytics(config: NativeAnalyticsConfig) {
     properties: Record<string, unknown> = {},
     route?: string,
     visitKind?: "new" | "returning",
+    snapshot = analyticsContext.snapshot(properties),
   ) => {
     if (!initialized || !visitor || !eventNameSchema.safeParse(name).success)
       return;
@@ -142,32 +177,74 @@ export function createNativeAnalytics(config: NativeAnalyticsConfig) {
       visitorId: visitor.id,
       visitKind,
       route: route ? safeRoute(route) : undefined,
-      properties: sanitizeProperties(properties),
+      ...snapshot,
     };
+    if (!fitsAnalyticsEventBudget(event)) return;
     queue.push(event);
     queue = queue.slice(-MAX_QUEUE_EVENTS);
     await persistQueue();
     void flush();
   };
 
-  const trackSession = async (route?: string) => {
+  const trackSession = async (
+    route?: string,
+    snapshot = analyticsContext.snapshot(),
+  ) => {
     if (!initialized || !visitor) return;
     const day = now().toISOString().slice(0, 10);
     if (visitor.lastSessionOn === day) return;
     const visitKind = visitor.firstSeenOn === day ? "new" : "returning";
     visitor.lastSessionOn = day;
-    await config.storage.setItem(visitorKey, JSON.stringify(visitor));
-    await enqueue("app_session", {}, route, visitKind);
+    const pendingEvent = enqueue("app_session", {}, route, visitKind, snapshot);
+    await persistVisitor();
+    await pendingEvent;
   };
 
   return {
+    identify(actorId: string) {
+      const accepted = analyticsContext.identify(actorId);
+      if (accepted) lastRoute = null;
+      return accepted;
+    },
+    group(
+      type: string,
+      key: string,
+      properties?: Record<string, EventProperty>,
+    ) {
+      const accepted = analyticsContext.group(type, key, properties);
+      if (accepted) lastRoute = null;
+      return accepted;
+    },
+    clearGroup(type: string) {
+      analyticsContext.clearGroup(type);
+      lastRoute = null;
+    },
+    setGlobalProperties: analyticsContext.setGlobalProperties,
+    unsetGlobalProperties: analyticsContext.unsetGlobalProperties,
+    async reset() {
+      lifecycleGeneration++;
+      analyticsContext.reset();
+      queue = [];
+      lastRoute = null;
+      visitor = initialized
+        ? {
+            id: config.createId(),
+            firstSeenOn: now().toISOString().slice(0, 10),
+            lastSessionOn: null,
+          }
+        : null;
+      await persistQueue();
+      await persistVisitor();
+    },
     async init() {
       if (initialized || config.enabled === false) return;
+      const generation = ++lifecycleGeneration;
       try {
         const [storedVisitor, storedQueue] = await Promise.all([
           config.storage.getItem(visitorKey),
           config.storage.getItem(queueKey),
         ]);
+        if (generation !== lifecycleGeneration) return;
         const parsedVisitor = storedVisitor ? JSON.parse(storedVisitor) : null;
         const parsedQueue = storedQueue ? JSON.parse(storedQueue) : [];
         const day = now().toISOString().slice(0, 10);
@@ -178,15 +255,24 @@ export function createNativeAnalytics(config: NativeAnalyticsConfig) {
             ? parsedVisitor
             : { id: config.createId(), firstSeenOn: day, lastSessionOn: null };
         queue = Array.isArray(parsedQueue)
-          ? parsedQueue.slice(-MAX_QUEUE_EVENTS)
+          ? parsedQueue.slice(-MAX_QUEUE_EVENTS).flatMap((value: unknown) => {
+              const parsed = analyticsEventSchema.safeParse(value);
+              return parsed.success &&
+                parsed.data.project === config.project &&
+                fitsAnalyticsEventBudget(parsed.data)
+                ? [parsed.data]
+                : [];
+            })
           : [];
         initialized = true;
-        await config.storage.setItem(visitorKey, JSON.stringify(visitor));
+        await persistVisitor();
+        if (generation !== lifecycleGeneration) return;
         timer = setInterval(
           () => void flush(),
           config.flushIntervalMs ?? 60_000,
         );
       } catch {
+        if (generation !== lifecycleGeneration) return;
         initialized = false;
         visitor = null;
       }
@@ -195,16 +281,22 @@ export function createNativeAnalytics(config: NativeAnalyticsConfig) {
     async trackScreenView(route: string) {
       if (!initialized) return;
       const safe = safeRoute(route);
-      await trackSession(safe);
-      if (lastRoute === safe) return;
+      const snapshot = analyticsContext.snapshot();
+      const session = trackSession(safe, snapshot);
+      if (lastRoute === safe) {
+        await session;
+        return;
+      }
       lastRoute = safe;
-      await enqueue("screen_view", {}, safe);
+      await enqueue("screen_view", {}, safe, undefined, snapshot);
+      await session;
     },
     track(name: string, properties?: Record<string, EventProperty>) {
       return enqueue(name, properties);
     },
     flush,
     async destroy() {
+      lifecycleGeneration++;
       if (timer) clearInterval(timer);
       await flush();
       initialized = false;

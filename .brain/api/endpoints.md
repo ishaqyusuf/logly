@@ -1,5 +1,15 @@
 # API Endpoints
 
+## Generic analytics context (2026-10-01, local)
+
+- `GET /v1/dashboard/groups`: authenticated, project-required group search,
+  max 50 results plus hasMore. Same-origin operator-session proxy:
+  `GET /api/dashboard/groups`.
+- Existing event-list/summary endpoints accept group type/key, actor and typed
+  property equality filters; invalid context filters return 400.
+- Existing ingestion accepts optional bounded generic groups. No identity or
+  group profile upsert endpoint is introduced.
+
 - `GET /health`: collector health.
 - `POST /v1/events`: validated client or server event batch ingestion.
 - `GET /v1/dashboard/overview?organization=<slug>&project=<slug>&range=<24h|7d|30d>`:
@@ -37,6 +47,10 @@
   two to five steps, maximum 90-day range. See contracts for counting rules.
 
 - Event list, options and summary reads accept `platforms`. Event-summary endpoints include the additive `mobile` platform/version aggregate and `geography` country-visit aggregate. `POST /v1/events` accepts mobile platform/app release metadata and country only through authenticated proxy request metadata; see the contracts.
+
+## Project key reissue — 7 October 2026
+
+- `POST /api/project-keys`: same-origin admin-session mutation accepting organization/project slugs and one of the four existing scopes. Returns one new plaintext key once, with `Cache-Control: no-store`; unavailable, mismatched or disabled projects return 404.
 
 ## Breakdown — 2026-11-12 (local)
 

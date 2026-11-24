@@ -1,20 +1,28 @@
 import {
-  createHash,
-  createHmac,
-  randomBytes,
-  timingSafeEqual,
-} from "node:crypto";
+  createProjectCredential,
+  hashCredential,
+  type ProjectKeyScope,
+} from "./credential";
+
+export {
+  createProjectCredential,
+  hashCredential,
+  type ProjectKeyScope,
+} from "./credential";
+
+import { createHmac, timingSafeEqual } from "node:crypto";
 import type { AnalyticsBatch } from "@ishaqyusuf/logly-core";
 import {
-  actorReadFields,
-  matchesActorRead,
   type AnalyticsEventFilterOptions,
   type AnalyticsEventPage,
   type AnalyticsEventQuery,
   type AnalyticsEventRow,
   type AnalyticsEventSummary,
   type AnalyticsOverviewRange,
+  actorReadFields,
   getDemoAnalytics,
+  matchesActorRead,
+  matchesEventContext,
   normalizeCountry,
   summarizeAnalyticsEvents,
   summarizeCountries,
@@ -36,13 +44,14 @@ import {
   sql,
 } from "drizzle-orm";
 import { getDatabase } from "../client";
-import { getOverviewTopEvents, getOverviewTrend } from "./overview-trend";
 import {
   analyticsEvents,
   analyticsOrganizations,
   analyticsProjectKeys,
   analyticsProjects,
 } from "../schema";
+import { eventContextConditions, hashEventGroups } from "./event-context";
+import { getOverviewTopEvents, getOverviewTrend } from "./overview-trend";
 
 export const DEFAULT_ORGANIZATION_ID = "00000000-0000-4000-8000-000000000001";
 
@@ -72,10 +81,6 @@ function safeEqual(left: string, right: string) {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-export function hashCredential(value: string) {
-  return createHash("sha256").update(value).digest("hex");
-}
-
 export function coerceDatabaseTimestamp(value: Date | string | null) {
   if (!value) return null;
   const date = value instanceof Date ? value : new Date(value);
@@ -97,23 +102,6 @@ export function decodeEventCursor(cursor?: string) {
 
 export function normalizeEventPageSize(pageSize?: number) {
   return Math.min(100, Math.max(10, pageSize ?? 50));
-}
-
-export type ProjectKeyScope =
-  | "client-ingest"
-  | "server-write"
-  | "read"
-  | "admin";
-
-const keyPrefixes: Record<ProjectKeyScope, string> = {
-  "client-ingest": "logly_ci",
-  "server-write": "logly_sw",
-  read: "logly_rd",
-  admin: "logly_ad",
-};
-
-export function createProjectCredential(scope: ProjectKeyScope) {
-  return `${keyPrefixes[scope]}_${randomBytes(24).toString("base64url")}`;
 }
 
 export async function createAnalyticsProject(input: {
@@ -202,6 +190,7 @@ export async function verifyProjectCredential(
       and(
         eq(analyticsProjects.slug, projectSlug),
         eq(analyticsProjectKeys.scope, scope),
+        eq(analyticsProjectKeys.keyHash, hashCredential(credential)),
         isNull(analyticsProjectKeys.revokedAt),
         or(
           isNull(analyticsProjectKeys.expiresAt),
@@ -209,7 +198,7 @@ export async function verifyProjectCredential(
         ),
       ),
     )
-    .limit(10);
+    .limit(1);
   const candidate = hashCredential(credential);
   return rows.some((row) => safeEqual(row.hash, candidate));
 }
@@ -266,6 +255,7 @@ export async function ingestEventBatch(
           .update(event.actorId)
           .digest("hex")
       : null,
+    groups: hashEventGroups(event.groups, hashSecret, project.id),
     visitKind: event.visitKind ?? null,
     route: event.route ?? null,
     referrerHost: event.referrerHost ?? null,
@@ -341,6 +331,7 @@ function eventConditions(query: AnalyticsEventQuery) {
   const end = query.end ? new Date(query.end) : null;
   return and(
     query.actor ? eq(analyticsEvents.actorId, query.actor) : undefined,
+    eventContextConditions(query),
     query.project ? eq(analyticsProjects.slug, query.project) : undefined,
     query.organization
       ? eq(analyticsOrganizations.slug, query.organization)
@@ -383,6 +374,7 @@ function mapDashboardEvent({
 }): AnalyticsEventRow {
   return {
     ...actorReadFields(event),
+    groups: event.groups,
     id: event.eventId,
     name: event.name,
     project,
@@ -421,6 +413,7 @@ export async function listDashboardEventPage(
       return (
         matchesActorRead(event, query) &&
         (!query.project || event.project === query.project) &&
+        matchesEventContext(event, query) &&
         (!query.projects?.length || query.projects.includes(event.project)) &&
         (!query.names?.length || query.names.includes(event.name)) &&
         (!query.sources?.length || query.sources.includes(event.source)) &&
@@ -907,6 +900,37 @@ export async function getDashboardEventFilterOptions(
   };
 }
 
+export async function listDashboardGroups(query: {
+  project: string;
+  q?: string;
+}) {
+  const db = getDatabase();
+  if (!db) return { data: [], hasMore: false };
+  // Latest received label is display data; the immutable key owns attribution.
+  const rows = await db.execute<{
+    type: string;
+    key: string;
+    name: string;
+  }>(sql`
+    with latest as (
+      select distinct on (g.key, g.value->>'key')
+        g.key as type, g.value->>'key' as key,
+        coalesce(nullif(g.value->'properties'->>'name', ''), g.value->>'key') as name
+      from ${analyticsEvents} e
+      join ${analyticsProjects} p on p.id = e.project_id
+      cross join lateral jsonb_each(e.groups) g
+      where p.slug = ${query.project}
+      order by g.key, g.value->>'key', e.received_at desc, e.id desc
+    )
+    select * from latest
+    where name ilike ${`%${(query.q ?? "").slice(0, 128)}%`}
+       or key ilike ${`%${(query.q ?? "").slice(0, 128)}%`}
+       or type ilike ${`%${(query.q ?? "").slice(0, 128)}%`}
+    order by name, type, key limit 51
+  `);
+  return { data: [...rows].slice(0, 50), hasMore: rows.length > 50 };
+}
+
 export async function getDashboardData(
   projectSlug?: string,
   organizationSlug?: string,
@@ -931,9 +955,10 @@ export async function getDashboardData(
         )
         .map((project) => project.slug),
     );
-    const events = demo.events.filter((event) =>
-      allowedProjects.has(event.project) &&
-      (!rangeStart || new Date(event.occurredAt) >= rangeStart),
+    const events = demo.events.filter(
+      (event) =>
+        allowedProjects.has(event.project) &&
+        (!rangeStart || new Date(event.occurredAt) >= rangeStart),
     );
     const summary = summarizeAnalyticsEvents(events, {});
     const visitorEvents = events.filter((event) => event.visitorKey);
@@ -968,7 +993,11 @@ export async function getDashboardData(
       },
     };
   }
-  const events = await listDashboardEvents(projectSlug, organizationSlug, rangeStart);
+  const events = await listDashboardEvents(
+    projectSlug,
+    organizationSlug,
+    rangeStart,
+  );
   const projectFilter = and(
     projectSlug ? eq(analyticsProjects.slug, projectSlug) : undefined,
     organizationSlug
@@ -1162,3 +1191,8 @@ export async function getDashboardData(
 
 export { getDashboardBreakdown } from "./breakdown";
 export { getDashboardFunnel } from "./funnel";
+
+export {
+  type IssueProjectKeyInput,
+  issueAnalyticsProjectKey,
+} from "./project-key";

@@ -17,7 +17,7 @@ export function OverviewRangeFilter({
   // The metric tab changes the URL shallowly, so read it here to carry it over.
   const { metric } = useOverviewParams();
   return (
-    <div
+    <nav
       aria-label="Overview date range"
       className="flex items-center rounded-lg border bg-white p-1"
     >
@@ -40,6 +40,6 @@ export function OverviewRangeFilter({
           </Link>
         );
       })}
-    </div>
+    </nav>
   );
 }

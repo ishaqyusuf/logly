@@ -1,6 +1,7 @@
 import { createHmac, randomUUID } from "node:crypto";
 import {
   type AnalyticsBatch,
+  type AnalyticsGroups,
   analyticsBatchSchema,
   LOGLY_CORE_PACKAGE_NAME,
   LOGLY_CORE_VERSION,
@@ -27,24 +28,32 @@ export function signBatch(batch: AnalyticsBatch, secret: string) {
     .digest("hex");
 }
 
+export type ServerTrackOptions = {
+  groups?: AnalyticsGroups;
+  eventId?: string;
+  occurredAt?: string;
+};
+
 export function createServerAnalytics(config: ServerAnalyticsConfig) {
   return {
     async track(
       name: string,
       properties: Record<string, unknown> = {},
       actorId?: string,
+      options: ServerTrackOptions = {},
     ) {
       const batch = analyticsBatchSchema.parse({
         sentAt: new Date().toISOString(),
         sdk: { name: LOGLY_CORE_PACKAGE_NAME, version: LOGLY_CORE_VERSION },
         events: [
           {
-            eventId: randomUUID(),
+            eventId: options.eventId ?? randomUUID(),
             project: config.project,
             name,
             version: 1,
             source: "server",
-            occurredAt: new Date().toISOString(),
+            occurredAt: options.occurredAt ?? new Date().toISOString(),
+            groups: options.groups,
             actorId,
             properties: sanitizeProperties(properties),
           },

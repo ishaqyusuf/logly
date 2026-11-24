@@ -1,8 +1,12 @@
+import {
+  type AnalyticsContextMethods,
+  createAnalyticsContext,
+} from "./context";
 import type { AnalyticsBatch, AnalyticsEvent } from "./contracts";
 import {
   eventNameSchema,
+  fitsAnalyticsEventBudget,
   LOGLY_CORE_PACKAGE_NAME,
-  sanitizeProperties,
 } from "./contracts";
 import {
   type AnalyticsEventStore,
@@ -54,7 +58,7 @@ export type TrackContext = {
   campaign?: AnalyticsEvent["campaign"];
 };
 
-export type AnalyticsClient = {
+export type AnalyticsClient = AnalyticsContextMethods & {
   init: () => void;
   track: (
     name: string,
@@ -214,6 +218,7 @@ function createAnalyticsClient(
   let initialized = false;
   let destroyed = false;
   let lastPageViewRoute: string | undefined;
+  const analyticsContext = createAnalyticsContext();
   const normalizeRoute =
     config.routeTemplates === false
       ? undefined
@@ -322,8 +327,9 @@ function createAnalyticsClient(
       route: templateRoute(sanitizeRoute(context.route ?? browser.route)),
       referrerHost: capped(context.referrerHost ?? browser.referrerHost, 160),
       campaign: sanitizeCampaign(context.campaign ?? browser.campaign),
-      properties: sanitizeProperties(properties),
+      ...analyticsContext.snapshot(properties),
     };
+    if (!fitsAnalyticsEventBudget(event)) return null;
     enqueueEvent(event);
     return event;
   };
@@ -452,6 +458,7 @@ function createAnalyticsClient(
   };
 
   const init = () => {
+    destroyed = false;
     if (initialized || !isAllowed() || !storage) return;
     initialized = true;
     addListeners();
@@ -472,17 +479,36 @@ function createAnalyticsClient(
   };
 
   return {
+    identify: (actorId) => {
+      const accepted = analyticsContext.identify(actorId);
+      if (accepted) lastPageViewRoute = undefined;
+      return accepted;
+    },
+    group: (type, key, properties) => {
+      const accepted = analyticsContext.group(type, key, properties);
+      if (accepted) lastPageViewRoute = undefined;
+      return accepted;
+    },
+    clearGroup: (type) => {
+      analyticsContext.clearGroup(type);
+      lastPageViewRoute = undefined;
+    },
+    setGlobalProperties: analyticsContext.setGlobalProperties,
+    unsetGlobalProperties: analyticsContext.unsetGlobalProperties,
     init,
     track,
     trackPageView,
     flush,
     reset: () => {
+      analyticsContext.reset();
       lastPageViewRoute = undefined;
       clearPersistedAnalytics();
     },
     destroy: () => {
       destroyed = true;
+      initialized = false;
       if (flushTimer) clearTimeout(flushTimer);
+      flushTimer = undefined;
       removeListeners();
     },
   };

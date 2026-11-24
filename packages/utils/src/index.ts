@@ -4,11 +4,18 @@ import {
   matchesActorRead,
 } from "./actor-read";
 import { type CountryVisits, summarizeCountries } from "./countries";
+import {
+  type ContextFilters,
+  type EventGroups,
+  matchesEventContext,
+} from "./event-context";
 
 export * from "./actor-read";
 export * from "./breakdown";
 export * from "./countries";
+export * from "./event-context";
 export type AnalyticsEventRow = ActorReadContext & {
+  groups?: EventGroups;
   id: string;
   name: string;
   project: string;
@@ -32,20 +39,21 @@ export type AnalyticsEventSort =
   | "project"
   | "source";
 
-export type AnalyticsEventQuery = ActorReadQuery & {
-  organization?: string;
-  project?: string;
-  projects?: string[];
-  names?: string[];
-  sources?: Array<"browser" | "server" | "mobile">;
-  platforms?: Array<"web" | "ios" | "android">;
-  q?: string;
-  start?: string;
-  end?: string;
-  sort?: `${AnalyticsEventSort}:${"asc" | "desc"}`;
-  cursor?: string;
-  pageSize?: number;
-};
+export type AnalyticsEventQuery = ActorReadQuery &
+  ContextFilters & {
+    organization?: string;
+    project?: string;
+    projects?: string[];
+    names?: string[];
+    sources?: Array<"browser" | "server" | "mobile">;
+    platforms?: Array<"web" | "ios" | "android">;
+    q?: string;
+    start?: string;
+    end?: string;
+    sort?: `${AnalyticsEventSort}:${"asc" | "desc"}`;
+    cursor?: string;
+    pageSize?: number;
+  };
 
 export type AnalyticsEventPage = {
   data: AnalyticsEventRow[];
@@ -53,6 +61,7 @@ export type AnalyticsEventPage = {
 };
 
 export type AnalyticsEventFilterOptions = {
+  groups?: import("./event-context").AnalyticsGroupOption[];
   projects: string[];
   names: string[];
   sources: Array<"browser" | "server" | "mobile">;
@@ -238,6 +247,7 @@ function matchesEventQuery(
   return (
     matchesActorRead(event, query) &&
     (!query.project || event.project === query.project) &&
+    matchesEventContext(event, query) &&
     (!query.projects?.length || query.projects.includes(event.project)) &&
     (!query.names?.length || query.names.includes(event.name)) &&
     (!query.sources?.length || query.sources.includes(event.source)) &&

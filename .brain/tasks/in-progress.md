@@ -26,6 +26,20 @@
   range switching, tooltip, and empty states. Hourly 24h buckets were verified
   through the collector response, but not visually with live hourly traffic.
 
+## Generic group analytics — 2026-10-01
+
+Local implementation and verification complete; release review pending. See
+[delivery checklist](2026-10-01-generic-group-analytics.md). Logly provides
+generic group/user/property filtering; EwaTrade and Halaalvest derive trusted
+business context. Production migration/configuration and live traffic QA remain.
+
+## Vercel-style team → project header selector — 2026-09-23
+
+- Status: implemented locally; browser visual QA pending because browser access to the local preview was blocked by the browser URL policy.
+- Three HTML proposals are in `.design/vercel-header/`, with the two-column selector marked as recommended and implemented.
+- The header now owns the organization/project selector on desktop and mobile. The sidebar retains page navigation and operator identity. URL-backed project scope and organization/project creation remain available.
+- Typecheck, tests, dashboard production build, and focused Biome lint pass. Full-repository lint remains blocked by existing formatting in untouched `packages/db/src/queries/index.ts`. No API or database contract changed.
+
 ### [EwaTrade and Halaalvest integration completion](2026-09-22-portfolio-integration-completion.md)
 
 - Status: both project tasks active. Each owns
@@ -226,6 +240,19 @@ Release branches are pushed for all three consumer repositories. The requested i
 ## Country analytics production QA — 2026-09-12
 
 Halaalvest production generated a located browser arrival and Logly displayed United States, 1 visit, 100.0% with the correct active heat-map polygon. Country flags, explicit visit labels and the fewer-to-more heat legend are deployed in `dpl_CjsARB4jVyf5NKiKMFYRHk7inKJf`. Desktop and 390px mobile QA pass without overflow or console errors. See `country-map/production-qa-2026-09-12.md`.
+
+## Project key reissue — 7 October 2026
+
+Completed: additive credential issuance for the existing EwaTrade Dashboard and Marketing projects. Production deployment `dpl_AJBtoENjZbPnxkRBoxvDuEadFhkZ` is Ready on logly-chi.vercel.app. Focused tests (9 tests / 31 assertions), full typing, scoped formatting, package builds, dashboard build and desktop/390px checks pass. Both local EwaTrade env entries are filled and verified: own-project credentials pass authentication before disallowed-origin rejection; cross-project credentials fail authentication. No test events were ingested. No schema change, migration, existing-key revocation or commit. Unused issuance attempts remain active. Evidence and changed-file inventory: `/Users/M1PRO/Documents/code/ewatrade/.brain/tasks/2026-10-07-logly-project-key-reissue.md`.
+
+## Afterservice visit countries — 2026-10-24
+
+Completed and production-verified. Fresh Afterservice website and dashboard
+visits both show Nigeria (NG) in Logly.
+Added opt-in Cloudflare SDK forwarding and event table/detail country labels.
+Afterservice uses published 0.2.1 plus a tracked Bun patch. Existing country
+schema/Insights reports are reused. Validation and rollout notes:
+`country-map/afterservice-2026-10-24.md`.
 
 ## Breakdown read endpoint — 2026-11-12
 

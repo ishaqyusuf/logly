@@ -217,6 +217,10 @@ export const analyticsEvents = pgTable(
       .defaultNow(),
     visitorKey: text("visitor_key"),
     actorId: text("actor_id"),
+    groups: jsonb("groups")
+      .$type<import("@logly/utils").EventGroups>()
+      .notNull()
+      .default({}),
     visitKind: text("visit_kind"),
     route: text("route"),
     referrerHost: text("referrer_host"),
@@ -246,6 +250,12 @@ export const analyticsEvents = pgTable(
     index("analytics_events_properties_idx").using(
       "gin",
       table.properties.op("jsonb_path_ops"),
+    ),
+    index("analytics_events_groups_idx").using("gin", table.groups),
+    index("analytics_events_project_actor_idx").on(
+      table.projectId,
+      table.actorId,
+      table.occurredAt,
     ),
   ],
 );
