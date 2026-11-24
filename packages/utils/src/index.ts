@@ -14,6 +14,8 @@ export * from "./actor-read";
 export * from "./breakdown";
 export * from "./countries";
 export * from "./event-context";
+export * from "./pages";
+export * from "./tracking-alerts";
 export type AnalyticsEventRow = ActorReadContext & {
   groups?: EventGroups;
   id: string;
@@ -180,6 +182,8 @@ export type AnalyticsProjectSummary = {
   eventsToday: number;
   visitorsToday: number;
   lastEventAt: string | null;
+  /** Tracking-quiet alert state; absent in demo mode and older responses. */
+  trackingAlert?: import("./tracking-alerts").TrackingAlertState;
 };
 
 export type AnalyticsOrganizationSummary = {

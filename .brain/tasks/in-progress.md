@@ -1,5 +1,24 @@
 # In Progress
 
+## Pages report and tracking-quiet alerts — 2026-11-24
+
+- Status: committed locally on `main`, unreleased (held for the coordinated
+  8-feature release; nothing pushed, deployed or migrated in production).
+- Features 1 and 3 of the 8 approved: [Pages report](../features/pages-report.md)
+  and [tracking-quiet alerts](../features/tracking-alerts.md),
+  [ADR 0013](../decisions/0013-tracking-alerts-evaluate-on-read.md).
+- Migration `0007_tracking_quiet_alerts` (next free number is `0008`).
+- New read endpoints `GET /v1/dashboard/pages` and
+  `GET /v1/dashboard/tracking-alerts`; optional `projects[].trackingAlert` on
+  overview. No env vars, cron or Vercel config changes.
+- Typecheck, lint, tests, dashboard build and local SQL fixtures pass. The API was
+  verified against the local stack with a seeded `pages-qa-*` project
+  (templates, raw paths, `/other`, null routes, a `stopped` alert). Visual
+  browser QA of `/pages`, the Overview banner, selector badge and Settings
+  history is pending an operator sign-in in the local browser.
+- Follow-ups: email alert channel (needs a scheduled trigger, see ADR 0013);
+  per-route drill-down; session-based entry/exit if visitor-day is too coarse.
+
 ## SDK route templates — 2026-11-24
 
 - Status: merged to main and in the 2026-11-24 production deploy (`7c81d51`).

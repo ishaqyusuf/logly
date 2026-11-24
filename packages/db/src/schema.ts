@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -283,6 +283,53 @@ export const analyticsDailyRollups = pgTable(
       table.metric,
       table.dimension,
       table.dimensionValue,
+    ),
+  ],
+);
+
+/**
+ * Latest tracking-quiet evaluation per project. `evaluated_at` doubles as the
+ * evaluation claim: an upsert only re-claims a project once its row is stale,
+ * so overlapping dashboard reads never evaluate the same project twice.
+ */
+export const analyticsTrackingAlertState = pgTable(
+  "analytics_tracking_alert_state",
+  {
+    projectId: uuid("project_id")
+      .primaryKey()
+      .references(() => analyticsProjects.id, { onDelete: "cascade" }),
+    status: text("status").notNull().default("pending"),
+    observedEvents: integer("observed_events").notNull().default(0),
+    baselineEvents: integer("baseline_events").notNull().default(0),
+    windowStart: timestamp("window_start", { withTimezone: true }),
+    windowEnd: timestamp("window_end", { withTimezone: true }),
+    evaluatedAt: timestamp("evaluated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+);
+
+/** Tracking-quiet alert history; at most one open alert per project. */
+export const analyticsTrackingAlerts = pgTable(
+  "analytics_tracking_alerts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => analyticsProjects.id, { onDelete: "cascade" }),
+    severity: text("severity").notNull(),
+    openedAt: timestamp("opened_at", { withTimezone: true }).notNull(),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    observedEvents: integer("observed_events").notNull(),
+    baselineEvents: integer("baseline_events").notNull(),
+  },
+  (table) => [
+    uniqueIndex("analytics_tracking_alerts_open_idx")
+      .on(table.projectId)
+      .where(sql`${table.resolvedAt} is null`),
+    index("analytics_tracking_alerts_project_opened_idx").on(
+      table.projectId,
+      table.openedAt,
     ),
   ],
 );

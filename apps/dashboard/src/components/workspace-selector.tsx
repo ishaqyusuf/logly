@@ -18,6 +18,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import { resolveProjectWorkspace } from "@/lib/project-workspace";
 
+function isTrackingAlertOpen(status?: string) {
+  return status === "drop" || status === "stopped";
+}
+
 export function WorkspaceSelector({
   organizations,
   projects,
@@ -141,6 +145,13 @@ export function WorkspaceSelector({
         <span className="truncate font-semibold text-foreground">
           {selectedProject?.name ?? "Choose project"}
         </span>
+        {isTrackingAlertOpen(selectedProject?.trackingAlert?.status) ? (
+          <span
+            className="size-2 shrink-0 rounded-full bg-red-500"
+            role="img"
+            aria-label="Tracking alert open"
+          />
+        ) : null}
         <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       </button>
       {open ? (
@@ -245,6 +256,16 @@ export function WorkspaceSelector({
                 >
                   <FolderKanban className="h-3.5 w-3.5 shrink-0" />
                   <span className="min-w-0 flex-1 truncate">{item.name}</span>
+                  {isTrackingAlertOpen(item.trackingAlert?.status) ? (
+                    <span
+                      className="shrink-0 rounded-full bg-red-50 px-1.5 py-0.5 text-[10px] font-semibold text-red-700"
+                      title="Tracking volume is far below normal"
+                    >
+                      {item.trackingAlert?.status === "stopped"
+                        ? "Stopped"
+                        : "Dropped"}
+                    </span>
+                  ) : null}
                   {item.id === selectedProject?.id ? (
                     <Check className="h-3.5 w-3.5 shrink-0" />
                   ) : null}

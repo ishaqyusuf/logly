@@ -50,6 +50,13 @@
       "when": 1794502423144,
       "tag": "0006_breakdown_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795509092387,
+      "tag": "0007_tracking_quiet_alerts",
+      "breakpoints": true
     }
   ]
 }

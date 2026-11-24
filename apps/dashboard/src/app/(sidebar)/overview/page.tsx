@@ -8,6 +8,7 @@ import { OverviewStatus } from "@/components/overview/overview-status";
 import { OverviewTopEvents } from "@/components/overview/overview-top-events";
 import { OverviewRangeFilter } from "@/components/overview-range-filter";
 import { ScrollableContent } from "@/components/scrollable-content";
+import { TrackingAlertBanner } from "@/components/tracking-alerts/tracking-alert-banner";
 import { getDashboardData } from "@/lib/dashboard-data";
 import { loadProjectWorkspace } from "@/lib/project-workspace-server";
 
@@ -47,6 +48,7 @@ export default async function OverviewPage({
     scope.set("organization", workspace.organization.slug);
   scope.set("project", project.slug);
   const eventsHref = `/events?${scope}` as Route;
+  const alertsHref = `/settings?${scope}#tracking-alerts` as Route;
   const labels = windowLabels[range];
 
   return (
@@ -61,6 +63,10 @@ export default async function OverviewPage({
           </div>
           <OverviewRangeFilter range={range} query={scope.toString()} />
         </div>
+        <TrackingAlertBanner
+          state={project.trackingAlert}
+          historyHref={alertsHref}
+        />
         <OverviewMetrics
           overview={data.overview}
           windowLabel={labels.current}

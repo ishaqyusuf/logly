@@ -10,11 +10,15 @@ import {
   type AnalyticsOrganizationSummary,
   type AnalyticsOverview,
   type AnalyticsOverviewRange,
+  type AnalyticsPagesReport,
+  type AnalyticsPageViewEvent,
   type AnalyticsProjectSummary,
   getDemoAnalytics,
   matchesEventContext,
   summarizeAnalyticsEvents,
   summarizeFunnel,
+  summarizePages,
+  type TrackingAlertsReport,
 } from "@logly/utils";
 import { cache } from "react";
 
@@ -204,4 +208,36 @@ export async function getDashboardFunnel(
   if (query.start) params.set("start", query.start);
   if (query.end) params.set("end", query.end);
   return client.read<AnalyticsFunnel>(`/v1/dashboard/funnel?${params}`);
+}
+
+export async function getDashboardPages(query: {
+  project: string;
+  organization?: string;
+  range: AnalyticsOverviewRange;
+  view?: AnalyticsPageViewEvent;
+}): Promise<AnalyticsPagesReport> {
+  const client = dashboardClient();
+  if (!client) return summarizePages(getDemoAnalytics().events, query);
+  const params = new URLSearchParams({
+    project: query.project,
+    range: query.range,
+  });
+  if (query.organization) params.set("organization", query.organization);
+  if (query.view) params.set("view", query.view);
+  return client.read<AnalyticsPagesReport>(`/v1/dashboard/pages?${params}`);
+}
+
+export async function getTrackingAlerts(
+  project: string,
+): Promise<TrackingAlertsReport | null> {
+  const client = dashboardClient();
+  if (!client) return null;
+  try {
+    return await client.read<TrackingAlertsReport>(
+      `/v1/dashboard/tracking-alerts?${new URLSearchParams({ project })}`,
+    );
+  } catch {
+    // Alert history is supplementary; never fail the page over it.
+    return null;
+  }
 }

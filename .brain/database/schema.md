@@ -71,3 +71,20 @@ column, with exact scalar containment preserving null/missing/type semantics.
 - Property breakdown dimensions and duration percentiles read
   `properties ->> key` per row inside the project/time window; no per-key
   expression indexes are created.
+
+## Tracking-quiet alerts — 2026-11-24 (local, unreleased)
+
+- `analytics_tracking_alert_state`: one row per project (PK `project_id`, FK
+  cascade): latest `status`, `observed_events`, `baseline_events`, evaluated
+  `window_start`/`window_end`, and `evaluated_at`, which doubles as the
+  evaluation claim (upsert re-claims only rows older than 5 minutes).
+- `analytics_tracking_alerts`: alert history (`severity` drop|stopped,
+  `opened_at`, nullable `resolved_at`, counts at open). Partial unique index
+  `analytics_tracking_alerts_open_idx` on `project_id where resolved_at is
+  null` (one open alert per project); `(project_id, opened_at)` index for
+  history.
+- Both are identifier-free operational tables (counts only), deleted with the
+  project. Retention cleanup does not touch them yet.
+
+The Pages report adds no schema; it reads `analytics_events` through the
+existing `(project_id, name, occurred_at)` index.

@@ -59,3 +59,16 @@
   event/distinct-actor/distinct-group metrics, optional UTC daily series,
   top-N plus `(other)`/`(none)` buckets, and optional p50/p95 of a numeric
   property. Invalid input returns 400. See the contracts.
+
+## Pages report and tracking alerts — 2026-11-24 (local, unreleased)
+
+- `GET /v1/dashboard/pages?project=<slug>&range=<24h|7d|30d>&view=<page_view|screen_view>`:
+  read-key or operator authenticated, project required. `range` defaults to
+  `7d`; `view` is optional (auto-selected). Invalid range/view returns 400.
+  Without a database it returns the demo summary. Dashboard page: `/pages`.
+- `GET /v1/dashboard/tracking-alerts?project=<slug>`: current tracking-quiet
+  state plus the 20 most recent alerts; 400 without a project, 404 for an
+  unknown project. Runs the throttled alert evaluation first.
+- `GET /v1/dashboard/overview` now also runs the throttled alert evaluation
+  (at most once per project per 5 minutes, bounded to 1.5s) and adds optional
+  `projects[].trackingAlert`.

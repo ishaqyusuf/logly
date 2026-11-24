@@ -52,6 +52,7 @@ import {
 } from "../schema";
 import { eventContextConditions, hashEventGroups } from "./event-context";
 import { getOverviewTopEvents, getOverviewTrend } from "./overview-trend";
+import { listTrackingAlertStates } from "./tracking-alerts";
 
 export const DEFAULT_ORGANIZATION_ID = "00000000-0000-4000-8000-000000000001";
 
@@ -1127,6 +1128,9 @@ export async function getDashboardData(
     )
     .groupBy(analyticsOrganizations.id)
     .orderBy(analyticsOrganizations.name);
+  const trackingAlerts = await listTrackingAlertStates(
+    projects.map((project) => project.id),
+  );
   return {
     mode: "database" as const,
     overview: {
@@ -1184,6 +1188,7 @@ export async function getDashboardData(
         eventsToday: project.eventsToday,
         visitorsToday: project.visitorsToday,
         lastEventAt: lastEventAt?.toISOString() ?? null,
+        trackingAlert: trackingAlerts.get(project.id),
       };
     }),
   };
@@ -1191,8 +1196,13 @@ export async function getDashboardData(
 
 export { getDashboardBreakdown } from "./breakdown";
 export { getDashboardFunnel } from "./funnel";
-
+export { getDashboardPages, type PagesReportQuery } from "./pages";
 export {
   type IssueProjectKeyInput,
   issueAnalyticsProjectKey,
 } from "./project-key";
+export {
+  evaluateTrackingAlerts,
+  getTrackingAlertsReport,
+  refreshTrackingAlerts,
+} from "./tracking-alerts";

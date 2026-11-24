@@ -6,10 +6,13 @@ import {
   getDashboardEventFilterOptions,
   getDashboardEventSummary,
   getDashboardFunnel,
+  getDashboardPages,
   getProjectPolicy,
+  getTrackingAlertsReport,
   ingestEventBatch,
   listDashboardEventPage,
   listDashboardGroups,
+  refreshTrackingAlerts,
   verifyProjectCredential,
 } from "@logly/db/queries";
 import {
@@ -18,6 +21,7 @@ import {
   normalizeFunnelQuery,
   parseActorReadQuery,
   parseBreakdownQuery,
+  parsePageViewEvent,
   readContextFilters,
 } from "@logly/utils";
 import { Hono } from "hono";
@@ -177,8 +181,10 @@ export function createCollectorApp() {
     );
   });
 
-  app.get("/v1/dashboard/overview", async (context) =>
-    context.json(
+  app.get("/v1/dashboard/overview", async (context) => {
+    // Tracking-quiet alerts are evaluated on read, throttled per project.
+    await refreshTrackingAlerts();
+    return context.json(
       await getDashboardData(
         context.req.query("project"),
         context.req.query("organization"),
@@ -186,8 +192,37 @@ export function createCollectorApp() {
           (range) => range === context.req.query("range"),
         ),
       ),
-    ),
-  );
+    );
+  });
+  app.get("/v1/dashboard/pages", async (context) => {
+    const project = context.req.query("project");
+    if (!project) return context.json({ error: "Project is required" }, 400);
+    const range = (["24h", "7d", "30d"] as const).find(
+      (option) => option === (context.req.query("range") ?? "7d"),
+    );
+    const viewParam = context.req.query("view");
+    const view = parsePageViewEvent(viewParam);
+    if (!range || (viewParam && !view)) {
+      return context.json({ error: "Invalid pages query" }, 400);
+    }
+    return context.json(
+      await getDashboardPages({
+        project,
+        organization: context.req.query("organization"),
+        range,
+        view,
+      }),
+    );
+  });
+  app.get("/v1/dashboard/tracking-alerts", async (context) => {
+    const project = context.req.query("project");
+    if (!project) return context.json({ error: "Project is required" }, 400);
+    await refreshTrackingAlerts();
+    const report = await getTrackingAlertsReport({ project });
+    return report
+      ? context.json(report)
+      : context.json({ error: "Project not found" }, 404);
+  });
   app.get("/v1/dashboard/events", async (context) => {
     const split = (value?: string) => value?.split(",").filter(Boolean);
     const sources = split(context.req.query("sources"))?.filter(

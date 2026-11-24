@@ -51,3 +51,26 @@ test("breakdown requires read authorization before validation", async () => {
   expect(result.status).toBe(401);
   expect(await result.json()).toEqual({ error: "Unauthorized" });
 });
+
+test("pages rejects a missing project or invalid range/view", async () => {
+  process.env.NODE_ENV = "development";
+  delete process.env.LOGLY_READ_KEY;
+  const app = createCollectorApp();
+  for (const params of [
+    "range=7d",
+    "project=p&range=90d",
+    "project=p&view=click",
+  ]) {
+    const result = await app.request(`/v1/dashboard/pages?${params}`);
+    expect(result.status).toBe(400);
+  }
+});
+
+test("tracking alerts require a project", async () => {
+  process.env.NODE_ENV = "development";
+  delete process.env.LOGLY_READ_KEY;
+  const result = await createCollectorApp().request(
+    "/v1/dashboard/tracking-alerts",
+  );
+  expect(result.status).toBe(400);
+});

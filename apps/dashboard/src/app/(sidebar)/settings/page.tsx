@@ -14,6 +14,8 @@ import type { SearchParams } from "nuqs/server";
 import { OpenProjectSheet } from "@/components/open-project-sheet";
 import { ProjectKeySettings } from "@/components/project-key-settings";
 import { ScrollableContent } from "@/components/scrollable-content";
+import { TrackingAlertHistory } from "@/components/tracking-alerts/tracking-alert-history";
+import { getTrackingAlerts } from "@/lib/dashboard-data";
 import { loadProjectWorkspace } from "@/lib/project-workspace-server";
 
 export const metadata: Metadata = { title: "Settings" };
@@ -54,7 +56,10 @@ export default async function SettingsPage({
     );
   }
   const project = workspace.project;
-  const session = await auth.api.getSession({ headers: await headers() });
+  const [session, trackingAlerts] = await Promise.all([
+    auth.api.getSession({ headers: await headers() }),
+    getTrackingAlerts(project.slug),
+  ]);
   return (
     <ScrollableContent>
       <div className="mx-auto max-w-4xl space-y-6">
@@ -144,6 +149,7 @@ export default async function SettingsPage({
             </SettingField>
           </div>
         </section>
+        <TrackingAlertHistory report={trackingAlerts} />
         {session?.user.role === "admin" && workspace.organization ? (
           <ProjectKeySettings
             key={project.slug}

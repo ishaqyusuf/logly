@@ -235,3 +235,35 @@ Country now appears in Events/Live table columns and event Context details
 as flag + English name + code, or Unknown. Saved table layouts keep the
 actions column last when new columns are introduced. No migration or
 historical backfill is required.
+
+### Pages report — 2026-11-24 (local, unreleased)
+
+`GET /v1/dashboard/pages` returns `AnalyticsPagesReport` (`@logly/utils`):
+`{ view, range, start, end, previousStart, available: { page_view, screen_view },
+totals: { views, visitors, previousViews, previousVisitors, visitorDays },
+pages[], entries[], exits[] }`.
+
+- `pages[]` (max 25, by current views): `{ route, views, visitors,
+  previousViews, previousVisitors }`. `route` is the stored string or null.
+- `entries[]`/`exits[]` (max 10): `{ route, count }`, where count is the number
+  of visitor-days (visitor key × UTC day) whose first/last view was that route.
+  Events without a visitor key are excluded.
+- Windows: `[start, end)` rolling to now; previous window `[previousStart, start)`
+  of equal length. Change is derived by the client (Pulse rule; prior 0 = new).
+- `view` defaults to `page_view`, or `screen_view` when the window has only
+  screen views.
+
+### Tracking-quiet alerts — 2026-11-24 (local, unreleased)
+
+`AnalyticsProjectSummary.trackingAlert?` (overview `projects[]`) is a
+`TrackingAlertState`: `{ status, observedEvents, baselineEvents, windowStart,
+windowEnd, evaluatedAt, openedAt }`. `status` is `ok`, `drop`, `stopped`,
+`low_volume` or `pending`. `openedAt` is set only while an alert is open. The
+field is absent in demo mode and in older responses, and clients must tolerate
+that.
+
+`GET /v1/dashboard/tracking-alerts` returns `{ state: TrackingAlertState,
+history: [{ id, severity: "drop"|"stopped", openedAt, resolvedAt|null,
+observedEvents, baselineEvents }] }`. The rule constants live in
+`packages/utils/src/tracking-alerts.ts`; see
+`../features/tracking-alerts.md`.

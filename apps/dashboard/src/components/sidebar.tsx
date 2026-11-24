@@ -9,6 +9,7 @@ import type {
 import {
   Activity,
   BarChart3,
+  FileText,
   LayoutDashboard,
   Radio,
   Settings2,
@@ -23,6 +24,7 @@ import { resolveProjectWorkspace } from "@/lib/project-workspace";
 const navigation = [
   { href: "/overview", label: "Overview", icon: LayoutDashboard },
   { href: "/events", label: "Events", icon: Activity },
+  { href: "/pages", label: "Pages", icon: FileText },
   { href: "/live", label: "Live", icon: Radio },
   { href: "/insights", label: "Insights", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings2 },
