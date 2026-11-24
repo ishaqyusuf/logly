@@ -128,3 +128,27 @@
   `/api/releases`).
 - Page `/funnels`: request-time render; one options read and at most one
   funnel read per view, no polling.
+
+## Email channel — 2026-11-24 (local, unreleased)
+
+Dashboard route handlers (feature 8, [ADR 0020](../decisions/0020-email-channel-weekly-digest.md)):
+
+- `GET /api/cron/email`: Vercel cron, daily `0 7 * * *` UTC. Bearer
+  `CRON_SECRET` (503 when unset, 401 on mismatch). Evaluates tracking alerts,
+  emails alert transitions, sends last week's digests; returns
+  `{ status: "ok"|"disabled", reason?, alerts: { sent, failed },
+  digests: { sent, failed, projects }, truncated }`. `maxDuration` 60 s.
+- `PUT /api/email/subscriptions`: admin session + trusted same origin. Body
+  `{ project, userId, scope: "project"|"organization", weeklyDigest,
+  trackingAlerts }` (≤ 2 KB); both false deletes the row. 404 for an unknown
+  project or operator.
+- `POST /api/email/test`: admin session + same origin, `{ project }`. Sends
+  last week's digest to the signed-in admin only; 409 when sending is disabled
+  (local/preview/missing keys), 502 when the provider rejects it.
+- `GET /api/email/preview?project=<slug>&format=text`: admin session. Rendered
+  HTML (restrictive CSP) or the text fallback of last week's digest.
+- `GET|POST /api/email/unsubscribe?token=<signed>`: public (proxy-exempt).
+  GET renders a confirmation form and changes nothing; POST (form or RFC 8058
+  one-click) unsubscribes. 400 page for an invalid token.
+
+All are request-rendered (`ƒ`). No collector (`/v1`) contract changes.

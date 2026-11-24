@@ -20,7 +20,9 @@ Detects when a project's event volume drops far below normal or stops.
 
 ## Delivery
 
-- In-dashboard only. Logly has no email channel; email alerts are a follow-up.
+- In-dashboard, and by email since feature 8: opted-in operators get an email
+  when an alert opens or resolves ([email digest](email-digest.md),
+  [ADR 0020](../decisions/0020-email-channel-weekly-digest.md)).
 - Overview shows a red banner while an alert is open, linking to history.
 - The header project selector marks the selected project with a red dot, and
   the project list shows "Stopped" or "Dropped".
@@ -30,8 +32,9 @@ Detects when a project's event volume drops far below normal or stops.
 ## Evaluation (trigger, frequency, timeout, overlap, idempotency)
 
 - Trigger: `GET /v1/dashboard/overview` (every dashboard navigation loads it
-  for the shell) and `GET /v1/dashboard/tracking-alerts`. No cron or
-  scheduled job.
+  for the shell), `GET /v1/dashboard/tracking-alerts`, and since feature 8 the
+  daily email cron (`GET /api/cron/email`, 07:00 UTC), which calls
+  `evaluateTrackingAlerts` before emailing transitions.
 - Frequency: at most once per project per 5 minutes, and only while someone
   uses the dashboard. Between checks, reads reuse stored state.
 - Cost per check: one claim upsert, one query of 8 indexed counts per claimed
@@ -46,7 +49,7 @@ Detects when a project's event volume drops far below normal or stops.
   opening uses `on conflict do nothing`, and resolving only touches an
   unresolved row.
 
-Limitation: when nobody opens the dashboard, nothing is evaluated, so
-`opened_at` is the first check after the drop, not the moment it began. This is
-acceptable while alerts appear only in the dashboard. Email alerts will need a
-scheduled trigger (see the ADR).
+Limitation: `opened_at` is the first check after the drop, not the moment it
+began. With the daily cron (ADR 0020) an unwatched project's alert opens, and
+is emailed, within 24 hours; dashboard reads open it sooner, and the next cron
+run emails it. An hourly schedule (Pro plan) would tighten that.

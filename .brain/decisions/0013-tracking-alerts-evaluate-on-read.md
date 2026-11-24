@@ -1,6 +1,7 @@
 # 0013. Evaluate tracking-quiet alerts on dashboard reads
 
-Accepted 2026-11-24.
+Accepted 2026-11-24. Extended by [ADR 0020](0020-email-channel-weekly-digest.md):
+the daily email cron also evaluates alerts and emails transitions.
 
 Tracking-quiet alerts need periodic evaluation. Logly has no email channel,
 so for now alerts are seen only in the dashboard. An hourly Vercel cron would

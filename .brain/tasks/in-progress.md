@@ -1,5 +1,46 @@
 # In Progress
 
+## Weekly email digest — 2026-11-24
+
+- Status: committed locally on `main` (`e9fa14a`), unreleased (feature 8 of
+  the 8; held for the coordinated release; nothing pushed, deployed, migrated
+  in production or published, and no real email sent).
+- [Email digest](../features/email-digest.md),
+  [ADR 0020](../decisions/0020-email-channel-weekly-digest.md) (adds email to
+  [tracking alerts](../features/tracking-alerts.md); the cron now also
+  evaluates them).
+- Migration `0013_email_digest` (`analytics_email_subscriptions`,
+  `analytics_email_sends`). Not applied to the shared local database, so
+  `0012` (feature 7) and `0013` apply in order there. Next free: `0014`.
+- New package `@logly/email`; routes `GET /api/cron/email` (daily cron),
+  `PUT /api/email/subscriptions`, `POST /api/email/test`,
+  `GET /api/email/preview`, `GET|POST /api/email/unsubscribe`; Settings →
+  Email (admin).
+- Before release the user must: create a Resend account, verify a sending
+  domain (DNS), create an API key; add Vercel Production env vars
+  `RESEND_API_KEY`, `EMAIL_FROM` (e.g. `Logly <digest@your-domain>`),
+  `CRON_SECRET` (random, 16+ chars), optional `EMAIL_REPLY_TO`; confirm
+  `NEXT_PUBLIC_DASHBOARD_URL` or `BETTER_AUTH_URL` is the public dashboard
+  URL. `vercel.json` already declares the cron (daily, valid on Hobby).
+  After deploy: opt operators in under Settings → Email and use "Send test
+  digest to me".
+- Checks: email package (25 tests, fake transport and fake store: idempotent
+  re-runs, concurrent runs, retry/reject, disabled transport, send cap),
+  dashboard route tests (cron auth fails closed, admin/same-origin, test
+  send, unsubscribe GET is inert and POST works, forged token), and the
+  `logly_test` SQL fixture (exclusive claims under concurrency, attempt cap,
+  stale-claim recovery, recipient dedupe, unsubscribe scope, digest
+  metrics). Lint, tests and `bun run build:dashboard` pass; typecheck passes
+  except feature 7's in-progress `event-catalog.sql.test.ts`.
+- The digest and alert emails were rendered from seeded data (a gnd-shaped
+  project in Africa/Lagos, two weeks of events, releases and an alert, in a
+  throwaway `logly_test` schema) and browser-checked at desktop and 375px. The
+  Settings → Email section was not browser-checked: it needs an operator
+  sign-in, migration `0013` applied locally, and a dev server (starting
+  `logly-dev` would restart the event-catalog session's servers).
+- Follow-ups: hourly cron on a Pro plan for faster alert emails; Resend
+  bounce webhooks; a retention job for `analytics_email_sends`.
+
 ## Funnel builder — 2026-11-24
 
 - Status: committed locally on `main` (`39993f7`), unreleased (feature 6 of

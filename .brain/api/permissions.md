@@ -62,3 +62,15 @@ Reading saved funnels and running any funnel needs a signed-in operator (or a
 project read credential at the collector). Creating, updating and deleting a
 saved funnel (`/api/funnels`) needs a server-validated `admin` session and a
 trusted same-origin request, the same check as manual deploy markers.
+
+## Email channel — 2026-11-24 (local, unreleased)
+
+- Email opt-ins, the digest preview and the test send need a server-validated
+  `admin` session; writes also need a trusted same-origin request.
+- `/api/cron/email` is outside the session proxy and accepts only
+  `Authorization: Bearer $CRON_SECRET` (constant-time compare); without the
+  secret it refuses to run.
+- `/api/email/unsubscribe` is public; the HMAC token (key derived from
+  `BETTER_AUTH_SECRET`) names one subscription row and kind, never an address.
+  It can only turn email off.
+- Email is sent only from the production deployment (`VERCEL_ENV=production`).

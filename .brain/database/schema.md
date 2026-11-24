@@ -118,3 +118,23 @@ cascade), `name` (1–80 characters, trimmed), `steps` jsonb (2–8
 `created_at`, `updated_at`. Unique `analytics_funnels_project_name_idx
 (project_id, name)`; at most 50 rows per project, enforced on create. Operator
 configuration only, no identifiers; deleted with the project.
+
+## Email channel — 2026-11-24 (local, unreleased)
+
+`analytics_email_subscriptions`: `id` uuid PK, `user_id` (FK `user.id`,
+cascade), exactly one of `organization_id` (FK, cascade) or `project_id` (FK,
+cascade) (check `analytics_email_subscriptions_scope_check`), `weekly_digest`,
+`tracking_alerts`, `created_at`, `updated_at`. Partial unique indexes
+`(user_id, organization_id)` and `(user_id, project_id)`. A row with both
+kinds off is deleted.
+
+`analytics_email_sends`: `id` uuid PK, `kind`
+(`digest`|`alert_opened`|`alert_resolved`), `project_id` (FK, cascade),
+`period_key` (digest week's local Monday `YYYY-MM-DD`, or the alert id),
+`user_id` (FK `user.id`, cascade), `status`
+(`sending`|`sent`|`failed`|`rejected`), `attempts`, `provider_message_id`,
+`error` (≤ 300 chars), `claimed_at`, `sent_at`, `created_at`. Unique
+`analytics_email_sends_unique_idx (kind, project_id, period_key, user_id)` is
+the idempotency claim. Neither table stores an email address; addresses are
+read from `user` at send time. No retention job yet: about one row per
+recipient per project per week.

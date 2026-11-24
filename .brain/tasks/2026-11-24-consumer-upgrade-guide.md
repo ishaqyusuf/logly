@@ -86,7 +86,7 @@ Filled in as each feature lands.
 | 5 | Retention | Built (`85cc8d1`); authenticated-page visual QA pending | Nothing. Uses `site_visit` (web SDK) and `app_session` (mobile clients), which every project already sends. See "Retention notes" below. |
 | 6 | Funnel builder | Built (`39993f7`, migration `0011`); authenticated-page visual QA pending | No SDK upgrade or config. Funnels can only use events a project already sends, so useful funnels need new browser/mobile events: gnd quote events, school-clerk and halaal-coperative milestone events, and a forwarded `visitorId` on the server milestones of plot-keys and after-service. ewatrade storefront requests work today. See "Funnel setup" below. |
 | 7 | Event catalog | Not started | Expected: nothing; add descriptions in the dashboard. |
-| 8 | Weekly email digest | Not started | Expected: nothing; recipients set in Logly. |
+| 8 | Weekly email digest | Built (`e9fa14a`, migration `0013`); Settings section visual QA pending | Nothing. No SDK upgrade, event or config change; digests and alert emails are configured in Logly (Settings → Email). Logly itself needs Resend and Vercel setup before release; see "Email digest setup" below. |
 
 ## Deploy markers setup (feature 2)
 
@@ -198,3 +198,28 @@ Key funnels and what each project must track (read-only check of each repo,
 | school-clerk | School: onboarding → first student added → first result published | Only `site_visit`/`page_view`. | Track `onboarding_completed`, `student_added`, `result_published`, `fee_payment_recorded` from the browser. |
 | after-service | Workspace: customer created → service job created → follow-up message sent | `customer_created`, `service_job_created`, `message_sent`, `follow_up_status_updated` as server events keyed by actor, not visitor; browser `site_visit`. Its `packages/events/src/events.ts` catalog (`pricing_viewed`, `cta_clicked`, `user_signed_in`, `subscription_started`, …) is used by the website, but local Logly data shows none of these arriving. | Forward the browser `visitorId` on the server milestones, or emit them from the browser. Confirm the catalog events reach Logly through the browser SDK; then a marketing funnel (`pricing_viewed` → `cta_clicked` → `user_signed_in` → `subscription_started`) works. |
 
+## Email digest setup (feature 8)
+
+Product projects do nothing. The digest reads data they already send: visitors
+and events from every project, top pages from `page_view`/`screen_view`
+(better once steps 1–2 land), releases from deploy markers (feature 2) and
+tracking alerts (feature 3). Projects that set `timezone` get their own
+Monday–Sunday; all are UTC today.
+
+Logly (one-time, by the user, before the coordinated release):
+
+1. Resend: create the account, add and verify a sending domain (DNS records
+   at the domain's registrar), create an API key with send access.
+2. Vercel → logly → Settings → Environment Variables, **Production** only:
+   `RESEND_API_KEY`, `EMAIL_FROM` (`Logly <digest@verified-domain>`),
+   `CRON_SECRET` (random, 16+ characters; Vercel sends it to the cron),
+   optional `EMAIL_REPLY_TO`. Keep `NEXT_PUBLIC_DASHBOARD_URL` or
+   `BETTER_AUTH_URL` set to the public dashboard URL (email links use it).
+   Do not add the email keys to Preview; preview never sends anyway.
+3. `vercel.json` declares the cron (`/api/cron/email`, daily 07:00 UTC),
+   which a Hobby plan allows. Check it under Settings → Cron Jobs after the
+   deploy. On a Pro plan the schedule can be made hourly for faster alert
+   emails.
+4. After the deploy (migration `0013` runs in `deploy:prepare`): Settings →
+   Email → opt operators in per project or organization, open "Preview
+   digest", then "Send test digest to me".
