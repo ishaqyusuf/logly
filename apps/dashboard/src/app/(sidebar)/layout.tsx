@@ -23,7 +23,12 @@ export default async function SidebarLayout({
         user={session.user}
       />
       <div className="md:ml-[84px]">
-        <Header mode={data.mode} projects={data.projects} user={session.user} />
+        <Header
+          mode={data.mode}
+          organizations={data.organizations}
+          projects={data.projects}
+          user={session.user}
+        />
         {children}
       </div>
       <GlobalSheetsProvider
