@@ -78,6 +78,13 @@
       "when": 1795511569401,
       "tag": "0011_saved_funnels",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1795524271750,
+      "tag": "0013_email_digest",
+      "breakpoints": true
     }
   ]
 }

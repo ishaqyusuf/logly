@@ -19,6 +19,8 @@ export type PagesReportQuery = {
   range: AnalyticsOverviewRange;
   view?: AnalyticsPageViewEvent;
   now?: Date;
+  /** Explicit window (the weekly email digest); overrides `range` and `now`. */
+  window?: { start: Date; end: Date; previousStart: Date };
 };
 
 /**
@@ -33,7 +35,8 @@ export async function getDashboardPages(
   db: Database | null = getDatabase(),
 ): Promise<AnalyticsPagesReport> {
   if (!db) return summarizePages(getDemoAnalytics().events, query);
-  const window = pagesReportWindow(query.range, query.now ?? new Date());
+  const window =
+    query.window ?? pagesReportWindow(query.range, query.now ?? new Date());
   const start = window.start.toISOString();
   const end = window.end.toISOString();
   const previousStart = window.previousStart.toISOString();

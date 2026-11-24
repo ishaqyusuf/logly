@@ -1,6 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   index,
   integer,
   jsonb,
@@ -424,6 +425,81 @@ export const analyticsFunnels = pgTable(
     uniqueIndex("analytics_funnels_project_name_idx").on(
       table.projectId,
       table.name,
+    ),
+  ],
+);
+
+// Email channel (feature 8). Admin-managed opt-ins: one row per operator and
+// project or organization. Addresses live only in the auth `user` table.
+export const analyticsEmailSubscriptions = pgTable(
+  "analytics_email_subscriptions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    organizationId: uuid("organization_id").references(
+      () => analyticsOrganizations.id,
+      { onDelete: "cascade" },
+    ),
+    projectId: uuid("project_id").references(() => analyticsProjects.id, {
+      onDelete: "cascade",
+    }),
+    weeklyDigest: boolean("weekly_digest").notNull().default(false),
+    trackingAlerts: boolean("tracking_alerts").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    check(
+      "analytics_email_subscriptions_scope_check",
+      sql`(${table.organizationId} is null) <> (${table.projectId} is null)`,
+    ),
+    uniqueIndex("analytics_email_subscriptions_user_org_idx")
+      .on(table.userId, table.organizationId)
+      .where(sql`${table.organizationId} is not null`),
+    uniqueIndex("analytics_email_subscriptions_user_project_idx")
+      .on(table.userId, table.projectId)
+      .where(sql`${table.projectId} is not null`),
+  ],
+);
+
+/**
+ * Email send log and idempotency claim: one row per kind, project, period
+ * (digest week or alert id) and recipient. Never stores the address.
+ */
+export const analyticsEmailSends = pgTable(
+  "analytics_email_sends",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    kind: text("kind").notNull(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => analyticsProjects.id, { onDelete: "cascade" }),
+    periodKey: text("period_key").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    status: text("status").notNull().default("sending"),
+    attempts: integer("attempts").notNull().default(1),
+    providerMessageId: text("provider_message_id"),
+    error: text("error"),
+    claimedAt: timestamp("claimed_at", { withTimezone: true }).notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("analytics_email_sends_unique_idx").on(
+      table.kind,
+      table.projectId,
+      table.periodKey,
+      table.userId,
     ),
   ],
 );

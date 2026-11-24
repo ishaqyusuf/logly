@@ -35,6 +35,7 @@
         "@logly/auth": "workspace:*",
         "@logly/collector": "workspace:*",
         "@logly/db": "workspace:*",
+        "@logly/email": "workspace:*",
         "@logly/ui": "workspace:*",
         "@logly/utils": "workspace:*",
         "@tanstack/react-query": "^5.102.8",
@@ -157,6 +158,15 @@
         "@types/bun": "latest",
         "@types/node": "^25.2.3",
         "drizzle-kit": "^0.31.4",
+        "typescript": "^5.9.3",
+      },
+    },
+    "packages/email": {
+      "name": "@logly/email",
+      "version": "0.1.0",
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@types/node": "^25.2.3",
         "typescript": "^5.9.3",
       },
     },
@@ -395,6 +405,7 @@
 
     "@logly/db": ["@logly/db@workspace:packages/db"],
 
+    "@logly/email": ["@logly/email@workspace:packages/email"],
     "@logly/ui": ["@logly/ui@workspace:packages/ui"],
 
     "@logly/utils": ["@logly/utils@workspace:packages/utils"],

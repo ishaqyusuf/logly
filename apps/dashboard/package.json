@@ -20,6 +20,7 @@
     "@logly/auth": "workspace:*",
     "@logly/collector": "workspace:*",
     "@logly/db": "workspace:*",
+    "@logly/email": "workspace:*",
     "@logly/ui": "workspace:*",
     "@logly/utils": "workspace:*",
     "@tanstack/react-query": "^5.102.8",

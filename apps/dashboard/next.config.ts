@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     "@logly/auth",
     "@logly/collector",
     "@logly/db",
+    "@logly/email",
     "@logly/ui",
     "@logly/utils",
   ],

@@ -1229,3 +1229,20 @@ export {
   getTrackingAlertsReport,
   refreshTrackingAlerts,
 } from "./tracking-alerts";
+export {
+  claimEmailSend,
+  DIGEST_EVENT_CANDIDATES,
+  type EmailOperatorSubscriptions,
+  type EmailProjectRow,
+  type EmailRecipientRow,
+  finishEmailSend,
+  getEmailProject,
+  getWeeklyDigestMetrics,
+  listAlertTransitions,
+  listDigestProjects,
+  listEmailRecipients,
+  listEmailSubscriptions,
+  setEmailSubscription,
+  unsubscribeEmail,
+  type WeeklyDigestMetrics,
+} from "./email";

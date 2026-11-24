@@ -3,5 +3,6 @@
   "framework": "nextjs",
   "installCommand": "bun install",
   "buildCommand": "bun run deploy:prepare && bun run build:dashboard",
-  "outputDirectory": "apps/dashboard/.next"
+  "outputDirectory": "apps/dashboard/.next",
+  "crons": [{ "path": "/api/cron/email", "schedule": "0 7 * * *" }]
 }

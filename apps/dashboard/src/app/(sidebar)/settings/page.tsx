@@ -12,12 +12,14 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import type { SearchParams } from "nuqs/server";
 import { PasskeySettings } from "@/components/auth/passkey-settings";
+import { EmailSettings } from "@/components/email/email-settings";
 import { OpenProjectSheet } from "@/components/open-project-sheet";
 import { ProjectKeySettings } from "@/components/project-key-settings";
 import { ReleaseSettings } from "@/components/releases/release-settings";
 import { ScrollableContent } from "@/components/scrollable-content";
 import { TrackingAlertHistory } from "@/components/tracking-alerts/tracking-alert-history";
 import { getReleases, getTrackingAlerts } from "@/lib/dashboard-data";
+import { getEmailSettings } from "@/lib/email-settings";
 import { loadProjectWorkspace } from "@/lib/project-workspace-server";
 
 export const metadata: Metadata = { title: "Settings" };
@@ -66,6 +68,10 @@ export default async function SettingsPage({
     getTrackingAlerts(project.slug),
     getReleases({ project: project.slug, limit: 20 }),
   ]);
+  const emailSettings =
+    session?.user.role === "admin" && workspace.mode === "database"
+      ? await getEmailSettings(project.slug)
+      : null;
   return (
     <ScrollableContent>
       <div className="mx-auto max-w-4xl space-y-6">
@@ -156,6 +162,9 @@ export default async function SettingsPage({
           </div>
         </section>
         <TrackingAlertHistory report={trackingAlerts} />
+        {emailSettings ? (
+          <EmailSettings key={`email-${project.slug}`} {...emailSettings} />
+        ) : null}
         <ReleaseSettings
           key={`releases-${project.slug}`}
           project={project.slug}

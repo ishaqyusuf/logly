@@ -1,7 +1,15 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { type NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_PATHS = ["/sign-in", "/api/auth", "/_next", "/favicon"];
+// Cron and unsubscribe authenticate with CRON_SECRET or a signed token.
+const PUBLIC_PATHS = [
+  "/sign-in",
+  "/api/auth",
+  "/api/cron/",
+  "/api/email/unsubscribe",
+  "/_next",
+  "/favicon",
+];
 
 function isPublicPath(pathname: string) {
   return (
