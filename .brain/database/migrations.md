@@ -107,3 +107,13 @@ No migration. Feature 4 reads the existing `analytics_events` columns
 originally reserved for it is used by `0009_passkeys.sql`; nothing needs
 renumbering. `app-versions.sql.test.ts` runs against `logly_test` like the
 Pages fixtures.
+
+## Retention (2026-11-24)
+
+No migration; `0010`, reserved for feature 5, is unused (`0011` belongs to
+the funnel builder). Feature 5 reads `analytics_events` `name`, `source`,
+`visitor_key` and `occurred_at` through the existing `(project_id, name,
+occurred_at)` and `(project_id, occurred_at)` indexes, bounded to at most
+90 days + 12 weeks of entry events and 12 weeks of activity per project.
+`retention.test.ts` runs its SQL fixture against `logly_test` like the Pages
+and app-version fixtures.

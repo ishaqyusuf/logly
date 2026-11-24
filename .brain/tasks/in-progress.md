@@ -1,5 +1,30 @@
 # In Progress
 
+## Retention — 2026-11-24
+
+- Status: committed locally on `main` (`85cc8d1`), unreleased (feature 5 of
+  the 8; held for the coordinated release; nothing pushed, deployed, migrated
+  in production or published).
+- [Retention](../features/retention.md),
+  [ADR 0017](../decisions/0017-retention-cohorts-first-entry-event.md).
+- New read endpoint `GET /v1/dashboard/retention`; new page `/retention`
+  (sidebar "Retention"). No migration (`0010` unused), env vars, cron or
+  Vercel config changes.
+- Typecheck, tests (including the `logly_test` SQL fixture that checks the
+  query against the in-memory spec for every range, surface and returning
+  event) and the dashboard build pass; lint passes for the retention files
+  (full-repo lint was failing only on the funnel session's in-progress files).
+- Checked against the local stack with a seeded `retention-qa` project
+  (900 visitors over 13 weeks, web and mobile, `signup` returns, 3 releases):
+  the collector endpoint returns 200, and 400 for a bad range or surface.
+  The real components were browser-checked at desktop and 375px (7d, 5w, 12w)
+  through a temporary unauthenticated local route (removed, never
+  committed); no console errors or page overflow. The authenticated
+  `/retention` page, its filter links and event picker still need an operator
+  sign-in to view.
+- Follow-ups: a daily activity rollup if volume grows; optional
+  `visitKind = "new"` cross-check for web cohort entry.
+
 ## Mobile app-version adoption — 2026-11-24
 
 - Status: committed locally on `main` (`b58bfe5`), unreleased (held for the

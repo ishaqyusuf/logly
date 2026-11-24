@@ -319,3 +319,30 @@ series[], versions[], trend[], platforms[] }`.
 - Version strings are trimmed; blank is null (Unknown). Ordering is semantic
   (`compareAppVersions`). See `../features/app-version-adoption.md` and
   ADR 0016.
+
+### Retention — 2026-11-24 (local, unreleased)
+
+`GET /v1/dashboard/retention` returns `AnalyticsRetentionReport`
+(`packages/utils/src/retention.ts`):
+`{ range: "7d"|"30d"|"12w", granularity: "day"|"week",
+surface: "all"|"web"|"mobile", returnEvent|null, start, end, periods,
+lookbackDays: 90, surfaces: { web, mobile }, cohorts[], average[],
+totals: { users } }`.
+
+- `start` is the first cohort's period start (UTC day, or Monday 00:00 UTC);
+  `end` is the read time. `periods` equals the cohort count (7, 5 or 12);
+  columns are `0 .. periods - 1`.
+- `cohorts[]`, oldest first: `{ start, size, complete, cells[] }`. `cells`
+  has one entry per period: null when the period has not started, else
+  `{ period, users, rate (0–1), status: "complete"|"partial" }`. Period 0 is
+  the cohort size. `partial` means the period has not ended; clients must not
+  show it as a drop. `complete` is false for the current cohort.
+- `average[]`: `{ period, rate|null, users, cohortUsers, cohorts }`, weighted
+  by cohort size over cohorts whose period is complete and non-empty; null
+  when none is.
+- `surfaces` reports whether the project sent `site_visit` (web) and
+  `app_session` (mobile) in the lookback; clients show the web/mobile filter
+  only when both are true. Both false means no entry events (empty state).
+- Users are per-project `visitorKey`s, so rates are lower bounds. See
+  `../features/retention.md` and ADR 0017. Deploy markers map onto cohorts
+  with `groupReleasesByCohort`.

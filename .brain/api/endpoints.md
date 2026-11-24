@@ -101,3 +101,13 @@
   `7d`, invalid range returns 400. Without a database it returns the demo
   summary. Read-only; no new write path, env var, cron or Vercel config.
   Dashboard page: `/versions` (request-rendered, `ƒ` in the build output).
+
+## Retention — 2026-11-24 (local, unreleased)
+
+- `GET /v1/dashboard/retention?project=<slug>&range=<7d|30d|12w>&surface=<all|web|mobile>&event=<name>&organization=<slug>`:
+  read-key or operator authenticated, project required. `range` defaults to
+  `30d`, `surface` to `all`; an invalid range or surface returns 400. `event`
+  is optional (blank or over 120 characters means any event). Without a
+  database it returns the demo summary. Read-only; no new write path, env var,
+  cron or Vercel config. Dashboard page: `/retention` (request-rendered, `ƒ`
+  in the build output).

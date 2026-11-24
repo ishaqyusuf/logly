@@ -83,7 +83,7 @@ Filled in as each feature lands.
 | 2 | Deploy markers | Built (see below); visual QA pending | Optional but needed to see markers: record each deploy. See "Deploy markers setup" below. |
 | 3 | Tracking alerts | Built (`6eed75e`) | Nothing. Evaluated on dashboard reads (ADR 0013); in-dashboard only until feature 8 adds email. |
 | 4 | App version adoption | Built (`b58bfe5`); authenticated-page visual QA pending | Mobile events must carry `appVersion`/`appBuild` from `expo-application`. gnd: enable Logly in store builds. ewatrade: send the native version and build. halaal-coperative: send both. See "App version adoption setup" below. |
-| 5 | Retention | Not started | Expected: nothing. |
+| 5 | Retention | Built (`85cc8d1`); authenticated-page visual QA pending | Nothing. Uses `site_visit` (web SDK) and `app_session` (mobile clients), which every project already sends. See "Retention notes" below. |
 | 6 | Funnel builder | Not started | Expected: nothing beyond the events already tracked. |
 | 7 | Event catalog | Not started | Expected: nothing; add descriptions in the dashboard. |
 | 8 | Weekly email digest | Not started | Expected: nothing; recipients set in Logly. |
@@ -151,3 +151,22 @@ change `appVersion`, so OTA adoption is not visible; that would need
 `runtimeVersion`/`updateId` in the event contract and SDKs (follow-up).
 Web-only projects (plot-keys, school-clerk, after-service) need nothing; the
 page shows an explanatory empty state for them.
+
+## Retention notes (feature 5)
+
+No SDK upgrade, migration, env var or code change is needed. The Retention
+page (`/retention`) starts cohorts at each visitor's first `site_visit` (web,
+sent automatically by `@ishaqyusuf/logly-core`) or `app_session` (the gnd,
+ewatrade and halaal-coperative native clients all emit it). Checked
+2026-11-24, read-only.
+
+Things that make a project's numbers lower than reality:
+
+- Visitor IDs are per browser or install and reset when storage clears, so
+  all retention is a lower bound.
+- ewatrade and halaal-coperative mobile clients reset the visitor when the
+  identity or context scope changes (`native.ts`, see the feature 4 notes), so
+  an account switch looks like a new user who never returned.
+- gnd store builds disable Logly (`EXPO_PUBLIC_LOGLY_ENABLED: "false"`), so
+  gnd mobile retention stays empty until that is enabled.
+
