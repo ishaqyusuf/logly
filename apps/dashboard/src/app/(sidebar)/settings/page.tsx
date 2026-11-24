@@ -11,6 +11,7 @@ import {
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import type { SearchParams } from "nuqs/server";
+import { PasskeySettings } from "@/components/auth/passkey-settings";
 import { OpenProjectSheet } from "@/components/open-project-sheet";
 import { ProjectKeySettings } from "@/components/project-key-settings";
 import { ScrollableContent } from "@/components/scrollable-content";
@@ -51,6 +52,9 @@ export default async function SettingsPage({
               <OpenProjectSheet />
             </div>
           </div>
+        </div>
+        <div className="mx-auto mt-6 max-w-4xl">
+          <PasskeySettings />
         </div>
       </ScrollableContent>
     );
@@ -157,6 +161,7 @@ export default async function SettingsPage({
             project={project.slug}
           />
         ) : null}
+        <PasskeySettings />
         <section className="rounded-xl border bg-white shadow-soft">
           <div className="border-b p-5">
             <h3 className="text-sm font-semibold">Privacy defaults</h3>

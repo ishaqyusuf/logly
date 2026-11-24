@@ -1,8 +1,10 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { passkey } from "@better-auth/passkey";
 import { getRequiredDatabase } from "@logly/db/client";
 import * as schema from "@logly/db/schema";
 import { betterAuth } from "better-auth";
 import { admin } from "better-auth/plugins";
+import { resolvePasskeyRelyingParty } from "./passkey-config";
 
 function readEnv(name: string) {
   const value = process.env[name]?.trim();
@@ -54,6 +56,8 @@ export function getTrustedOrigins() {
   ]);
 }
 
+const passkeyRelyingParty = resolvePasskeyRelyingParty(getBaseUrl());
+
 export const auth = betterAuth({
   basePath: "/api/auth",
   baseURL: getBaseUrl(),
@@ -68,7 +72,20 @@ export const auth = betterAuth({
     minPasswordLength: 6,
     requireEmailVerification: false,
   },
-  plugins: [admin()],
+  plugins: [
+    admin(),
+    passkey({
+      rpID: passkeyRelyingParty.rpID,
+      rpName: passkeyRelyingParty.rpName,
+      origin: passkeyRelyingParty.origin,
+      // Discoverable credentials let the sign-in page offer passkeys without
+      // an email first, including browser autofill (conditional UI).
+      authenticatorSelection: {
+        residentKey: "required",
+        userVerification: "preferred",
+      },
+    }),
+  ],
   secret: getSecret(),
   telemetry: { enabled: false },
   trustedOrigins: getTrustedOrigins(),

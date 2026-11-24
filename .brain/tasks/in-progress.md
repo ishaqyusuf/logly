@@ -1,5 +1,19 @@
 # In Progress
 
+## Passkey operator sign-in — 2026-11-24
+
+- Status: committed locally on `main`, unreleased (held for the coordinated
+  release; nothing pushed, deployed or migrated in production).
+- [Operator authentication](../features/operator-authentication.md#passkey-sign-in--2026-11-24-local-unreleased),
+  [ADR 0014](../decisions/0014-passkey-operator-sign-in.md).
+- Migration `0009_passkeys` (after `0008_deploy_markers`; next free is `0010`).
+- New optional env vars `PASSKEY_RP_ID`, `PASSKEY_RP_NAME`, `PASSKEY_ORIGINS`;
+  production needs none while `BETTER_AUTH_URL` is the production URL.
+- Typecheck, tests and dashboard build pass; lint passes for the touched
+  packages. Sign-in page browser QA passed. Pending with the user: apply `0009`
+  locally, then register a passkey in Settings, sign out, and sign in with it
+  (button and autofill), and remove it.
+
 ## Pages report and tracking-quiet alerts — 2026-11-24
 
 - Status: committed locally on `main`, unreleased (held for the coordinated

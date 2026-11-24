@@ -3,10 +3,15 @@
 import { BrandMark, BrandWordmark, brandColor } from "@logly/ui/brand";
 import { Button } from "@logly/ui/button";
 import { Input } from "@logly/ui/input";
+import { KeyRound } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import { signIn } from "@/lib/auth-client";
 import { safeReturnTo } from "@/lib/auth-return-to";
+import {
+  isPasskeyCancellation,
+  passkeySignInMessage,
+} from "@/lib/passkey-errors";
 
 export function SignInForm() {
   const searchParams = useSearchParams();
@@ -14,6 +19,46 @@ export function SignInForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
+  const [supportsPasskeys, setSupportsPasskeys] = useState(false);
+  const returnTo = searchParams.get("return_to");
+
+  // Conditional UI: offer saved passkeys in the email field's autofill. The
+  // pending request is aborted automatically when the button flow starts.
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.PublicKeyCredential) return;
+    setSupportsPasskeys(true);
+    let active = true;
+    const credential = window.PublicKeyCredential;
+    void (async () => {
+      const conditional =
+        (await credential.isConditionalMediationAvailable?.()) ?? false;
+      if (!conditional || !active) return;
+      const result = await signIn.passkey({ autoFill: true });
+      if (!active) return;
+      if (result.error) {
+        if (!isPasskeyCancellation(result.error)) {
+          setError(passkeySignInMessage(result.error));
+        }
+        return;
+      }
+      window.location.href = safeReturnTo(returnTo);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [returnTo]);
+
+  async function handlePasskeySignIn() {
+    setError(null);
+    setIsPending(true);
+    const result = await signIn.passkey();
+    if (result.error) {
+      setError(passkeySignInMessage(result.error));
+      setIsPending(false);
+      return;
+    }
+    window.location.href = safeReturnTo(returnTo);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,7 +104,7 @@ export function SignInForm() {
               Email
             </label>
             <Input
-              autoComplete="email"
+              autoComplete="username webauthn"
               disabled={isPending}
               id="email"
               onChange={(event) => setEmail(event.target.value)}
@@ -93,6 +138,25 @@ export function SignInForm() {
             {isPending ? "Signing in…" : "Sign in"}
           </Button>
         </form>
+        {supportsPasskeys ? (
+          <>
+            <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+              <span className="h-px flex-1 bg-border" />
+              or
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            <Button
+              className="h-10 w-full"
+              disabled={isPending}
+              onClick={handlePasskeySignIn}
+              type="button"
+              variant="outline"
+            >
+              <KeyRound className="size-4" />
+              Sign in with a passkey
+            </Button>
+          </>
+        ) : null}
       </div>
     </main>
   );

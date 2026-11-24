@@ -29,7 +29,10 @@
   and source values for the selected organization/project scope.
 - `GET /v1/dashboard/projects?project=<slug>`: project registry list restricted
   to the authorized project when a project read key is used.
-- `GET|POST /api/auth/[...all]`: Better Auth dashboard session endpoints.
+- `GET|POST /api/auth/[...all]`: Better Auth dashboard session endpoints,
+  including the passkey plugin's `/passkey/*` routes (registration options and
+  verification, authentication options and verification, list, update and
+  delete). Registration, list, update and delete require a session.
 - `POST /api/projects`: same-origin, authenticated operator endpoint that
   creates a project inside an organization from a normalized 1–10-origin
   allowlist and returns four scoped plaintext credentials exactly once.

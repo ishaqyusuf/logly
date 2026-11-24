@@ -19,6 +19,7 @@ column, with exact scalar containment preserving null/missing/type semantics.
 - `analytics_daily_rollups`: identifier-free daily metric aggregates.
 - `user`, `session`, `account`, and `verification`: Better Auth operator
   identity, sessions, credentials, and verification records.
+- `passkey`: Better Auth WebAuthn credentials for operators (see below).
 
 ## Rules
 
@@ -88,3 +89,12 @@ column, with exact scalar containment preserving null/missing/type semantics.
 
 The Pages report adds no schema; it reads `analytics_events` through the
 existing `(project_id, name, occurred_at)` index.
+
+## Operator passkeys — 2026-11-24 (local, unreleased)
+
+`passkey` holds the Better Auth passkey plugin's credentials: text `id` PK,
+optional `name`, `public_key`, `user_id` (FK `user.id`, cascade), `credential_id`,
+`counter`, `device_type`, `backed_up`, optional `transports`, `created_at` and
+`aaguid`. Indexes: `passkey_user_id_idx` and unique `passkey_credential_id_idx`.
+Only public keys are stored; nothing here enters analytics payloads. The table
+is auth-only and deleted with the operator.

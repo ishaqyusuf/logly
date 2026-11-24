@@ -3,7 +3,7 @@
   "compilerOptions": {
     "declaration": false,
     "noEmit": true,
-    "types": ["node"]
+    "types": ["node", "bun"]
   },
   "include": ["src/**/*.ts", "scripts/**/*.ts"]
 }
