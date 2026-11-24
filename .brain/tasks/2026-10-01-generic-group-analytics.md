@@ -1,6 +1,6 @@
 # Generic group analytics delivery
 
-Status: source implemented and locally verified; release review pending.
+Status: deployed to production 2026-11-24 (`7c81d51`); SDK 0.3.0 npm publish pending.
 
 - [x] Generic SDK identity, group and metadata context with immutable snapshots.
 - [x] Collector validation, project/type-scoped hashing and generic JSONB storage.
@@ -14,7 +14,7 @@ Status: source implemented and locally verified; release review pending.
   reload persistence, desktop and 390px layout, no page errors.
 - [x] Cross-repository proxy contract check: both signed issuer payloads pass
   Logly validation; raw IDs and proof absent; tampered proofs rejected.
-- [ ] Approve/release collector migration before activating app attribution.
+- [x] Collector migration 0005 in production (applied 2026-11-13; code released 2026-11-24).
 - [ ] Configure each product's private signing secret and deploy its adapters.
 - [ ] Verify real dashboard and Android traffic after release.
 - [ ] Separately implement merchant-authorized reporting UI/API when requested.

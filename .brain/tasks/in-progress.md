@@ -2,13 +2,15 @@
 
 ## SDK route templates — 2026-11-24
 
-- Status: implemented locally; not released. See
-  [ADR 0012](../decisions/0012-sdk-route-templates.md).
+- Status: merged to main and in the 2026-11-24 production deploy (`7c81d51`).
+  npm publish of 0.3.0 pending (npm was not logged in on the release machine).
+  See [ADR 0012](../decisions/0012-sdk-route-templates.md).
 - `logly-core` and `logly-native` record routes as templates (`/orders/:id`)
   by default, with project rules through `routeTemplates`.
-- Core and native tests, typecheck and lint pass. Release needs a minor
-  version bump and changelog note; GND can then drop its own route allowlist
-  in `packages/events/src/policy.ts`.
+- Core and native tests, typecheck and lint pass. Released as 0.3.0 (npm had
+  0.2.x; native publishes for the first time), with a `CHANGELOG.md` shipped in
+  each SDK package. After publish, GND can drop its own route allowlist in
+  `packages/events/src/policy.ts` and move the rules into `routeTemplates`.
 
 ## Overview redesign — Pulse — 2026-11-13
 
@@ -33,14 +35,15 @@
 
 ## Generic group analytics — 2026-10-01
 
-Local implementation and verification complete; release review pending. See
+Deployed to production 2026-11-24 (`7c81d51`); migration 0005 was already
+applied by the 2026-11-13 release. SDK 0.3.0 npm publish pending. See
 [delivery checklist](2026-10-01-generic-group-analytics.md). Logly provides
 generic group/user/property filtering; EwaTrade and Halaalvest derive trusted
-business context. Production migration/configuration and live traffic QA remain.
+business context. Product signing-secret configuration and live traffic QA remain.
 
 ## Vercel-style team → project header selector — 2026-09-23
 
-- Status: implemented locally; browser visual QA pending because browser access to the local preview was blocked by the browser URL policy.
+- Status: deployed to production 2026-11-24 (`6f2ef6a`, released in `7c81d51`); browser visual QA still pending.
 - Three HTML proposals are in `.design/vercel-header/`, with the two-column selector marked as recommended and implemented.
 - The header now owns the organization/project selector on desktop and mobile. The sidebar retains page navigation and operator identity. URL-backed project scope and organization/project creation remain available.
 - Typecheck, tests, dashboard production build, and focused Biome lint pass. Full-repository lint remains blocked by existing formatting in untouched `packages/db/src/queries/index.ts`. No API or database contract changed.
