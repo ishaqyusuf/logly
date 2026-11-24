@@ -6,6 +6,14 @@ all are done.
 
 ## Release checklist — all 8 features
 
+**Released to production 2026-11-24** (`2ce560e`, Vercel deploy succeeded;
+`deploy:prepare` reported "migrations applied successfully"). Smoke check: the
+new pages redirect to sign-in, every new `/v1/dashboard/*` endpoint returns 401
+without a key, `/health` is ok, and `/api/cron/email` returns 503 until
+`CRON_SECRET` is set. Still open: steps 1 (signed-in visual check), 3 (email
+setup), 5 (publish `logly-server` 0.4.0), 6 (signed-in smoke check) and 7
+(product rollout).
+
 All 8 features are committed on local `main` (as of `e78723d`, 20 commits
 ahead of `origin/main`). Combined checks on 2026-11-24: typecheck (18 tasks),
 lint, all package tests (233), the db SQL fixtures against `logly_test` (86)
