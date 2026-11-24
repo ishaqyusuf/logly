@@ -79,9 +79,9 @@ Filled in as each feature lands.
 
 | # | Feature | Status | What projects must do |
 | --- | --- | --- | --- |
-| 1 | Pages report | In progress | Steps 1–2 above, so routes arrive as templates. |
+| 1 | Pages report | Built (`6eed75e`); visual QA pending | Nothing required. To see real pages: web projects need core/next 0.3.0 with `autoTrackPageViews` and steps 1–2; mobile projects need `logly-native` 0.1.0 (or `normalizeRoute`) calling `trackScreenView`. Older events keep raw paths or `/other`; no backfill. |
 | 2 | Deploy markers | Not started | Expected: call a release endpoint from CI or a deploy hook. |
-| 3 | Tracking alerts | In progress | Expected: nothing. |
+| 3 | Tracking alerts | Built (`6eed75e`) | Nothing. Evaluated on dashboard reads (ADR 0013); in-dashboard only until feature 8 adds email. |
 | 4 | App version adoption | Not started | Expected: mobile events must carry `appVersion`/`appBuild`. |
 | 5 | Retention | Not started | Expected: nothing. |
 | 6 | Funnel builder | Not started | Expected: nothing beyond the events already tracked. |
