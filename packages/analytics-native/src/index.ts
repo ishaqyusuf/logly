@@ -2,9 +2,12 @@ import {
   type AnalyticsBatch,
   type AnalyticsEvent,
   type AnalyticsPlatform,
+  createRouteNormalizer,
   type EventProperty,
   eventNameSchema,
   LOGLY_CORE_VERSION,
+  normalizeRoute,
+  type RouteTemplateOptions,
   sanitizeProperties,
 } from "@ishaqyusuf/logly-core";
 
@@ -31,6 +34,9 @@ export type NativeAnalyticsConfig = {
   enabled?: boolean;
   now?: () => Date;
   send?: (batch: AnalyticsBatch) => Promise<void>;
+  /** Project rules for route templates such as `/jobs/:id`. */
+  routeTemplates?: RouteTemplateOptions;
+  /** Replaces route templating entirely. */
   sanitizeRoute?: (route: string) => string;
   flushIntervalMs?: number;
 };
@@ -39,26 +45,18 @@ const MAX_QUEUE_EVENTS = 250;
 const MAX_QUEUE_AGE_MS = 86_400_000;
 
 export function sanitizeNativeRoute(route: string) {
-  const pathname = route.split(/[?#]/, 1)[0] || "/";
-  const safe = pathname
-    .split("/")
-    .filter(Boolean)
-    .map((segment) =>
-      /^\d+$/.test(segment) ||
-      /^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(segment) ||
-      segment.length > 64
-        ? ":id"
-        : segment,
-    )
-    .join("/");
-  return `/${safe}`.slice(0, 256);
+  return normalizeRoute(route);
 }
 
 export function createNativeAnalytics(config: NativeAnalyticsConfig) {
   const now = config.now ?? (() => new Date());
   const visitorKey = `logly:${config.project}:native-visitor`;
   const queueKey = `logly:${config.project}:native-queue`;
-  const safeRoute = config.sanitizeRoute ?? sanitizeNativeRoute;
+  const safeRoute =
+    config.sanitizeRoute ??
+    (config.routeTemplates
+      ? createRouteNormalizer(config.routeTemplates)
+      : sanitizeNativeRoute);
   let visitor: NativeVisitor | null = null;
   let queue: AnalyticsEvent[] = [];
   let initialized = false;

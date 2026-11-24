@@ -1,5 +1,15 @@
 # In Progress
 
+## SDK route templates — 2026-11-24
+
+- Status: implemented locally; not released. See
+  [ADR 0012](../decisions/0012-sdk-route-templates.md).
+- `logly-core` and `logly-native` record routes as templates (`/orders/:id`)
+  by default, with project rules through `routeTemplates`.
+- Core and native tests, typecheck and lint pass. Release needs a minor
+  version bump and changelog note; GND can then drop its own route allowlist
+  in `packages/events/src/policy.ts`.
+
 ## Overview redesign — Pulse — 2026-11-13
 
 - Status: implemented locally; not deployed.

@@ -12,8 +12,9 @@
   connectivity returns.
 - Retain failed events with stable IDs and acknowledge them only after a
   successful collector response.
-- Support opt-in pathname-only `page_view` events for initial loads and Next.js
-  route changes.
+- Support opt-in `page_view` events for initial loads and Next.js route
+  changes. Routes are recorded as templates (`/orders/:id`) in the SDK; see
+  [ADR 0012](../decisions/0012-sdk-route-templates.md).
 - Support opt-in declarative clicks through `data-logly-event` and
   `data-logly-prop-*` without reading text, form values, URLs, IDs, classes, or
   unrelated attributes.

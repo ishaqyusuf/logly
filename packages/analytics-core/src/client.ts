@@ -10,6 +10,10 @@ import {
   createMemoryEventStore,
 } from "./event-store";
 import {
+  createRouteNormalizer,
+  type RouteTemplateOptions,
+} from "./route-template";
+import {
   dateKey,
   getOrCreateVisitor,
   type StorageLike,
@@ -30,6 +34,11 @@ export type AnalyticsConfig = {
   maxQueueAgeMs?: number;
   autoTrackPageViews?: boolean;
   trackAttributes?: boolean;
+  /**
+   * Records routes as templates such as `/orders/:id`. On by default; pass
+   * options to add project rules, or `false` to record raw pathnames.
+   */
+  routeTemplates?: RouteTemplateOptions | false;
   storage?: StorageLike;
   transport?: (batch: AnalyticsBatch) => Promise<void>;
   disabled?: boolean;
@@ -205,6 +214,12 @@ function createAnalyticsClient(
   let initialized = false;
   let destroyed = false;
   let lastPageViewRoute: string | undefined;
+  const normalizeRoute =
+    config.routeTemplates === false
+      ? undefined
+      : createRouteNormalizer(config.routeTemplates);
+  const templateRoute = (route?: string) =>
+    route && normalizeRoute ? normalizeRoute(route) : route;
 
   const warn = (message: string, error?: unknown) => {
     if (config.debug) console.warn(`[logly] ${message}`, error);
@@ -304,7 +319,7 @@ function createAnalyticsClient(
       source: "browser",
       occurredAt: current.toISOString(),
       visitorId: visitor.id,
-      route: sanitizeRoute(context.route ?? browser.route),
+      route: templateRoute(sanitizeRoute(context.route ?? browser.route)),
       referrerHost: capped(context.referrerHost ?? browser.referrerHost, 160),
       campaign: sanitizeCampaign(context.campaign ?? browser.campaign),
       properties: sanitizeProperties(properties),

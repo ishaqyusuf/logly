@@ -26,7 +26,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 ```
 
-Automatic pageviews are opt-in and record pathname only. Declarative click
+Automatic pageviews are opt-in and record a route template such as
+`/orders/:id` (see `routeTemplates` in `@ishaqyusuf/logly-core`). Declarative click
 events are also opt-in:
 
 ```tsx

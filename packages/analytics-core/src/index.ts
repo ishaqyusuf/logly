@@ -7,4 +7,5 @@ export {
   type TrackContext,
 } from "./client";
 export * from "./contracts";
+export * from "./route-template";
 export * from "./visitor";
