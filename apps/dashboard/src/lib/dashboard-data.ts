@@ -7,7 +7,6 @@ import {
   type AnalyticsEventRow,
   type AnalyticsEventSummary,
   type AnalyticsFunnel,
-  type AnalyticsFunnelQuery,
   type AnalyticsOrganizationSummary,
   type AnalyticsOverview,
   type AnalyticsOverviewRange,
@@ -15,13 +14,17 @@ import {
   type AnalyticsPageViewEvent,
   type AnalyticsProjectSummary,
   type AnalyticsRetentionReport,
+  type FunnelOptions,
   getDemoAnalytics,
   matchesEventContext,
+  type NormalizedFunnelQuery,
   type RetentionRange,
   type RetentionSurface,
+  serializeFunnelSteps,
   summarizeAnalyticsEvents,
   summarizeAppVersions,
   summarizeFunnel,
+  summarizeFunnelOptions,
   summarizePages,
   summarizeRetention,
   type TrackingAlertsReport,
@@ -202,18 +205,32 @@ export async function getDashboardEventById(
 }
 
 export async function getDashboardFunnel(
-  query: AnalyticsFunnelQuery,
+  query: NormalizedFunnelQuery,
 ): Promise<AnalyticsFunnel> {
   const client = dashboardClient();
   if (!client) return summarizeFunnel(getDemoAnalytics().events, query);
   const params = new URLSearchParams({
     project: query.project,
-    steps: query.steps.join(","),
+    steps: serializeFunnelSteps(query.steps),
+    window: query.window,
+    start: query.start,
+    end: query.end,
   });
   if (query.organization) params.set("organization", query.organization);
-  if (query.start) params.set("start", query.start);
-  if (query.end) params.set("end", query.end);
+  if (query.breakdown) params.set("breakdown", query.breakdown);
   return client.read<AnalyticsFunnel>(`/v1/dashboard/funnel?${params}`);
+}
+
+/** Saved funnels plus known events, property keys and routes. */
+export async function getFunnelOptions(
+  project: string,
+): Promise<FunnelOptions> {
+  const client = dashboardClient();
+  if (!client)
+    return summarizeFunnelOptions(getDemoAnalytics().events, project);
+  return client.read<FunnelOptions>(
+    `/v1/dashboard/funnels?${new URLSearchParams({ project })}`,
+  );
 }
 
 export async function getDashboardPages(query: {

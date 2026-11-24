@@ -9,6 +9,7 @@ import {
   getDashboardFunnel,
   getDashboardPages,
   getDashboardRetention,
+  getFunnelOptions,
   getProjectPolicy,
   getTrackingAlertsReport,
   ingestEventBatch,
@@ -22,11 +23,14 @@ import {
 import {
   type AnalyticsEventQuery,
   BreakdownQueryError,
+  type FunnelBreakdown,
+  type FunnelWindow,
   isRetentionRange,
   isRetentionSurface,
   normalizeFunnelQuery,
   parseActorReadQuery,
   parseBreakdownQuery,
+  parseFunnelStepsParam,
   parsePageViewEvent,
   parseReleaseInput,
   RELEASE_MAX_BODY_BYTES,
@@ -402,10 +406,14 @@ export function createCollectorApp() {
   app.get("/v1/dashboard/funnel", async (context) => {
     let query: ReturnType<typeof normalizeFunnelQuery>;
     try {
+      const window = context.req.query("window");
+      const breakdown = context.req.query("breakdown");
       query = normalizeFunnelQuery({
         project: context.req.query("project") ?? "",
         organization: context.req.query("organization"),
-        steps: context.req.query("steps")?.split(",") ?? [],
+        steps: parseFunnelStepsParam(context.req.query("steps")) as string[],
+        window: (window || undefined) as FunnelWindow | undefined,
+        breakdown: (breakdown || undefined) as FunnelBreakdown | undefined,
         start: context.req.query("start"),
         end: context.req.query("end"),
       });
@@ -415,7 +423,26 @@ export function createCollectorApp() {
         400,
       );
     }
-    return context.json(await getDashboardFunnel(query));
+    try {
+      return context.json(await getDashboardFunnel(query));
+    } catch (error) {
+      // 57014: the funnel exceeded its statement timeout.
+      const code =
+        (error as { code?: string }).code ??
+        (error as { cause?: { code?: string } }).cause?.code;
+      if (code === "57014")
+        return context.json(
+          { error: "This funnel took too long. Narrow the date range." },
+          503,
+        );
+      throw error;
+    }
+  });
+  app.get("/v1/dashboard/funnels", async (context) => {
+    const project = context.req.query("project");
+    if (!project || !/^[a-z0-9-]{2,64}$/.test(project))
+      return context.json({ error: "Project is required" }, 400);
+    return context.json(await getFunnelOptions(project));
   });
   app.get("/v1/dashboard/event-summary", async (context) => {
     const split = (value?: string) => value?.split(",").filter(Boolean);

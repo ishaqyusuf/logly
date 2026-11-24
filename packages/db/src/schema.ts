@@ -398,3 +398,32 @@ export const analyticsReleases = pgTable(
     ),
   ],
 );
+
+// Saved funnels (feature 6): an ordered step list and conversion window per
+// project. The date range is chosen when the funnel is viewed.
+export const analyticsFunnels = pgTable(
+  "analytics_funnels",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => analyticsProjects.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    steps: jsonb("steps")
+      .$type<import("@logly/utils").FunnelStep[]>()
+      .notNull(),
+    conversionWindow: text("conversion_window").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("analytics_funnels_project_name_idx").on(
+      table.projectId,
+      table.name,
+    ),
+  ],
+);

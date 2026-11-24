@@ -1199,7 +1199,15 @@ export {
   getDashboardAppVersions,
 } from "./app-versions";
 export { getDashboardBreakdown } from "./breakdown";
-export { getDashboardFunnel } from "./funnel";
+export {
+  createSavedFunnel,
+  deleteSavedFunnel,
+  getDashboardFunnel,
+  getFunnelOptions,
+  listSavedFunnels,
+  type SaveFunnelResult,
+  updateSavedFunnel,
+} from "./funnel";
 export { getDashboardPages, type PagesReportQuery } from "./pages";
 export {
   type IssueProjectKeyInput,

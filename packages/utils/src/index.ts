@@ -645,10 +645,4 @@ export function getDemoAnalytics(range?: AnalyticsOverviewRange) {
   };
 }
 
-export {
-  type AnalyticsFunnel,
-  type AnalyticsFunnelQuery,
-  formatFunnelCounts,
-  normalizeFunnelQuery,
-  summarizeFunnel,
-} from "./funnel";
+export * from "./funnel";

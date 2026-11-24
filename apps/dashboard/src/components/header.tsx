@@ -33,6 +33,10 @@ const titles: Record<string, { title: string; description: string }> = {
     title: "Retention",
     description: "How many users come back after their first visit",
   },
+  "/funnels": {
+    title: "Funnels",
+    description: "Ordered steps per visitor, with drop-off and step times",
+  },
   "/live": {
     title: "Live",
     description: "Watch the selected project's newest signals arrive",
