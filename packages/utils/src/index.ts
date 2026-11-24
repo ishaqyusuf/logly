@@ -17,6 +17,7 @@ export * from "./countries";
 export * from "./event-context";
 export * from "./pages";
 export * from "./releases";
+export * from "./retention";
 export * from "./tracking-alerts";
 export type AnalyticsEventRow = ActorReadContext & {
   groups?: EventGroups;

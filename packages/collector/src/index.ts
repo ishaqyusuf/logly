@@ -8,6 +8,7 @@ import {
   getDashboardEventSummary,
   getDashboardFunnel,
   getDashboardPages,
+  getDashboardRetention,
   getProjectPolicy,
   getTrackingAlertsReport,
   ingestEventBatch,
@@ -21,6 +22,8 @@ import {
 import {
   type AnalyticsEventQuery,
   BreakdownQueryError,
+  isRetentionRange,
+  isRetentionSurface,
   normalizeFunnelQuery,
   parseActorReadQuery,
   parseBreakdownQuery,
@@ -337,6 +340,25 @@ export function createCollectorApp() {
         project,
         organization: context.req.query("organization"),
         range,
+      }),
+    );
+  });
+  app.get("/v1/dashboard/retention", async (context) => {
+    const project = context.req.query("project");
+    if (!project) return context.json({ error: "Project is required" }, 400);
+    const range = context.req.query("range") ?? "30d";
+    if (!isRetentionRange(range))
+      return context.json({ error: "Invalid range" }, 400);
+    const surface = context.req.query("surface") ?? "all";
+    if (!isRetentionSurface(surface))
+      return context.json({ error: "Invalid surface" }, 400);
+    return context.json(
+      await getDashboardRetention({
+        project,
+        organization: context.req.query("organization"),
+        range,
+        surface,
+        returnEvent: context.req.query("event"),
       }),
     );
   });

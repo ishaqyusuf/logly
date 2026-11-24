@@ -12,6 +12,7 @@ import {
   FileText,
   LayoutDashboard,
   Radio,
+  Repeat,
   Settings2,
   Smartphone,
 } from "lucide-react";
@@ -27,6 +28,7 @@ const navigation = [
   { href: "/events", label: "Events", icon: Activity },
   { href: "/pages", label: "Pages", icon: FileText },
   { href: "/versions", label: "Versions", icon: Smartphone },
+  { href: "/retention", label: "Retention", icon: Repeat },
   { href: "/live", label: "Live", icon: Radio },
   { href: "/insights", label: "Insights", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings2 },

@@ -1213,6 +1213,10 @@ export {
   recordRelease,
 } from "./releases";
 export {
+  getDashboardRetention,
+  type RetentionReportQuery,
+} from "./retention";
+export {
   evaluateTrackingAlerts,
   getTrackingAlertsReport,
   refreshTrackingAlerts,

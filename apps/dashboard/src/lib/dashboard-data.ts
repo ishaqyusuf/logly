@@ -14,12 +14,16 @@ import {
   type AnalyticsPagesReport,
   type AnalyticsPageViewEvent,
   type AnalyticsProjectSummary,
+  type AnalyticsRetentionReport,
   getDemoAnalytics,
   matchesEventContext,
+  type RetentionRange,
+  type RetentionSurface,
   summarizeAnalyticsEvents,
   summarizeAppVersions,
   summarizeFunnel,
   summarizePages,
+  summarizeRetention,
   type TrackingAlertsReport,
 } from "@logly/utils";
 import { cache } from "react";
@@ -243,6 +247,27 @@ export async function getDashboardAppVersions(query: {
   if (query.organization) params.set("organization", query.organization);
   return client.read<AnalyticsAppVersionsReport>(
     `/v1/dashboard/app-versions?${params}`,
+  );
+}
+
+export async function getDashboardRetention(query: {
+  project: string;
+  organization?: string;
+  range: RetentionRange;
+  surface: RetentionSurface;
+  returnEvent?: string | null;
+}): Promise<AnalyticsRetentionReport> {
+  const client = dashboardClient();
+  if (!client) return summarizeRetention(getDemoAnalytics().events, query);
+  const params = new URLSearchParams({
+    project: query.project,
+    range: query.range,
+    surface: query.surface,
+  });
+  if (query.organization) params.set("organization", query.organization);
+  if (query.returnEvent) params.set("event", query.returnEvent);
+  return client.read<AnalyticsRetentionReport>(
+    `/v1/dashboard/retention?${params}`,
   );
 }
 

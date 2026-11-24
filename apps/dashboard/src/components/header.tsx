@@ -29,6 +29,10 @@ const titles: Record<string, { title: string; description: string }> = {
     title: "Versions",
     description: "How fast each mobile app release reaches active users",
   },
+  "/retention": {
+    title: "Retention",
+    description: "How many users come back after their first visit",
+  },
   "/live": {
     title: "Live",
     description: "Watch the selected project's newest signals arrive",
