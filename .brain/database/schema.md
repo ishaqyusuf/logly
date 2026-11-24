@@ -60,7 +60,7 @@ column, with exact scalar containment preserving null/missing/type semantics.
 
 ## Mobile release metadata
 
-`analytics_events.platform`, `analytics_events.app_version`, and `analytics_events.app_build` are nullable text columns. Mobile events require `ios` or `android` at validation; browser events may record `web`; server events remain nullable. Version/build values are bounded opaque release labels. Complete-window mobile session, installation, platform and version aggregates operate within the existing project, organization, date, event, source, platform and search scopes.
+`analytics_events.platform`, `analytics_events.app_version`, and `analytics_events.app_build` are nullable text columns. Mobile events require `ios` or `android` at validation; browser events may record `web`; server events remain nullable. Version/build values are bounded opaque release labels. Complete-window mobile session, installation, platform and version aggregates operate within the existing project, organization, date, event, source, platform and search scopes. The app-version adoption report (`/versions`, 2026-11-24) reads these columns with `visitor_key` and `occurred_at`; blank `app_version` is treated as unknown and versions sort semantically. No schema change.
 
 ## Breakdown indexes — 2026-11-12 (local)
 
