@@ -80,3 +80,11 @@ The full rollout evidence and baseline IDs are also recorded in Afterservice's
 `brain/handoffs/2026-10-24-country-tracking-release.md`. Exact source snapshots
 and changed-file hashes remain in `/private/tmp/country-release-record.json`
 and `/private/tmp/country-release-{website,dashboard,logly}`.
+
+## Country-only source branch
+
+`codex/visit-country-tracking` contains only this country SDK option, country
+row/detail display, saved-column-order compatibility, tests and country docs.
+It is based on GitHub main. The unrelated group-analytics, project-key and
+header-selector work is excluded. The shared checkout and its index are
+preserved; this push does not replace the isolated production release above.

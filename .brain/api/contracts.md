@@ -220,3 +220,18 @@ migration `0005`.
 `@ishaqyusuf/logly-server` exposes `createAdminClient(...).breakdown(query)`
 with matching `LoglyBreakdownQuery`/`LoglyBreakdownResult` types (unpublished).
 No dashboard same-origin proxy exists yet; add one when a dashboard view needs it.
+
+### Cloudflare country forwarding option — 2026-10-24
+
+The Next route adapter accepts optional `trustCloudflareCountry` (default
+false). On Vercel, opted-in product proxies prefer normalized `cf-ipcountry`
+when it or `cf-ray` is present. Missing/invalid Cloudflare location stays
+unknown; direct Vercel traffic uses its existing country header. No IP is
+forwarded. The deployment must supply/overwrite these headers at trusted
+ingress. Existing collector credential/origin checks, country whitelist,
+nullable row field and country-summary contract are unchanged.
+
+Country now appears in Events/Live table columns and event Context details
+as flag + English name + code, or Unknown. Saved table layouts keep the
+actions column last when new columns are introduced. No migration or
+historical backfill is required.
