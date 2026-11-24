@@ -35,6 +35,16 @@ Before deploying:
    `EMAIL_REPLY_TO` is optional. Keep `NEXT_PUBLIC_DASHBOARD_URL` or
    `BETTER_AUTH_URL` set to the public URL. Without these, everything else
    still works and no email is sent.
+   **Status 2026-11-24:** Resend workspace "SaaS" has domain `ishaqyusuf.com`
+   (region eu-west-1) and a sending-only key `logly-production`. Vercel
+   Production and local `.env.local` have `RESEND_API_KEY`,
+   `EMAIL_FROM="Logly <logly@ishaqyusuf.com>"`, `EMAIL_REPLY_TO` (the owner's
+   Gmail) and `CRON_SECRET`. Pending: add the Resend DNS records in Cloudflare
+   (DKIM TXT `resend._domainkey`, CNAME `send` → `send.forge.rmta.net`, CNAME
+   `rsend` → `rsend-euw1.forge.rmta.net`, both DNS only, and TXT `_dmarc`
+   `v=DMARC1; p=none;`), verify the domain in Resend, then redeploy so the
+   env vars take effect. The root's Cloudflare Email Routing MX/SPF records are
+   untouched.
 
 Deploy:
 
