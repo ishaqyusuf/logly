@@ -1,6 +1,6 @@
 "use client";
 
-import type { AnalyticsTrendPoint } from "@logly/utils";
+import type { AnalyticsRelease, AnalyticsTrendPoint } from "@logly/utils";
 import { format, parseISO } from "date-fns";
 import {
   Area,
@@ -11,20 +11,38 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {
+  ReleaseTooltipList,
+  releaseMarkerLines,
+  useReleaseGroups,
+} from "@/components/charts/release-markers";
 
 export function OverviewChart({
   data,
+  releases,
   height = 280,
 }: {
   data: AnalyticsTrendPoint[];
+  /** Deploy markers, drawn on the day they fall in. */
+  releases?: AnalyticsRelease[];
   height?: number;
 }) {
+  const releaseGroups = useReleaseGroups(
+    releases,
+    data.map((point) => point.date),
+    "day",
+  );
   return (
     <div className="w-full" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
           data={data}
-          margin={{ top: 10, right: 4, left: -24, bottom: 0 }}
+          margin={{
+            top: releaseGroups.size ? 16 : 10,
+            right: 4,
+            left: -24,
+            bottom: 0,
+          }}
         >
           <defs>
             <linearGradient id="events-fill" x1="0" y1="0" x2="0" y2="1">
@@ -52,16 +70,27 @@ export function OverviewChart({
             allowDecimals={false}
           />
           <Tooltip
-            contentStyle={{
-              border: "1px solid #e3dfd8",
-              borderRadius: 10,
-              boxShadow: "0 12px 32px rgba(16,16,16,.08)",
-              fontSize: 12,
-            }}
-            labelFormatter={(value) =>
-              format(parseISO(String(value)), "MMM d, yyyy")
+            cursor={{ stroke: "#cfcac0" }}
+            content={({ active, payload, label }) =>
+              active && payload?.length ? (
+                <div className="min-w-[140px] rounded-[10px] border border-[#e3dfd8] bg-white px-3 py-2 text-xs shadow-[0_12px_32px_rgba(16,16,16,.08)]">
+                  <p className="mb-1.5 text-[11px] text-muted-foreground">
+                    {format(parseISO(String(label)), "MMM d, yyyy")}
+                  </p>
+                  <p className="flex items-center justify-between gap-4">
+                    <span className="text-muted-foreground">Events</span>
+                    <span className="font-medium tabular-nums">
+                      {Number(payload[0]?.value ?? 0).toLocaleString()}
+                    </span>
+                  </p>
+                  <ReleaseTooltipList
+                    releases={releaseGroups.get(String(label))}
+                  />
+                </div>
+              ) : null
             }
           />
+          {releaseMarkerLines(releaseGroups)}
           <Area
             type="monotone"
             dataKey="events"

@@ -9,7 +9,7 @@ import { OverviewTopEvents } from "@/components/overview/overview-top-events";
 import { OverviewRangeFilter } from "@/components/overview-range-filter";
 import { ScrollableContent } from "@/components/scrollable-content";
 import { TrackingAlertBanner } from "@/components/tracking-alerts/tracking-alert-banner";
-import { getDashboardData } from "@/lib/dashboard-data";
+import { getDashboardData, getReleases } from "@/lib/dashboard-data";
 import { loadProjectWorkspace } from "@/lib/project-workspace-server";
 
 export const metadata: Metadata = { title: "Overview" };
@@ -22,6 +22,12 @@ const windowLabels: Record<
   "24h": { current: "last 24 hours", previous: "Previous 24 hours" },
   "7d": { current: "last 7 days", previous: "Previous 7 days" },
   "30d": { current: "last 30 days", previous: "Previous 30 days" },
+};
+
+const rangeDays: Record<AnalyticsOverviewRange, number> = {
+  "24h": 1,
+  "7d": 7,
+  "30d": 30,
 };
 
 export default async function OverviewPage({
@@ -38,11 +44,22 @@ export default async function OverviewPage({
   });
   const { project, organization } = workspace;
   if (!project) throw new Error("A project workspace is required");
-  const data = await getDashboardData({
-    organization: organization?.slug,
-    project: project.slug,
-    range,
-  });
+  // Releases are read in parallel over a window a day wider than the range;
+  // the chart keeps only those inside its buckets.
+  const [data, releases] = await Promise.all([
+    getDashboardData({
+      organization: organization?.slug,
+      project: project.slug,
+      range,
+    }),
+    getReleases({
+      project: project.slug,
+      start: new Date(
+        Date.now() - (rangeDays[range] + 1) * 86_400_000,
+      ).toISOString(),
+      environment: "production",
+    }),
+  ]);
   const scope = new URLSearchParams();
   if (workspace.organization)
     scope.set("organization", workspace.organization.slug);
@@ -71,6 +88,7 @@ export default async function OverviewPage({
           overview={data.overview}
           windowLabel={labels.current}
           previousLabel={labels.previous}
+          releases={releases}
         />
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           <OverviewTopEvents

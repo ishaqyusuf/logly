@@ -1,7 +1,11 @@
 "use client";
 
 import { cn } from "@logly/ui/cn";
-import type { AnalyticsOverview, AnalyticsTrendPoint } from "@logly/utils";
+import type {
+  AnalyticsOverview,
+  AnalyticsRelease,
+  AnalyticsTrendPoint,
+} from "@logly/utils";
 import {
   MousePointerClick,
   Send,
@@ -84,10 +88,12 @@ export function OverviewMetrics({
   overview,
   windowLabel,
   previousLabel,
+  releases,
 }: {
   overview: AnalyticsOverview;
   windowLabel: string;
   previousLabel: string;
+  releases?: AnalyticsRelease[];
 }) {
   const { metric, setMetric } = useOverviewParams();
   const tabsRef = useRef<Array<HTMLButtonElement | null>>([]);
@@ -189,6 +195,12 @@ export function OverviewMetrics({
                 <span className="w-3.5 border-t-[1.5px] border-dashed border-[#9a958c]" />
                 {previousLabel}
               </span>
+              {releases?.length ? (
+                <span className="flex items-center gap-1.5">
+                  <span className="size-2 rotate-45 bg-[#b45309]" />
+                  Release
+                </span>
+              ) : null}
             </div>
           ) : null}
         </div>
@@ -198,6 +210,7 @@ export function OverviewMetrics({
               data={data}
               granularity={overview.trendGranularity ?? "day"}
               metricLabel={config.label}
+              releases={releases}
             />
           ) : (
             <div className="grid h-[300px] place-items-center rounded-lg border border-dashed text-center text-xs text-muted-foreground">

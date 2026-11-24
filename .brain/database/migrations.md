@@ -88,3 +88,12 @@ journal entry) after the deploy-markers session's `0008_deploy_markers.sql`,
 whose table the cumulative snapshot includes. Not applied to the shared local
 or production databases; `deploy:prepare` applies it at the coordinated
 release. Apply it locally before passkey browser QA.
+
+## App-version adoption (2026-11-24)
+
+No migration. Feature 4 reads the existing `analytics_events` columns
+`source`, `platform`, `app_version`, `app_build`, `visitor_key` and
+`occurred_at` through the `(project_id, occurred_at)` index. The `0009` number
+originally reserved for it is used by `0009_passkeys.sql`; nothing needs
+renumbering. `app-versions.sql.test.ts` runs against `logly_test` like the
+Pages fixtures.

@@ -1,6 +1,6 @@
 "use client";
 
-import type { AnalyticsTrendGranularity } from "@logly/utils";
+import type { AnalyticsRelease, AnalyticsTrendGranularity } from "@logly/utils";
 import { format, parseISO } from "date-fns";
 import {
   Area,
@@ -12,6 +12,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {
+  ReleaseTooltipList,
+  releaseMarkerLines,
+  useReleaseGroups,
+} from "@/components/charts/release-markers";
 
 export type OverviewTrendDatum = {
   date: string;
@@ -47,12 +52,14 @@ function TrendTooltip({
   label,
   granularity,
   metricLabel,
+  releases,
 }: {
   active?: boolean;
   payload?: ReadonlyArray<{ dataKey?: unknown; value?: unknown }>;
   label?: unknown;
   granularity: AnalyticsTrendGranularity;
   metricLabel: string;
+  releases?: AnalyticsRelease[];
 }) {
   if (!active || !payload?.length) return null;
   const current = payload.find((item) => item.dataKey === "current")?.value;
@@ -80,6 +87,7 @@ function TrendTooltip({
           <span className="tabular-nums">{previous.toLocaleString()}</span>
         </p>
       ) : null}
+      <ReleaseTooltipList releases={releases} />
     </div>
   );
 }
@@ -88,20 +96,33 @@ export function OverviewTrendChart({
   data,
   granularity,
   metricLabel,
+  releases,
   height = 300,
 }: {
   data: OverviewTrendDatum[];
   granularity: AnalyticsTrendGranularity;
   metricLabel: string;
+  /** Deploy markers; each is drawn on the bucket it falls in. */
+  releases?: AnalyticsRelease[];
   height?: number;
 }) {
+  const releaseGroups = useReleaseGroups(
+    releases,
+    data.map((point) => point.date),
+    granularity,
+  );
   const hasPrevious = data.some((point) => point.previous !== undefined);
   return (
     <div className="w-full" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={data}
-          margin={{ top: 10, right: 4, left: -24, bottom: 0 }}
+          margin={{
+            top: releaseGroups.size ? 16 : 10,
+            right: 4,
+            left: -24,
+            bottom: 0,
+          }}
           accessibilityLayer
         >
           <defs>
@@ -142,9 +163,11 @@ export function OverviewTrendChart({
                 {...props}
                 granularity={granularity}
                 metricLabel={metricLabel}
+                releases={releaseGroups.get(String(props.label))}
               />
             )}
           />
+          {releaseMarkerLines(releaseGroups)}
           {hasPrevious ? (
             <Line
               type="monotone"

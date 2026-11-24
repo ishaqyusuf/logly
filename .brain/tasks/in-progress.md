@@ -1,5 +1,29 @@
 # In Progress
 
+## Mobile app-version adoption — 2026-11-24
+
+- Status: committed locally on `main` (`b58bfe5`), unreleased (held for the
+  coordinated 8-feature release; nothing pushed, deployed or migrated).
+- Feature 4 of the 8: [app-version adoption](../features/app-version-adoption.md),
+  [ADR 0016](../decisions/0016-app-versions-latest-version-attribution.md).
+- New read endpoint `GET /v1/dashboard/app-versions`; new page `/versions`
+  (sidebar "Versions"). No migration (the reserved `0009` went to passkeys),
+  env vars, cron or Vercel config changes.
+- Typecheck, lint, tests (including the `logly_test` SQL fixture that checks
+  the query against the in-memory spec) and the dashboard build pass. The API
+  was checked against the local stack with a seeded `versions-qa` project
+  (four release waves, stragglers folded into Other, Unknown, iOS/Android;
+  a web-only project returns `mobile: false`). The real components were
+  browser-checked at desktop and 375px through a temporary unauthenticated
+  local route (removed, never committed); the authenticated `/versions` page
+  and its web-only empty state still need an operator sign-in to view.
+- Consumer findings (guide row 4): gnd sends correct versions but its store
+  builds disable Logly; ewatrade never sends a build and its version is the
+  static manifest `1.0.0`; halaal-coperative sends neither.
+- Follow-ups: deploy markers on the adoption chart once feature 2's marker
+  layer is committed; OTA (`updateId`/`runtimeVersion`) adoption; a daily
+  per-version rollup if mobile volume grows.
+
 ## Passkey operator sign-in — 2026-11-24
 
 - Status: committed locally on `main`, unreleased (held for the coordinated

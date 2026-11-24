@@ -14,9 +14,10 @@ import type { SearchParams } from "nuqs/server";
 import { PasskeySettings } from "@/components/auth/passkey-settings";
 import { OpenProjectSheet } from "@/components/open-project-sheet";
 import { ProjectKeySettings } from "@/components/project-key-settings";
+import { ReleaseSettings } from "@/components/releases/release-settings";
 import { ScrollableContent } from "@/components/scrollable-content";
 import { TrackingAlertHistory } from "@/components/tracking-alerts/tracking-alert-history";
-import { getTrackingAlerts } from "@/lib/dashboard-data";
+import { getReleases, getTrackingAlerts } from "@/lib/dashboard-data";
 import { loadProjectWorkspace } from "@/lib/project-workspace-server";
 
 export const metadata: Metadata = { title: "Settings" };
@@ -60,9 +61,10 @@ export default async function SettingsPage({
     );
   }
   const project = workspace.project;
-  const [session, trackingAlerts] = await Promise.all([
+  const [session, trackingAlerts, releases] = await Promise.all([
     auth.api.getSession({ headers: await headers() }),
     getTrackingAlerts(project.slug),
+    getReleases({ project: project.slug, limit: 20 }),
   ]);
   return (
     <ScrollableContent>
@@ -154,6 +156,14 @@ export default async function SettingsPage({
           </div>
         </section>
         <TrackingAlertHistory report={trackingAlerts} />
+        <ReleaseSettings
+          key={`releases-${project.slug}`}
+          project={project.slug}
+          releases={releases}
+          canEdit={
+            session?.user.role === "admin" && workspace.mode === "database"
+          }
+        />
         {session?.user.role === "admin" && workspace.organization ? (
           <ProjectKeySettings
             key={project.slug}

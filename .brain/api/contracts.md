@@ -267,3 +267,33 @@ history: [{ id, severity: "drop"|"stopped", openedAt, resolvedAt|null,
 observedEvents, baselineEvents }] }`. The rule constants live in
 `packages/utils/src/tracking-alerts.ts`; see
 `../features/tracking-alerts.md`.
+
+### App-version adoption — 2026-11-24 (local, unreleased)
+
+`GET /v1/dashboard/app-versions` returns `AnalyticsAppVersionsReport`
+(`packages/utils/src/app-versions.ts`):
+`{ range, start, end, granularity: "hour"|"day", lookbackDays: 90, mobile,
+totals: { activeUsers, events, unknownUsers, versions }, latestVersion,
+series[], versions[], trend[], platforms[] }`.
+
+- Only `source = "mobile"` events count. `mobile` is false when the project
+  has none in the 90-day lookback (web-only); clients show an empty state.
+- `series[]`: `{ key, label, kind: "version"|"other"|"unknown", version }`.
+  Keys are `v0`… (newest first), `other`, `unknown`, because version strings
+  contain dots. At most 8 version series, chosen by user-buckets.
+- `versions[]` (series order): series fields plus `{ activeUsers|null,
+  activeShare|null, currentUsers, currentShare, events, firstSeen|null,
+  lastSeen|null, versionCount, builds: [{ build|null, users }],
+  platforms: { ios, android, unknown }, latest }`. `activeUsers` is distinct
+  users with any event on the version in the range (null for `other`);
+  `currentUsers` is users whose latest event in the range was on it (sums to
+  `totals.activeUsers`). Builds and platforms count current users. Shares are
+  0–1.
+- `trend[]`: every UTC bucket in `[start, end)`: `{ bucket, total,
+  values: { [seriesKey]: users } }`, each visitor on the version of their
+  latest event in the bucket.
+- `platforms[]`: `{ platform: "ios"|"android"|"unknown", users, versions:
+  [series fields + { users, share }] }`, only platforms with users.
+- Version strings are trimmed; blank is null (Unknown). Ordering is semantic
+  (`compareAppVersions`). See `../features/app-version-adoption.md` and
+  ADR 0016.

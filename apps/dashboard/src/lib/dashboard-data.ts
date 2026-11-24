@@ -260,3 +260,28 @@ export async function getTrackingAlerts(
     return null;
   }
 }
+
+export async function getReleases(query: {
+  project: string;
+  start?: string;
+  end?: string;
+  environment?: import("@logly/utils").ReleaseEnvironment;
+  limit?: number;
+}): Promise<import("@logly/utils").AnalyticsRelease[]> {
+  const client = dashboardClient();
+  if (!client) return [];
+  const params = new URLSearchParams({ project: query.project });
+  if (query.start) params.set("start", query.start);
+  if (query.end) params.set("end", query.end);
+  if (query.environment) params.set("environment", query.environment);
+  if (query.limit) params.set("limit", String(query.limit));
+  try {
+    const result = await client.read<{
+      data: import("@logly/utils").AnalyticsRelease[];
+    }>(`/v1/dashboard/releases?${params}`);
+    return result.data;
+  } catch {
+    // Deploy markers are supplementary; never fail a chart over them.
+    return [];
+  }
+}

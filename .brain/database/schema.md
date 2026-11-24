@@ -90,6 +90,16 @@ column, with exact scalar containment preserving null/missing/type semantics.
 The Pages report adds no schema; it reads `analytics_events` through the
 existing `(project_id, name, occurred_at)` index.
 
+## Deploy markers — 2026-11-24 (local, unreleased)
+
+`analytics_releases`: `id` uuid PK, `project_id` (FK `analytics_projects`,
+cascade), `environment` (`production`|`preview`), `version`, `deployed_at`,
+nullable `description` and `url`, `source` (`api`|`dashboard`), `created_at`.
+Unique `analytics_releases_unique_idx (project_id, environment, version)` makes
+recording idempotent; `analytics_releases_project_deployed_idx (project_id,
+deployed_at)` serves chart and list reads. Operational metadata only, no
+identifiers; deleted with the project.
+
 ## Operator passkeys — 2026-11-24 (local, unreleased)
 
 `passkey` holds the Better Auth passkey plugin's credentials: text `id` PK,

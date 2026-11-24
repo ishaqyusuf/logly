@@ -75,3 +75,11 @@
 - `GET /v1/dashboard/overview` now also runs the throttled alert evaluation
   (at most once per project per 5 minutes, bounded to 1.5s) and adds optional
   `projects[].trackingAlert`.
+
+## App-version adoption — 2026-11-24 (local, unreleased)
+
+- `GET /v1/dashboard/app-versions?project=<slug>&range=<24h|7d|30d>&organization=<slug>`:
+  read-key or operator authenticated, project required, `range` defaults to
+  `7d`, invalid range returns 400. Without a database it returns the demo
+  summary. Read-only; no new write path, env var, cron or Vercel config.
+  Dashboard page: `/versions` (request-rendered, `ƒ` in the build output).

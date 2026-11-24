@@ -1,7 +1,11 @@
 "use client";
 
 import { Badge } from "@logly/ui/badge";
-import type { AnalyticsEventQuery, AnalyticsEventSummary } from "@logly/utils";
+import type {
+  AnalyticsEventQuery,
+  AnalyticsEventSummary,
+  AnalyticsRelease,
+} from "@logly/utils";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowDownRight,
@@ -84,6 +88,29 @@ export function EventAnalytics({
     initialData:
       initialQuery === JSON.stringify(query) ? initialSummary : undefined,
   });
+  const trend = summaryQuery.data?.trend ?? [];
+  const releaseWindow = {
+    start: trend[0]?.date,
+    end: trend[trend.length - 1]?.date,
+  };
+  const releasesQuery = useQuery({
+    queryKey: ["dashboard-releases", scope.project, releaseWindow],
+    enabled: Boolean(releaseWindow.start && releaseWindow.end),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        project: scope.project,
+        environment: "production",
+        start: `${releaseWindow.start}T00:00:00Z`,
+        end: new Date(
+          Date.parse(`${releaseWindow.end}T00:00:00Z`) + 86_400_000,
+        ).toISOString(),
+      });
+      const response = await fetch(`/api/releases?${params}`);
+      if (!response.ok) return [];
+      return ((await response.json()) as { data: AnalyticsRelease[] }).data;
+    },
+  });
   if (!summaryQuery.data) {
     return (
       <div
@@ -147,7 +174,11 @@ export function EventAnalytics({
             </div>
             <BarChart3 className="size-4 text-muted-foreground" />
           </div>
-          <OverviewChart data={summary.trend} height={205} />
+          <OverviewChart
+            data={summary.trend}
+            releases={releasesQuery.data}
+            height={205}
+          />
         </section>
         <section className="overflow-hidden rounded-xl border bg-white shadow-soft">
           <div className="border-b p-5">
