@@ -268,6 +268,28 @@ observedEvents, baselineEvents }] }`. The rule constants live in
 `packages/utils/src/tracking-alerts.ts`; see
 `../features/tracking-alerts.md`.
 
+### Deploy markers — 2026-11-24 (local, unreleased)
+
+`POST /v1/releases` body (JSON, ≤ 4 KiB):
+
+| Field | Type | Rules |
+| --- | --- | --- |
+| `project` | string | Required project slug; the key must belong to it. |
+| `version` | string | Required; 1–100 chars, `^[A-Za-z0-9][A-Za-z0-9._\-+/:@]*$` (version or SHA). |
+| `environment` | `"production" \| "preview"` | Optional, default `production`. |
+| `deployedAt` | ISO 8601 string | Optional, default now; ≤ 5 min ahead, ≤ 365 days back. |
+| `description` | string | Optional, ≤ 280 chars; blank is null. |
+| `url` | string | Optional http(s) URL, ≤ 500 chars. |
+
+Response: `{ created: boolean, release: AnalyticsRelease }` where
+`AnalyticsRelease` (`@logly/utils`) is `{ id, environment, version,
+deployedAt, description|null, url|null, source: "api"|"dashboard" }`.
+Identity is `(project, environment, version)`; the first write wins and later
+posts return it unchanged. `GET /v1/dashboard/releases` returns
+`{ data: AnalyticsRelease[] }`. Validation lives in
+`packages/utils/src/releases.ts` (`parseReleaseInput`); chart bucketing uses
+`groupReleasesByBucket`, matching the trend bucket keys (UTC).
+
 ### App-version adoption — 2026-11-24 (local, unreleased)
 
 `GET /v1/dashboard/app-versions` returns `AnalyticsAppVersionsReport`

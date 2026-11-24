@@ -80,13 +80,55 @@ Filled in as each feature lands.
 | # | Feature | Status | What projects must do |
 | --- | --- | --- | --- |
 | 1 | Pages report | Built (`6eed75e`); visual QA pending | Nothing required. To see real pages: web projects need core/next 0.3.0 with `autoTrackPageViews` and steps 1–2; mobile projects need `logly-native` 0.1.0 (or `normalizeRoute`) calling `trackScreenView`. Older events keep raw paths or `/other`; no backfill. |
-| 2 | Deploy markers | Not started | Expected: call a release endpoint from CI or a deploy hook. |
+| 2 | Deploy markers | Built (see below); visual QA pending | Optional but needed to see markers: record each deploy. See "Deploy markers setup" below. |
 | 3 | Tracking alerts | Built (`6eed75e`) | Nothing. Evaluated on dashboard reads (ADR 0013); in-dashboard only until feature 8 adds email. |
 | 4 | App version adoption | Built (`b58bfe5`); authenticated-page visual QA pending | Mobile events must carry `appVersion`/`appBuild` from `expo-application`. gnd: enable Logly in store builds. ewatrade: send the native version and build. halaal-coperative: send both. See "App version adoption setup" below. |
 | 5 | Retention | Not started | Expected: nothing. |
 | 6 | Funnel builder | Not started | Expected: nothing beyond the events already tracked. |
 | 7 | Event catalog | Not started | Expected: nothing; add descriptions in the dashboard. |
 | 8 | Weekly email digest | Not started | Expected: nothing; recipients set in Logly. |
+
+## Deploy markers setup (feature 2)
+
+Needs `@ishaqyusuf/logly-server` 0.4.0 once published (unreleased in the repo
+today). Until then, use the curl snippet; it needs no package.
+
+For each deployed surface (one Logly project each, e.g. ewatrade dashboard,
+marketing and storefront separately):
+
+1. Use the project's existing `server-write` key (gnd, plot-keys and
+   after-service already have one for server events). Others issue one in
+   Logly → Settings → Project keys → `server-write`. Never expose it as a
+   `NEXT_PUBLIC_*` variable.
+2. Add build/CI environment variables (Vercel: Production and Preview scope):
+   `LOGLY_COLLECTOR_URL=https://logly-chi.vercel.app`,
+   `LOGLY_PROJECT=<project slug>`, `LOGLY_SERVER_KEY=<server-write key>`.
+3. Pick one trigger:
+   - Vercel-built web apps (gnd, ewatrade, halaal-coperative, plot-keys,
+     school-clerk, after-service web): add `@ishaqyusuf/logly-server@^0.4.0`
+     as a dev dependency of the deployed app and
+     `"postbuild": "logly-release"` to its `package.json` (the app's own, not
+     the monorepo root, so each app reports its own project). It uses the Vercel
+     commit SHA (12 chars), `VERCEL_ENV` (production/preview), the commit
+     subject and the deployment URL. In Turbo repos, pass the four variable
+     names through `turbo.json` (`passThroughEnv` or `env`) for the build task,
+     plus `VERCEL_ENV`, `VERCEL_GIT_COMMIT_SHA`, `VERCEL_GIT_COMMIT_MESSAGE`
+     and `VERCEL_URL`.
+   - GitHub Actions deploys (or for exact go-live markers): after the deploy
+     step, run `bunx --package @ishaqyusuf/logly-server logly-release` with the
+     three variables (key from secrets) and `LOGLY_RELEASE_ENVIRONMENT`.
+   - Mobile releases (gnd, ewatrade, halaal-coperative EAS builds/updates):
+     call `logly-release` (or curl) after `eas update`/`eas submit` with
+     `LOGLY_RELEASE_VERSION=<app version or update group>` against the mobile
+     project.
+   - after-service jobs need nothing; markers belong to deployed surfaces.
+4. Without the package: the curl + `openssl dgst -sha256 -hmac` snippet in
+   `packages/analytics-server/README.md`.
+5. Check: Logly → Settings → Releases lists the deploy; the Overview chart
+   shows a marker on that day/hour. A deploy can also be added there by hand.
+
+Nothing else changes: no SDK upgrade is required for analytics itself, and
+a failed release call never fails the build (unless `--strict`).
 
 ## App version adoption setup (feature 4)
 

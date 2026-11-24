@@ -24,6 +24,27 @@
   layer is committed; OTA (`updateId`/`runtimeVersion`) adoption; a daily
   per-version rollup if mobile volume grows.
 
+## Deploy markers — 2026-11-24
+
+- Status: committed locally on `main`, unreleased (feature 2 of the 8; held for
+  the coordinated release; nothing pushed, deployed, migrated in production or
+  published).
+- [Deploy markers](../features/deploy-markers.md),
+  [ADR 0015](../decisions/0015-deploy-markers-signed-release-endpoint.md).
+- Migration `0008_deploy_markers` (`analytics_releases`).
+- New `POST /v1/releases`, `GET /v1/dashboard/releases`, and dashboard
+  `GET/POST/DELETE /api/releases`. No env vars, cron or Vercel config changes.
+- `@ishaqyusuf/logly-server` bumped to 0.4.0 in the repo (unreleased, not
+  published): `release()`, `sendRelease`, `logly-release` CLI.
+- Verified against the local stack: the built CLI recorded `v2.3.0` for
+  `pages-qa-11240837`; a curl/openssl post returned 201, then 200 on retry;
+  `GET /v1/dashboard/releases` returned both. Unit, route and SQL fixture
+  tests pass. Visual browser QA of the chart markers and the Settings section
+  is pending an operator sign-in in the local browser (creating a QA operator
+  was not permitted).
+- Follow-ups: markers on a future Pages trend chart; optional release
+  filtering per environment in charts.
+
 ## Passkey operator sign-in — 2026-11-24
 
 - Status: committed locally on `main`, unreleased (held for the coordinated

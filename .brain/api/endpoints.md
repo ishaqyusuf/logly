@@ -76,6 +76,24 @@
   (at most once per project per 5 minutes, bounded to 1.5s) and adds optional
   `projects[].trackingAlert`.
 
+## Deploy markers — 2026-11-24 (local, unreleased)
+
+- `POST /v1/releases`: trusted-writer release ingest. Bearer `server-write`
+  project key (or `LOGLY_SERVER_KEY`) plus `x-logly-signature` (hex HMAC-SHA256
+  of the raw body). 201 created, 200 already recorded, 400 invalid, 401
+  unauthenticated/bad signature, 404 unknown or disabled project, 413 body over
+  4 KiB, 429 over 30/min per client, 503 database unavailable. Not behind the
+  dashboard proxy (`/v1/` is excluded from the session matcher).
+- `GET /v1/dashboard/releases?project=<slug>[&start=<iso>&end=<iso>&environment=<production|preview>&limit=<1-200>]`:
+  read-key or operator authenticated; newest first, at most 200; 400 without a
+  project or with an invalid time/environment.
+- `GET /api/releases?project=<slug>&start&end&environment`: Better Auth
+  session proxy of the read above, used by the client-rendered Events chart.
+- `POST /api/releases`: same-origin admin-session manual marker (same body and
+  validation as `/v1/releases`, stored with `source = 'dashboard'`).
+- `DELETE /api/releases?project=<slug>&id=<uuid>`: same-origin admin-session
+  delete scoped to the project; 404 when no row matched.
+
 ## App-version adoption — 2026-11-24 (local, unreleased)
 
 - `GET /v1/dashboard/app-versions?project=<slug>&range=<24h|7d|30d>&organization=<slug>`:
