@@ -8,11 +8,17 @@ import { VersionsMetrics } from "@/components/versions/versions-metrics";
 import { VersionsPlatforms } from "@/components/versions/versions-platforms";
 import { VersionsRangeFilter } from "@/components/versions/versions-range-filter";
 import { VersionsTable } from "@/components/versions/versions-table";
-import { getDashboardAppVersions } from "@/lib/dashboard-data";
+import { getDashboardAppVersions, getReleases } from "@/lib/dashboard-data";
 import { loadProjectWorkspace } from "@/lib/project-workspace-server";
 
 export const metadata: Metadata = { title: "Versions" };
 export const dynamic = "force-dynamic";
+
+const rangeDays: Record<AnalyticsOverviewRange, number> = {
+  "24h": 1,
+  "7d": 7,
+  "30d": 30,
+};
 
 export default async function VersionsPage({
   searchParams,
@@ -28,11 +34,22 @@ export default async function VersionsPage({
   });
   const { project, organization } = workspace;
   if (!project) throw new Error("A project workspace is required");
-  const report = await getDashboardAppVersions({
-    project: project.slug,
-    organization: organization?.slug,
-    range,
-  });
+  // Releases are read over a window a day wider than the range; the chart
+  // keeps only those inside its buckets.
+  const [report, releases] = await Promise.all([
+    getDashboardAppVersions({
+      project: project.slug,
+      organization: organization?.slug,
+      range,
+    }),
+    getReleases({
+      project: project.slug,
+      start: new Date(
+        Date.now() - (rangeDays[range] + 1) * 86_400_000,
+      ).toISOString(),
+      environment: "production",
+    }),
+  ]);
   const scope = new URLSearchParams();
   if (organization) scope.set("organization", organization.slug);
   scope.set("project", project.slug);
@@ -60,7 +77,7 @@ export default async function VersionsPage({
         {report.mobile ? (
           <>
             <VersionsMetrics report={report} />
-            <VersionsAdoptionChart report={report} />
+            <VersionsAdoptionChart report={report} releases={releases} />
             <VersionsTable versions={report.versions} />
             <VersionsPlatforms
               platforms={report.platforms}

@@ -1,10 +1,12 @@
 "use client";
 
 import { cn } from "@logly/ui/cn";
-import type {
-  AnalyticsAppVersionsReport,
-  AnalyticsTrendGranularity,
-  AppVersionSeries,
+import {
+  type AnalyticsAppVersionsReport,
+  type AnalyticsRelease,
+  type AnalyticsTrendGranularity,
+  type AppVersionSeries,
+  releaseBucketKey,
 } from "@logly/utils";
 import { useState } from "react";
 import {
@@ -16,6 +18,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {
+  ReleaseTooltipList,
+  releaseMarkerLines,
+  useReleaseGroups,
+} from "@/components/charts/release-markers";
 import { versionColor } from "./version-colors";
 import { formatBucket, formatShare } from "./versions-format";
 
@@ -28,6 +35,7 @@ function AdoptionTooltip({
   granularity,
   series,
   totals,
+  releases,
 }: {
   active?: boolean;
   payload?: ReadonlyArray<{ dataKey?: unknown; value?: unknown }>;
@@ -35,6 +43,7 @@ function AdoptionTooltip({
   granularity: AnalyticsTrendGranularity;
   series: AppVersionSeries[];
   totals: Map<string, number>;
+  releases?: AnalyticsRelease[];
 }) {
   if (!active || !payload?.length) return null;
   const total = totals.get(String(label)) ?? 0;
@@ -71,6 +80,7 @@ function AdoptionTooltip({
           </p>
         );
       })}
+      <ReleaseTooltipList releases={releases} />
     </div>
   );
 }
@@ -81,10 +91,32 @@ function AdoptionTooltip({
  */
 export function VersionsAdoptionChart({
   report,
+  releases,
 }: {
   report: Pick<AnalyticsAppVersionsReport, "series" | "trend" | "granularity">;
+  /** Deploy markers (feature 2), drawn on the bucket each falls in. */
+  releases?: AnalyticsRelease[];
 }) {
   const [mode, setMode] = useState<Mode>("share");
+  // Report buckets are full ISO strings; release groups use Pulse's bucket
+  // keys, so map between the two.
+  const bucketByReleaseKey = new Map(
+    report.trend.map((point) => [
+      releaseBucketKey(point.bucket, report.granularity),
+      point.bucket,
+    ]),
+  );
+  const releaseKeyGroups = useReleaseGroups(
+    releases,
+    [...bucketByReleaseKey.keys()],
+    report.granularity,
+  );
+  const releaseGroups = new Map(
+    [...releaseKeyGroups].map(([key, list]) => [
+      bucketByReleaseKey.get(key) ?? key,
+      list,
+    ]),
+  );
   const data = report.trend.map((point) => ({
     bucket: point.bucket,
     ...point.values,
@@ -171,6 +203,7 @@ export function VersionsAdoptionChart({
                     granularity={report.granularity}
                     series={report.series}
                     totals={totals}
+                    releases={releaseGroups.get(String(props.label))}
                   />
                 )}
               />
@@ -188,6 +221,7 @@ export function VersionsAdoptionChart({
                   isAnimationActive={false}
                 />
               ))}
+              {releaseMarkerLines(releaseGroups)}
             </AreaChart>
           </ResponsiveContainer>
         </div>

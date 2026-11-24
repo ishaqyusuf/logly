@@ -27,6 +27,12 @@ old build be dropped. It reads `GET /v1/dashboard/app-versions` (see
   - iOS · Android split and builds (both of the still-on-it users), first seen
     (within a 90-day lookback) and last seen (in the range), in UTC.
 - By platform: each platform's version mix (still-on-it users).
+- Deploy markers (feature 2): production releases from
+  `GET /v1/dashboard/releases` are drawn on the adoption chart with the shared
+  `components/charts/release-markers.tsx` layer, and listed in the tooltip.
+  Report buckets are full ISO strings, so the chart maps them to Pulse's
+  release bucket keys (`releaseBucketKey`). Record mobile store releases
+  (EAS submit) as releases to see when each wave started.
 
 ## Edge cases
 
@@ -44,7 +50,7 @@ old build be dropped. It reads `GET /v1/dashboard/app-versions` (see
 
 ## Cost
 
-Three bounded SQL reads per page view, each limited to one project and
+Three bounded SQL reads per page view (plus the bounded releases read), each limited to one project and
 `source = 'mobile'`: latest event per visitor (range), per-version activity
 (90-day lookback), and latest event per visitor per bucket (range). They use the
 existing `(project_id, occurred_at)` index; no new index, table or migration. No
@@ -54,10 +60,6 @@ follow-up.
 
 ## Not included
 
-- Deploy markers (feature 2) on the adoption chart: feature 2's dashboard
-  marker layer was still uncommitted when this landed; add it to
-  `versions-adoption-chart.tsx` once `components/charts/release-markers.tsx`
-  is committed.
 - OTA (EAS Update) adoption: the version is the native binary version
   (or the Expo manifest version), not the OTA update. Tracking updates needs
   `runtimeVersion`/`updateId` in the event contract and SDKs.

@@ -20,9 +20,10 @@
 - Consumer findings (guide row 4): gnd sends correct versions but its store
   builds disable Logly; ewatrade never sends a build and its version is the
   static manifest `1.0.0`; halaal-coperative sends neither.
-- Follow-ups: deploy markers on the adoption chart once feature 2's marker
-  layer is committed; OTA (`updateId`/`runtimeVersion`) adoption; a daily
-  per-version rollup if mobile volume grows.
+- Deploy markers (feature 2) are drawn on the adoption chart with the shared
+  marker layer; checked with three seeded `versions-qa` releases.
+- Follow-ups: OTA (`updateId`/`runtimeVersion`) adoption; a daily per-version
+  rollup if mobile volume grows.
 
 ## Deploy markers — 2026-11-24
 
