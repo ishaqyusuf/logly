@@ -1194,6 +1194,10 @@ export async function getDashboardData(
   };
 }
 
+export {
+  type AppVersionsReportQuery,
+  getDashboardAppVersions,
+} from "./app-versions";
 export { getDashboardBreakdown } from "./breakdown";
 export { getDashboardFunnel } from "./funnel";
 export { getDashboardPages, type PagesReportQuery } from "./pages";

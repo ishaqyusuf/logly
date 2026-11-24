@@ -1,5 +1,6 @@
 import { analyticsBatchSchema } from "@ishaqyusuf/logly-core";
 import {
+  getDashboardAppVersions,
   getDashboardBreakdown,
   getDashboardData,
   getDashboardEventById,
@@ -323,6 +324,21 @@ export function createCollectorApp() {
         limit: Number(context.req.query("limit")) || undefined,
       }),
     });
+  });
+  app.get("/v1/dashboard/app-versions", async (context) => {
+    const project = context.req.query("project");
+    if (!project) return context.json({ error: "Project is required" }, 400);
+    const range = (["24h", "7d", "30d"] as const).find(
+      (option) => option === (context.req.query("range") ?? "7d"),
+    );
+    if (!range) return context.json({ error: "Invalid range" }, 400);
+    return context.json(
+      await getDashboardAppVersions({
+        project,
+        organization: context.req.query("organization"),
+        range,
+      }),
+    );
   });
   app.get("/v1/dashboard/tracking-alerts", async (context) => {
     const project = context.req.query("project");

@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   Radio,
   Settings2,
+  Smartphone,
 } from "lucide-react";
 import type { Route } from "next";
 import Link from "next/link";
@@ -25,6 +26,7 @@ const navigation = [
   { href: "/overview", label: "Overview", icon: LayoutDashboard },
   { href: "/events", label: "Events", icon: Activity },
   { href: "/pages", label: "Pages", icon: FileText },
+  { href: "/versions", label: "Versions", icon: Smartphone },
   { href: "/live", label: "Live", icon: Radio },
   { href: "/insights", label: "Insights", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings2 },

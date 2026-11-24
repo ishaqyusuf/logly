@@ -1,5 +1,6 @@
 import { createAdminClient } from "@ishaqyusuf/logly-server";
 import {
+  type AnalyticsAppVersionsReport,
   type AnalyticsEventFilterOptions,
   type AnalyticsEventPage,
   type AnalyticsEventQuery,
@@ -16,6 +17,7 @@ import {
   getDemoAnalytics,
   matchesEventContext,
   summarizeAnalyticsEvents,
+  summarizeAppVersions,
   summarizeFunnel,
   summarizePages,
   type TrackingAlertsReport,
@@ -225,6 +227,23 @@ export async function getDashboardPages(query: {
   if (query.organization) params.set("organization", query.organization);
   if (query.view) params.set("view", query.view);
   return client.read<AnalyticsPagesReport>(`/v1/dashboard/pages?${params}`);
+}
+
+export async function getDashboardAppVersions(query: {
+  project: string;
+  organization?: string;
+  range: AnalyticsOverviewRange;
+}): Promise<AnalyticsAppVersionsReport> {
+  const client = dashboardClient();
+  if (!client) return summarizeAppVersions(getDemoAnalytics().events, query);
+  const params = new URLSearchParams({
+    project: query.project,
+    range: query.range,
+  });
+  if (query.organization) params.set("organization", query.organization);
+  return client.read<AnalyticsAppVersionsReport>(
+    `/v1/dashboard/app-versions?${params}`,
+  );
 }
 
 export async function getTrackingAlerts(

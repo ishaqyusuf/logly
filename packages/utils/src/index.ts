@@ -11,6 +11,7 @@ import {
 } from "./event-context";
 
 export * from "./actor-read";
+export * from "./app-versions";
 export * from "./breakdown";
 export * from "./countries";
 export * from "./event-context";
