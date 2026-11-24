@@ -45,9 +45,10 @@
   for filter-aware, complete-window event analytics.
 - `GET /api/dashboard/events/:eventId?project=<slug>`: Better Auth-protected,
   project-scoped event-detail proxy used by the global detail sheet.
-- `GET /v1/dashboard/funnel?project=<slug>&steps=<event,event>`: authenticated,
-  complete-window ordered visitor-day funnel; optional organization/start/end,
-  two to five steps, maximum 90-day range. See contracts for counting rules.
+- `GET /v1/dashboard/funnel?project=<slug>&steps=<json|event,event>`:
+  authenticated ordered per-visitor funnel; optional organization, start/end
+  (90 days max), `window` and `breakdown`; 2–8 steps. Superseded the
+  visitor-day version on 2026-11-24 (see "Funnels" below and the contracts).
 
 - Event list, options and summary reads accept `platforms`. Event-summary endpoints include the additive `mobile` platform/version aggregate and `geography` country-visit aggregate. `POST /v1/events` accepts mobile platform/app release metadata and country only through authenticated proxy request metadata; see the contracts.
 
@@ -111,3 +112,19 @@
   database it returns the demo summary. Read-only; no new write path, env var,
   cron or Vercel config. Dashboard page: `/retention` (request-rendered, `ƒ`
   in the build output).
+
+## Funnels — 2026-11-24 (local, unreleased)
+
+- `GET /v1/dashboard/funnel`: extended with JSON `steps` (route and property
+  filters), `window` (`1h`/`1d`/`7d`/`30d`), `breakdown`
+  (`platform`/`country`/`app_version`/`source`); response adds
+  `stepConversion`, `medianSeconds`, `route`, `property`, `segments`,
+  `capped`, `visitorCap`, `window`, `breakdown`. 503 on statement timeout.
+- `GET /v1/dashboard/funnels?project=<slug>`: read credential; saved funnels,
+  known events with stored property keys, and top routes for the builder.
+- `POST /api/funnels`, `PATCH /api/funnels`, `DELETE /api/funnels?project=&id=`:
+  dashboard route handlers, admin session + trusted same origin, writing
+  `analytics_funnels` in-process through `@logly/db/queries` (like
+  `/api/releases`).
+- Page `/funnels`: request-time render; one options read and at most one
+  funnel read per view, no polling.

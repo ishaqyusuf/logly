@@ -137,18 +137,58 @@ ahead of receipt). All queries preserve organization/project boundaries.
 no success denominator exists for events that never reach the collector.
 Demo health is unmeasured. No persistence migration is needed.
 
-### Same-day funnel reports
+### Funnel reports — 2026-11-24 (local, unreleased; replaces same-day funnels)
 
-`GET /v1/dashboard/funnel` requires `project` and comma-separated `steps` (2–5
-valid event names); accepts organization and ISO start/end. Defaults to the
-last 30 days; windows over 90 days or invalid/reversed dates return 400.
-The existing dashboard read credential middleware applies. SQL uses full
-project-scoped pseudonymous visitor keys, browser events only and UTC days.
-Each stage requires a strictly later occurrence in the same day; repeated
-names therefore require another event. Counts are independent of row paging.
-Response: `{ start, end, steps: [{ name, visitors, conversion, dropOff }] }`.
-Visitors means visitor-days, conversion is percent of first-stage entrants,
-and dropOff is the count lost from the preceding stage. No cross-day joining.
+`GET /v1/dashboard/funnel` requires `project` and `steps`, accepts
+`organization`, ISO `start`/`end` (default last 30 days, at most 90),
+`window` (`1h` | `1d` | `7d` | `30d`, default `1d`) and `breakdown`
+(`platform` | `country` | `app_version` | `source`). `steps` is a JSON array of
+2–8 `{ event, route?, property?: { key, value } }`; a comma-separated list of
+event names is still accepted. Event names match `^[a-z][a-z0-9_.]{0,79}$`,
+routes are templates starting with `/` (at most 200 characters), property keys
+match `^[a-z][a-z0-9_]{0,63}$` and values are 1–200 characters compared as
+text. Invalid input returns 400; a funnel that exceeds the 15-second statement
+timeout returns 503 `{ error }`.
+
+Counting (ADR 0018): per project-scoped `visitor_key` from any source; entry at
+the earliest step-1 event in the range; each later step is the earliest match
+strictly after the previous step and within entry + window; one count per
+visitor per step. Only the earliest 50,000 entrants are followed.
+
+Response (additive over the old `{ start, end, steps: [{ name, visitors,
+conversion, dropOff }] }`):
+
+```ts
+{
+  start: string; end: string; window: "1h" | "1d" | "7d" | "30d";
+  breakdown: "platform" | "country" | "app_version" | "source" | null;
+  visitorCap: number;            // 50000
+  capped: boolean;               // more entrants than visitorCap
+  steps: Array<{
+    name: string; route: string | null;
+    property: { key: string; value: string } | null;
+    visitors: number;
+    conversion: number;          // % of step 1, one decimal
+    stepConversion: number;      // % of previous step (100 for step 1)
+    dropOff: number;             // lost since previous step (0 for step 1)
+    medianSeconds: number | null // median from previous step; null for step 1
+  }>;
+  segments: Array<{ value: string; counts: number[] }>; // top 5 + "(other)"; [] without breakdown
+}
+```
+
+`GET /v1/dashboard/funnels?project=<slug>` returns builder options:
+`{ funnels: SavedFunnel[], events: [{ name, properties: string[] }], routes:
+string[] }`. Events are names seen in the last 30 days (top 200 by count) with
+property keys sampled from the latest 5,000 events (at most 50 per event);
+routes are the top 100 recorded routes. `SavedFunnel` is `{ id, name, steps,
+window, createdAt, updatedAt }`, at most 50 per project, ordered by name.
+
+Dashboard writes (`/api/funnels`) take `{ project, name (1–80), steps, window }`
+(plus `id` for PATCH; DELETE uses `?project=&id=`), bodies up to 8 KB. They
+need an admin session and a trusted same origin: 403 foreign origin, 401 not
+admin, 400 invalid, 404 unknown project/funnel, 409 duplicate name or the
+50-funnel limit, 201 created / 200 updated or deleted, `Cache-Control: no-store`.
 
 ### Country visit summary
 

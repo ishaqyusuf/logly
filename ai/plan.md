@@ -458,3 +458,15 @@ Evidence: `.brain/tasks/country-map/afterservice-2026-10-24.md`.
   compatibility once provider access and release authorization are available.
 
 Evidence: [Vercel runtime optimization](../.brain/tasks/2026-11-14-vercel-runtime-optimization.md).
+
+## Funnel builder (feature 6) — 2026-11-24
+
+- [x] Extend the funnel contract: 2–8 steps, route/property filters, 1h–30d
+  conversion window, breakdown, medians, visitor cap (ADR 0018).
+- [x] Saved funnels table (`0011_saved_funnels`) with admin-only dashboard writes.
+- [x] `/funnels` builder and results; Insights funnel card removed.
+- [x] SQL fixture vs in-memory spec, route tests, local gnd-shaped seed, visual QA.
+- [ ] Authenticated `/funnels` visual QA with an operator sign-in; ship with
+  the coordinated 8-feature release.
+
+Evidence: [funnel builder](../.brain/features/funnels.md).

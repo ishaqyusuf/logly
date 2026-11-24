@@ -108,3 +108,13 @@ optional `name`, `public_key`, `user_id` (FK `user.id`, cascade), `credential_id
 `aaguid`. Indexes: `passkey_user_id_idx` and unique `passkey_credential_id_idx`.
 Only public keys are stored; nothing here enters analytics payloads. The table
 is auth-only and deleted with the operator.
+
+## Saved funnels — 2026-11-24 (local, unreleased)
+
+`analytics_funnels`: `id` uuid PK, `project_id` (FK `analytics_projects`,
+cascade), `name` (1–80 characters, trimmed), `steps` jsonb (2–8
+`{ event, route?, property?: { key, value } }`, validated by
+`normalizeFunnelSteps` before writes), `conversion_window` (`1h`|`1d`|`7d`|`30d`),
+`created_at`, `updated_at`. Unique `analytics_funnels_project_name_idx
+(project_id, name)`; at most 50 rows per project, enforced on create. Operator
+configuration only, no identifiers; deleted with the project.

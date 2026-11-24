@@ -84,7 +84,7 @@ Filled in as each feature lands.
 | 3 | Tracking alerts | Built (`6eed75e`) | Nothing. Evaluated on dashboard reads (ADR 0013); in-dashboard only until feature 8 adds email. |
 | 4 | App version adoption | Built (`b58bfe5`); authenticated-page visual QA pending | Mobile events must carry `appVersion`/`appBuild` from `expo-application`. gnd: enable Logly in store builds. ewatrade: send the native version and build. halaal-coperative: send both. See "App version adoption setup" below. |
 | 5 | Retention | Built (`85cc8d1`); authenticated-page visual QA pending | Nothing. Uses `site_visit` (web SDK) and `app_session` (mobile clients), which every project already sends. See "Retention notes" below. |
-| 6 | Funnel builder | Not started | Expected: nothing beyond the events already tracked. |
+| 6 | Funnel builder | Built (`39993f7`, migration `0011`); authenticated-page visual QA pending | No SDK upgrade or config. Funnels can only use events a project already sends, so useful funnels need new browser/mobile events: gnd quote events, school-clerk and halaal-coperative milestone events, and a forwarded `visitorId` on the server milestones of plot-keys and after-service. ewatrade storefront requests work today. See "Funnel setup" below. |
 | 7 | Event catalog | Not started | Expected: nothing; add descriptions in the dashboard. |
 | 8 | Weekly email digest | Not started | Expected: nothing; recipients set in Logly. |
 
@@ -169,4 +169,32 @@ Things that make a project's numbers lower than reality:
   an account switch looks like a new user who never returned.
 - gnd store builds disable Logly (`EXPO_PUBLIC_LOGLY_ENABLED: "false"`), so
   gnd mobile retention stays empty until that is enabled.
+
+## Funnel setup (feature 6)
+
+The funnel builder (`/funnels`) needs no SDK upgrade, env var or route change.
+It counts ordered steps per project-scoped `visitorId` (ADR 0018), so:
+
+- Each step must be an explicit event the project already sends (or
+  `page_view` on a route template, once steps 1–2 above are done).
+- Events without a `visitorId` are excluded. Trusted server events
+  (`@ishaqyusuf/logly-server`) join a browser funnel only when the server call
+  forwards the browser's `visitorId` (read it from the request that the
+  browser SDK made, never derive it from a user ID). Otherwise send the
+  milestone from the browser after the server confirms success.
+- Use snake_case names (`^[a-z][a-z0-9_.]{0,79}$`) and keep properties to
+  short, non-identifying values; a funnel filter can only use property keys
+  Logly has already stored for that event.
+
+Key funnels and what each project must track (read-only check of each repo,
+2026-11-24):
+
+| Project | Key funnel | Tracked today | What to add |
+| --- | --- | --- | --- |
+| gnd | Staff quote: opened → edited → sent; customer: accept page viewed → accepted | Web allowlist is only `site_visit`, `page_view`, `dealer_program_progress_viewed`; mobile sends `app_session`, `screen_view`, `job_opened`, `sales_order_opened`, `document_viewed`, `notification_opened`. No quote events. | Add `quote_opened`, `quote_edited`, `quote_sent` (dashboard, browser) and `quote_accepted` (accept-quote page, browser, after the server confirms) to `packages/events/src/policy.ts` `webEvents` and track them. Optional property `quote_type`. Staff and customer are different visitors, so these are two funnels, not one. Until then: `page_view` on `/sales-book/edit-quote/:id`. Mobile quote funnels need `quote_opened` added to `mobileEvents` (and Logly enabled in store builds, feature 4). |
+| ewatrade | Storefront: viewed → request started → request submitted (or WhatsApp clicked) | `storefront_request_started`, `storefront_request_submitted`, `storefront_whatsapp_clicked`, `storefront_link_shared` from the storefront browser client, plus `site_visit`/`page_view`. | Nothing for the storefront funnel. For dashboard onboarding, add milestones such as `store_created`, `first_product_added`, `first_order_received` from the browser. |
+| halaal-coperative | Member: registered → contribution made → loan requested → repayment made | Only `site_visit`/`page_view` (web) and `app_session` (mobile). | Track `member_registered`, `contribution_made`, `loan_requested`, `loan_approved`, `repayment_made` from the dashboard/mobile after each succeeds. The mobile visitor resets on context changes (feature 4 notes), which breaks cross-context funnels. |
+| plot-keys | Agent: onboarding completed → property created → website published | `plotkeys.onboarding_completed`, `plotkeys.property_created`, `plotkeys.website_published`, `plotkeys.contact_submitted`, `plotkeys.early_access_requested`, all server-side `trackEvent` calls without a `visitorId`. | Forward the browser `visitorId` into those `trackEvent` calls (or emit them from the browser on success). Nothing else. |
+| school-clerk | School: onboarding → first student added → first result published | Only `site_visit`/`page_view`. | Track `onboarding_completed`, `student_added`, `result_published`, `fee_payment_recorded` from the browser. |
+| after-service | Workspace: customer created → service job created → follow-up message sent | `customer_created`, `service_job_created`, `message_sent`, `follow_up_status_updated` as server events keyed by actor, not visitor; browser `site_visit`. Its `packages/events/src/events.ts` catalog (`pricing_viewed`, `cta_clicked`, `user_signed_in`, `subscription_started`, …) is used by the website, but local Logly data shows none of these arriving. | Forward the browser `visitorId` on the server milestones, or emit them from the browser. Confirm the catalog events reach Logly through the browser SDK; then a marketing funnel (`pricing_viewed` → `cta_clicked` → `user_signed_in` → `subscription_started`) works. |
 

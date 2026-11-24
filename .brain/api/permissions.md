@@ -55,3 +55,10 @@ The collector verifies `analytics_projects.allowed_origins` before accepting a
 ## Project key reissue — 7 October 2026
 
 Only a server-validated single-operator admin session can issue keys. The query binds both organization and enabled project before inserting only a SHA-256 hash. Existing keys are retained. Neither errors nor analytics include credential values; responses prohibit caching. Credential verification matches the requested hash directly rather than searching an arbitrary first ten keys.
+
+## Saved funnels — 2026-11-24 (local, unreleased)
+
+Reading saved funnels and running any funnel needs a signed-in operator (or a
+project read credential at the collector). Creating, updating and deleting a
+saved funnel (`/api/funnels`) needs a server-validated `admin` session and a
+trusted same-origin request, the same check as manual deploy markers.

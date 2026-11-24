@@ -1,5 +1,32 @@
 # In Progress
 
+## Funnel builder — 2026-11-24
+
+- Status: committed locally on `main` (`39993f7`), unreleased (feature 6 of
+  the 8; held for the coordinated release; nothing pushed, deployed, migrated
+  in production or published).
+- [Funnel builder](../features/funnels.md),
+  [ADR 0018](../decisions/0018-funnels-ordered-per-visitor-window.md)
+  (supersedes ADR 0006's same-day funnels; the Insights funnel card is gone).
+- Migration `0011_saved_funnels` (`analytics_funnels`); `0010` stays unused.
+  Applied to the shared local database only. Next free number: `0012`.
+- `GET /v1/dashboard/funnel` extended (JSON steps with route/property filters,
+  `window`, `breakdown`; adds `stepConversion`, `medianSeconds`, `segments`,
+  `capped`); new `GET /v1/dashboard/funnels`; dashboard
+  `POST/PATCH/DELETE /api/funnels` (admin, same-origin). No env vars, cron or
+  Vercel config changes.
+- Typecheck, lint, tests (including the `logly_test` SQL fixture against the
+  in-memory spec) and the dashboard build pass. `seed-funnel-qa.ts` seeded a
+  gnd-shaped project and saved funnel locally and its numbers match over the
+  local collector. The real components were browser-checked at desktop and
+  375px through a temporary unauthenticated route (removed); the
+  authenticated `/funnels` page still needs an operator sign-in to view.
+- Consumer findings (guide row 6): gnd has no quote events; school-clerk and
+  halaal-coperative send only visits; plot-keys and after-service milestones
+  are server events without a `visitorId`; ewatrade storefront works today.
+- Follow-ups: best-attempt entry (any step-1 occurrence) if retried flows
+  matter; custom date ranges; funnel trends over time.
+
 ## Retention — 2026-11-24
 
 - Status: committed locally on `main` (`85cc8d1`), unreleased (feature 5 of

@@ -144,6 +144,9 @@ These changes are local and await the combined production release.
 
 ### Same-day conversion funnels
 
+Superseded on 2026-11-24 by the [funnel builder](funnels.md) (ADR 0018):
+`/funnels` replaces this Insights card and the visitor-day rule.
+
 Insights includes two required and three optional event selectors backed by
 discovered event names. A GET form persists the chosen steps and project in
 the URL and renders ordered visitor-day counts, entrant conversion percentage,
