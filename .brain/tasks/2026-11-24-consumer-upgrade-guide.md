@@ -4,6 +4,57 @@ Started 2026-11-24. Living document: each feature session adds what product
 projects must do once its feature lands. Release of the 8 features is held until
 all are done.
 
+## Release checklist — all 8 features
+
+All 8 features are committed on local `main` (as of `e78723d`, 20 commits
+ahead of `origin/main`). Combined checks on 2026-11-24: typecheck (18 tasks),
+lint, all package tests (233), the db SQL fixtures against `logly_test` (86)
+and `build:dashboard` pass.
+
+Before deploying:
+
+1. **Sign in and check the new pages in a browser.** None of the signed-in
+   pages have been checked visually: `/pages`, `/versions`, `/retention`,
+   `/funnels`, `/catalog`, Settings → Releases / Tracking alerts / Email, the
+   Overview alert banner and deploy markers. The feature sessions checked the
+   components through temporary routes only.
+2. **Decide on the passkey commits.** `77047ac` and `194a670` (passkey sign-in,
+   migration `0009`) are separate work on the same `main` and ship with this
+   push unless split out.
+3. **Set up email (feature 8):** create a Resend account, verify the sending
+   domain (DNS) and create an API key. Add Vercel Production env vars
+   `RESEND_API_KEY`, `EMAIL_FROM` and `CRON_SECRET` (16+ random chars);
+   `EMAIL_REPLY_TO` is optional. Keep `NEXT_PUBLIC_DASHBOARD_URL` or
+   `BETTER_AUTH_URL` set to the public URL. Without these, everything else
+   still works and no email is sent.
+
+Deploy:
+
+4. Push `main`. Vercel's build runs `deploy:prepare`, which applies the new
+   migrations in order: `0007` tracking alerts, `0008` releases, `0009`
+   passkeys, `0011` saved funnels, `0012` event catalog, `0013` email
+   (`0010` does not exist). `vercel.json` adds a daily cron at 07:00 UTC for
+   `/api/cron/email`.
+5. Publish `@ishaqyusuf/logly-server@0.4.0` (deploy markers `release()` and
+   the `logly-release` CLI). core/next 0.3.0 and native 0.1.0 are already on
+   npm and unchanged.
+
+After deploy:
+
+6. Smoke-check production: record a release with the curl snippet (see
+   "Deploy markers setup") and confirm the marker, open each new page, and
+   opt yourself in under Settings → Email and use "Send test digest to me".
+7. Roll out to products using Steps 1–2 and the per-feature sections below.
+   The most valuable product changes, in order:
+   - every project: upgrade to core/next 0.3.0 (explicit bump; `^0.2.x`
+     won't pick it up)
+   - ewatrade, halaal-coperative, plot-keys, school-clerk: replace the
+     `/other` route allowlists
+   - gnd: turn on Logly in the production EAS profiles; ewatrade and
+     halaal-coperative: send `expo-application` versions (new store builds)
+   - add `logly-release` to each deployed app
+   - add funnel milestone events (gnd quote events first)
+
 ## Projects using Logly
 
 | Project | Path | SDK installed | Surfaces | Route handling today |
