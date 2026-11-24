@@ -129,6 +129,21 @@
 - Page `/funnels`: request-time render; one options read and at most one
   funnel read per view, no polling.
 
+## Event catalog — 2026-11-24 (local, unreleased)
+
+- `GET /v1/dashboard/event-catalog?project=<slug>&range=<24h|7d|30d>&stale=<7|14|30|90>&organization=<slug>`:
+  read credential; `range` defaults to `7d`, `stale` to `14`; invalid values
+  return 400, a statement timeout 503. Demo summary without a database.
+- `GET /v1/dashboard/event-options`: with `project`, leaves out names hidden
+  in the catalog and adds `deprecated: string[]` when any.
+- `GET /v1/dashboard/funnels`: `events[]` leaves out hidden names and marks
+  `deprecated: true`; adds `hidden: string[]` when any.
+- `PUT /api/event-catalog`: dashboard route handler, admin session + trusted
+  same origin, upserting `analytics_event_catalog` in-process through
+  `@logly/db/queries` (like `/api/releases` and `/api/funnels`).
+- Page `/catalog`: request-time render, one catalog read per view, no
+  polling. No env vars, cron or Vercel config changes.
+
 ## Email channel — 2026-11-24 (local, unreleased)
 
 Dashboard route handlers (feature 8, [ADR 0020](../decisions/0020-email-channel-weekly-digest.md)):

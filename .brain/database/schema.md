@@ -119,6 +119,17 @@ cascade), `name` (1–80 characters, trimmed), `steps` jsonb (2–8
 (project_id, name)`; at most 50 rows per project, enforced on create. Operator
 configuration only, no identifiers; deleted with the project.
 
+
+## Event catalog — 2026-11-24 (local, unreleased)
+
+`analytics_event_catalog`: `project_id` (FK `analytics_projects`, cascade),
+`name` (event name), `description` (≤280, default ''), `notes` (owner/notes,
+≤500, default ''), `deprecated` and `hidden` booleans (default false),
+`updated_at`. Primary key `(project_id, name)`; at most 1,000 rows per
+project, enforced on insert. Operator notes only: no foreign key to events,
+never renames, merges or deletes event data; deleted with the project. Reads
+use the existing `(project_id, name)`, `(project_id, name, occurred_at)` and
+`(project_id, occurred_at)` event indexes; no new event index.
 ## Email channel — 2026-11-24 (local, unreleased)
 
 `analytics_email_subscriptions`: `id` uuid PK, `user_id` (FK `user.id`,

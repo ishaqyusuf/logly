@@ -85,7 +85,7 @@ Filled in as each feature lands.
 | 4 | App version adoption | Built (`b58bfe5`); authenticated-page visual QA pending | Mobile events must carry `appVersion`/`appBuild` from `expo-application`. gnd: enable Logly in store builds. ewatrade: send the native version and build. halaal-coperative: send both. See "App version adoption setup" below. |
 | 5 | Retention | Built (`85cc8d1`); authenticated-page visual QA pending | Nothing. Uses `site_visit` (web SDK) and `app_session` (mobile clients), which every project already sends. See "Retention notes" below. |
 | 6 | Funnel builder | Built (`39993f7`, migration `0011`); authenticated-page visual QA pending | No SDK upgrade or config. Funnels can only use events a project already sends, so useful funnels need new browser/mobile events: gnd quote events, school-clerk and halaal-coperative milestone events, and a forwarded `visitorId` on the server milestones of plot-keys and after-service. ewatrade storefront requests work today. See "Funnel setup" below. |
-| 7 | Event catalog | Not started | Expected: nothing; add descriptions in the dashboard. |
+| 7 | Event catalog | Built (`f4dc58f`, migration `0012`) | Nothing required; no SDK upgrade, event or config change. After release, admins add descriptions/owners in `/catalog`, deprecate or hide old names, and products rename drifted events at the source (the catalog never merges data). See "Event catalog notes" below. |
 | 8 | Weekly email digest | Built (`e9fa14a`, migration `0013`); Settings section visual QA pending | Nothing. No SDK upgrade, event or config change; digests and alert emails are configured in Logly (Settings → Email). Logly itself needs Resend and Vercel setup before release; see "Email digest setup" below. |
 
 ## Deploy markers setup (feature 2)
@@ -197,6 +197,27 @@ Key funnels and what each project must track (read-only check of each repo,
 | plot-keys | Agent: onboarding completed → property created → website published | `plotkeys.onboarding_completed`, `plotkeys.property_created`, `plotkeys.website_published`, `plotkeys.contact_submitted`, `plotkeys.early_access_requested`, all server-side `trackEvent` calls without a `visitorId`. | Forward the browser `visitorId` into those `trackEvent` calls (or emit them from the browser on success). Nothing else. |
 | school-clerk | School: onboarding → first student added → first result published | Only `site_visit`/`page_view`. | Track `onboarding_completed`, `student_added`, `result_published`, `fee_payment_recorded` from the browser. |
 | after-service | Workspace: customer created → service job created → follow-up message sent | `customer_created`, `service_job_created`, `message_sent`, `follow_up_status_updated` as server events keyed by actor, not visitor; browser `site_visit`. Its `packages/events/src/events.ts` catalog (`pricing_viewed`, `cta_clicked`, `user_signed_in`, `subscription_started`, …) is used by the website, but local Logly data shows none of these arriving. | Forward the browser `visitorId` on the server milestones, or emit them from the browser. Confirm the catalog events reach Logly through the browser SDK; then a marketing funnel (`pricing_viewed` → `cta_clicked` → `user_signed_in` → `subscription_started`) works. |
+
+## Event catalog notes (feature 7)
+
+`/catalog` lists every name Logly has stored per project. Metadata
+(description, owner/notes, deprecated, hidden) is edited by admins in Logly;
+hidden names leave the funnel, retention and Events pickers only. Projects
+change nothing to use it. To fix a drifted name, rename it in the product,
+mark the old one deprecated (and hidden once it stops arriving).
+
+Names the catalog flags today. Only after-service has events in the local
+Logly database; the other rows come from each repo's tracked names and the
+names in the funnel notes above, run through the same duplicate rules
+(production data was not read):
+
+| Project | Stale (not seen in 14 days) | Likely typos / duplicates |
+| --- | --- | --- |
+| after-service (local data) | All 9 names; last events 2026-09-01 and a `site_visit` on 2026-10-24. Three test names, `local_route_smoke_1788292333441`, `…1788293345121`, `…1788294463103`, plus `local_infra_verified`, are local smoke checks: hide them. | None (the smoke names differ only in digits, which is not flagged). |
+| gnd | Not in local data. | None among `site_visit`, `page_view`, `dealer_program_progress_viewed`, `app_session`, `screen_view`, `job_opened`, `sales_order_opened`, `document_viewed`, `notification_opened`. When adding quote events, use `quote_opened` exactly (not `quoteopened`/`quote_open`). |
+| ewatrade | Not in local data. | None among its ~30 tracked names. |
+| halaal-coperative, school-clerk | Not in local data (visits only). | None. |
+| plot-keys | Not in local data. | None among the five `plotkeys.*` names. |
 
 ## Email digest setup (feature 8)
 

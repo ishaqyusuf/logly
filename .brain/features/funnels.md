@@ -20,7 +20,8 @@ be revisited. Replaces the same-day funnel card that used to sit on Insights.
   - Route: an exact recorded route template (`/orders/:id`), suggested from
     the project's top 100 routes.
   - One property equals-filter. Keys are limited to property keys Logly has
-    stored for that event (sampled from the latest 5,000 events in 30 days);
+    stored for that event (sampled from each name's latest 100 events in 30
+    days, shared with the [event catalog](event-catalog.md));
     the value is compared as text (`properties ->> key = value`).
 - Conversion window: 1 hour, 1 day, 7 days or 30 days. Date range: last 7, 30
   or 90 days. Optional breakdown: platform, country, app version or source.
@@ -35,6 +36,10 @@ be revisited. Replaces the same-day funnel card that used to sit on Insights.
   breakdown are chosen when viewing). Listed beside the builder for everyone
   signed in. Saving, updating ("Update" / "Save as new") and deleting need an
   admin session and the database mode; non-admins see a note instead.
+
+- Event catalog (feature 7): names hidden in the catalog are left out of the
+  event list (a saved step that uses one says "Hidden in the event catalog"
+  and still runs); deprecated names carry a badge.
 
 ## Counting rules
 

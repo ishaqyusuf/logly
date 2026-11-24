@@ -1,5 +1,30 @@
 # In Progress
 
+## Event catalog — 2026-11-24
+
+- Status: committed locally on `main` (`f4dc58f`), unreleased (feature 7 of
+  the 8; held for the coordinated release; nothing pushed, deployed, migrated
+  in production or published).
+- [Event catalog](../features/event-catalog.md),
+  [ADR 0019](../decisions/0019-event-catalog-discovered-names-with-metadata.md).
+- Migration `0012_event_catalog` (`analytics_event_catalog`), applied to the
+  shared local database only (recorded in the Drizzle journal table so
+  `0013` still applies after it).
+- New `GET /v1/dashboard/event-catalog`; `event-options` adds `deprecated`
+  and drops hidden names; `funnels` options mark `deprecated` and add
+  `hidden`; dashboard `PUT /api/event-catalog` (admin, same-origin); page
+  `/catalog`. The funnel options' property-key sample is now the shared
+  per-name sample (latest 100 per name). No env vars, cron or Vercel config.
+- Typecheck, tests (including the `logly_test` SQL fixture against the
+  in-memory spec), `bun run build:dashboard` pass; lint passes for these
+  files. `seed-event-catalog-qa.ts` seeded `catalog-qa-gnd-mwup04g5` locally
+  and its checks pass. Browser QA on the local stack with an admin session:
+  `/catalog`, the edit sheet (PUT 200), the funnel builder badge and hidden
+  note, Events filter options without the hidden name, 375px width.
+- Follow-ups: `getDashboardEventFilterOptions` still reads every event row
+  of the project to list names (pre-existing, unbounded); switch it to the
+  catalog's skip scan. A daily per-name rollup if catalog reads slow down.
+
 ## Weekly email digest — 2026-11-24
 
 - Status: committed locally on `main` (`e9fa14a`), unreleased (feature 8 of

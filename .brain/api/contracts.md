@@ -178,9 +178,11 @@ conversion, dropOff }] }`):
 ```
 
 `GET /v1/dashboard/funnels?project=<slug>` returns builder options:
-`{ funnels: SavedFunnel[], events: [{ name, properties: string[] }], routes:
-string[] }`. Events are names seen in the last 30 days (top 200 by count) with
-property keys sampled from the latest 5,000 events (at most 50 per event);
+`{ funnels: SavedFunnel[], events: [{ name, properties: string[],
+deprecated?: true }], routes: string[], hidden?: string[] }`. Events are names
+seen in the last 30 days (top 200 by count, minus names hidden in the event
+catalog) with property keys sampled from each name's latest 100 events in that
+window (at most 50 per event, shared with the event catalog);
 routes are the top 100 recorded routes. `SavedFunnel` is `{ id, name, steps,
 window, createdAt, updatedAt }`, at most 50 per project, ordered by name.
 
@@ -189,6 +191,34 @@ Dashboard writes (`/api/funnels`) take `{ project, name (1–80), steps, window 
 need an admin session and a trusted same origin: 403 foreign origin, 401 not
 admin, 400 invalid, 404 unknown project/funnel, 409 duplicate name or the
 50-funnel limit, 201 created / 200 updated or deleted, `Cache-Control: no-store`.
+
+### Event catalog — 2026-11-24 (local, unreleased)
+
+`GET /v1/dashboard/event-catalog` returns `AnalyticsEventCatalog`
+(`packages/utils/src/event-catalog.ts`): `{ project, range, staleDays, start,
+end, bucketMs, truncated, events[] }`. Each event:
+`{ name, description, notes, deprecated, hidden, updatedAt|null,
+firstSeen|null, lastSeen|null, count, previousCount, trend: number[],
+sources: ("browser"|"mobile"|"server")[], properties: string[],
+status: "active"|"stale", similar: [{ name, reason:
+"separators"|"word_order"|"suffix"|"typo" }] }`.
+
+- Current window `[end - span, end]`, previous `[end - 2·span, end - span)`;
+  `trend` has 24 hourly or 7/30 daily window-relative buckets, the event at
+  `end` folding into the last.
+- first/last seen are all-time; sources and keys come from the latest 100
+  events per name; `status` is stale when last seen before `end - staleDays`.
+- Names: every stored name (at most 500, `truncated` beyond) plus names with
+  metadata only. Ordered by `count`, then `lastSeen`, then name.
+
+`PUT /api/event-catalog` takes `{ project, name, description? (≤280),
+notes? (≤500), deprecated?, hidden? }`, bodies up to 4 KB, trimmed and
+stripped of control characters, and returns `{ metadata }`: 403 foreign
+origin, 401 not admin, 400 invalid, 413 too large, 404 unknown project, 409
+over 1,000 names per project, `Cache-Control: no-store`.
+
+`AnalyticsEventFilterOptions` adds optional `deprecated: string[]`; `names`
+excludes hidden names when a project is given.
 
 ### Country visit summary
 
