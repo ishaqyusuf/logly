@@ -18,9 +18,9 @@ Before deploying:
    `/funnels`, `/catalog`, Settings → Releases / Tracking alerts / Email, the
    Overview alert banner and deploy markers. The feature sessions checked the
    components through temporary routes only.
-2. **Decide on the passkey commits.** `77047ac` and `194a670` (passkey sign-in,
-   migration `0009`) are separate work on the same `main` and ship with this
-   push unless split out.
+2. **Passkey commits ship too** (decided 2026-11-24). `77047ac` and `194a670`
+   (passkey sign-in, migration `0009`) are separate work on the same `main` and
+   go out in the same push.
 3. **Set up email (feature 8):** create a Resend account, verify the sending
    domain (DNS) and create an API key. Add Vercel Production env vars
    `RESEND_API_KEY`, `EMAIL_FROM` and `CRON_SECRET` (16+ random chars);
