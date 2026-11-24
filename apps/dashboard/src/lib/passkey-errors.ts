@@ -11,8 +11,20 @@ export function isPasskeyCancellation(error: PasskeyError) {
     code === "AUTH_CANCELLED" ||
     code === "REGISTRATION_CANCELLED" ||
     code === "ERROR_CEREMONY_ABORTED" ||
-    code === "ERROR_PASSKEY_AUTOFILL_ABORTED"
+    code === "ERROR_PASSKEY_AUTOFILL_ABORTED" ||
+    // NotAllowedError: the prompt was dismissed or timed out.
+    code === "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY"
   );
+}
+
+/**
+ * True when the browser ceremony failed before anything reached the server.
+ * Autofill (conditional UI) stays silent on these: the operator never asked
+ * for a passkey prompt, and some browsers reject it immediately.
+ */
+export function isBrowserPasskeyFailure(error: PasskeyError) {
+  const code = error?.code ?? "";
+  return code === "AUTH_CANCELLED" || code.startsWith("ERROR_");
 }
 
 export function passkeySignInMessage(error: PasskeyError) {

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   defaultPasskeyName,
+  isBrowserPasskeyFailure,
   isPasskeyCancellation,
   passkeyRegistrationMessage,
   passkeySignInMessage,
@@ -12,8 +13,20 @@ describe("passkey errors", () => {
     expect(isPasskeyCancellation({ code: "ERROR_CEREMONY_ABORTED" })).toBe(
       true,
     );
+    expect(
+      isPasskeyCancellation({ code: "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY" }),
+    ).toBe(true);
     expect(isPasskeyCancellation({ code: "PASSKEY_NOT_FOUND" })).toBe(false);
     expect(isPasskeyCancellation(null)).toBe(false);
+  });
+
+  test("separates browser ceremony failures from server failures", () => {
+    expect(isBrowserPasskeyFailure({ code: "AUTH_CANCELLED" })).toBe(true);
+    expect(isBrowserPasskeyFailure({ code: "ERROR_INVALID_DOMAIN" })).toBe(
+      true,
+    );
+    expect(isBrowserPasskeyFailure({ code: "PASSKEY_NOT_FOUND" })).toBe(false);
+    expect(isBrowserPasskeyFailure(null)).toBe(false);
   });
 
   test("keeps server failures distinct from cancellations", () => {

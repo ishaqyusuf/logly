@@ -3,13 +3,13 @@
 import { BrandMark, BrandWordmark, brandColor } from "@logly/ui/brand";
 import { Button } from "@logly/ui/button";
 import { Input } from "@logly/ui/input";
-import { KeyRound } from "lucide-react";
+import { Eye, EyeOff, KeyRound } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
 import { signIn } from "@/lib/auth-client";
 import { safeReturnTo } from "@/lib/auth-return-to";
 import {
-  isPasskeyCancellation,
+  isBrowserPasskeyFailure,
   passkeySignInMessage,
 } from "@/lib/passkey-errors";
 
@@ -17,6 +17,7 @@ export function SignInForm() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [supportsPasskeys, setSupportsPasskeys] = useState(false);
@@ -36,7 +37,7 @@ export function SignInForm() {
       const result = await signIn.passkey({ autoFill: true });
       if (!active) return;
       if (result.error) {
-        if (!isPasskeyCancellation(result.error)) {
+        if (!isBrowserPasskeyFailure(result.error)) {
           setError(passkeySignInMessage(result.error));
         }
         return;
@@ -118,16 +119,34 @@ export function SignInForm() {
             <label className="text-sm font-medium" htmlFor="password">
               Password
             </label>
-            <Input
-              autoComplete="current-password"
-              disabled={isPending}
-              id="password"
-              minLength={6}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              type="password"
-              value={password}
-            />
+            <div className="relative">
+              <Input
+                autoComplete="current-password"
+                className="pr-10"
+                disabled={isPending}
+                id="password"
+                minLength={6}
+                onChange={(event) => setPassword(event.target.value)}
+                required
+                type={showPassword ? "text" : "password"}
+                value={password}
+              />
+              <button
+                aria-controls="password"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+                className="absolute inset-y-0 right-0 grid w-10 place-items-center rounded-r-md text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+                disabled={isPending}
+                onClick={() => setShowPassword((value) => !value)}
+                type="button"
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
+              </button>
+            </div>
           </div>
           {error ? (
             <p className="text-sm text-red-600" role="alert">
