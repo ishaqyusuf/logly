@@ -330,7 +330,9 @@ describe.skipIf(!runnable)("event catalog SQL", () => {
 
   test("the metadata limit counts only new names", async () => {
     const [project] =
-      await client`select id from analytics_projects where slug = 'cat-other'`;
+      (await client?.unsafe(
+        "select id from analytics_projects where slug = 'cat-other'",
+      )) ?? [];
     await client?.unsafe(
       `insert into analytics_event_catalog (project_id, name)
        select '${project?.id}', 'name_' || g from generate_series(1, ${EVENT_CATALOG_MAX_METADATA}) g`,

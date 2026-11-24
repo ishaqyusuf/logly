@@ -106,6 +106,9 @@
     "packages/analytics-server": {
       "name": "@ishaqyusuf/logly-server",
       "version": "0.4.0",
+      "bin": {
+        "logly-release": "./dist/cli.js",
+      },
       "dependencies": {
         "@ishaqyusuf/logly-core": "^0.3.0",
       },
@@ -406,6 +409,7 @@
     "@logly/db": ["@logly/db@workspace:packages/db"],
 
     "@logly/email": ["@logly/email@workspace:packages/email"],
+
     "@logly/ui": ["@logly/ui@workspace:packages/ui"],
 
     "@logly/utils": ["@logly/utils@workspace:packages/utils"],
