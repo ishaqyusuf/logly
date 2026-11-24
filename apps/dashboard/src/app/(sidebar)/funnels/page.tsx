@@ -86,6 +86,7 @@ export default async function FunnelsPage({
               scope={scope.toString()}
               project={project.slug}
               events={options.events}
+              hidden={options.hidden}
               routes={options.routes}
               saved={state.saved}
               initialSteps={state.steps}

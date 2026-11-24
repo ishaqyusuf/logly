@@ -6,6 +6,7 @@ import {
   integer,
   jsonb,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -427,6 +428,28 @@ export const analyticsFunnels = pgTable(
       table.name,
     ),
   ],
+);
+
+// Event catalog metadata (feature 7): operator notes per event name. Event
+// names themselves are discovered from analytics_events; a row here never
+// renames, merges or deletes event data. `hidden` only removes the name from
+// pickers; `deprecated` adds a badge.
+export const analyticsEventCatalog = pgTable(
+  "analytics_event_catalog",
+  {
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => analyticsProjects.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description").notNull().default(""),
+    notes: text("notes").notNull().default(""),
+    deprecated: boolean("deprecated").notNull().default(false),
+    hidden: boolean("hidden").notNull().default(false),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.projectId, table.name] })],
 );
 
 // Email channel (feature 8). Admin-managed opt-ins: one row per operator and

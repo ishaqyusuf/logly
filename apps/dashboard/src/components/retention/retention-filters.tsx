@@ -72,6 +72,7 @@ export function RetentionFilters({
   returnEvent,
   showSurfaces,
   eventNames,
+  deprecatedEvents,
 }: {
   query: string;
   range: RetentionRange;
@@ -79,6 +80,7 @@ export function RetentionFilters({
   returnEvent: string | null;
   showSurfaces: boolean;
   eventNames: string[];
+  deprecatedEvents?: string[];
 }) {
   const params = new URLSearchParams(query);
   params.set("range", range);
@@ -96,6 +98,7 @@ export function RetentionFilters({
         query={params.toString()}
         value={returnEvent}
         names={eventNames}
+        deprecated={deprecatedEvents}
       />
       {showSurfaces ? (
         <Segment label="Web or mobile">

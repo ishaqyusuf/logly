@@ -9,6 +9,7 @@ import type {
 import {
   Activity,
   BarChart3,
+  BookOpen,
   FileText,
   Filter,
   LayoutDashboard,
@@ -27,6 +28,7 @@ import { resolveProjectWorkspace } from "@/lib/project-workspace";
 const navigation = [
   { href: "/overview", label: "Overview", icon: LayoutDashboard },
   { href: "/events", label: "Events", icon: Activity },
+  { href: "/catalog", label: "Catalog", icon: BookOpen },
   { href: "/pages", label: "Pages", icon: FileText },
   { href: "/versions", label: "Versions", icon: Smartphone },
   { href: "/retention", label: "Retention", icon: Repeat },

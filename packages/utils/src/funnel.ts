@@ -112,11 +112,18 @@ export type SavedFunnel = {
   updatedAt: string;
 };
 
-export type FunnelEventOption = { name: string; properties: string[] };
+export type FunnelEventOption = {
+  name: string;
+  properties: string[];
+  /** Marked deprecated in the event catalog; shown with a badge. */
+  deprecated?: boolean;
+};
 export type FunnelOptions = {
   funnels: SavedFunnel[];
   events: FunnelEventOption[];
   routes: string[];
+  /** Names hidden from pickers in the event catalog (left out of `events`). */
+  hidden?: string[];
 };
 
 export type SavedFunnelInput = {

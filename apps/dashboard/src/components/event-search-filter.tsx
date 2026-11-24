@@ -24,6 +24,7 @@ import {
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useEventFilterParams } from "@/hooks/use-event-filter-params";
+import { DeprecatedBadge } from "./event-catalog/deprecated-events";
 
 type FilterKey = "names" | "sources" | "platforms";
 
@@ -260,6 +261,7 @@ function Options({
           onCheckedChange={() => onToggle(item)}
         >
           <span className="truncate font-mono text-xs">{item}</span>
+          <DeprecatedBadge name={item} className="ml-auto" />
         </DropdownMenuCheckboxItem>
       ))}
     </div>

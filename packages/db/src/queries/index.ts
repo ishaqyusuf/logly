@@ -26,6 +26,7 @@ import {
   normalizeCountry,
   summarizeAnalyticsEvents,
   summarizeCountries,
+  visibleEventNames,
 } from "@logly/utils";
 import {
   and,
@@ -50,6 +51,7 @@ import {
   analyticsProjectKeys,
   analyticsProjects,
 } from "../schema";
+import { getEventCatalogFlags } from "./event-catalog";
 import { eventContextConditions, hashEventGroups } from "./event-context";
 import { getOverviewTopEvents, getOverviewTrend } from "./overview-trend";
 import { listTrackingAlertStates } from "./tracking-alerts";
@@ -883,9 +885,17 @@ export async function getDashboardEventFilterOptions(
           : undefined,
       ),
     );
+  // Event catalog: hidden names drop out of the picker, deprecated are badged.
+  const flags = query.project
+    ? await getEventCatalogFlags(query.project, db)
+    : undefined;
   return {
     projects: [...new Set(rows.map((row) => row.project))].sort(),
-    names: [...new Set(rows.map((row) => row.name))].sort(),
+    names: visibleEventNames(
+      [...new Set(rows.map((row) => row.name))].sort(),
+      flags,
+    ),
+    ...(flags?.deprecated.length ? { deprecated: flags.deprecated } : {}),
     sources: [...new Set(rows.map((row) => row.source))]
       .filter(
         (source): source is "browser" | "server" | "mobile" =>
@@ -1200,6 +1210,30 @@ export {
 } from "./app-versions";
 export { getDashboardBreakdown } from "./breakdown";
 export {
+  claimEmailSend,
+  DIGEST_EVENT_CANDIDATES,
+  type EmailOperatorSubscriptions,
+  type EmailProjectRow,
+  type EmailRecipientRow,
+  finishEmailSend,
+  getEmailProject,
+  getWeeklyDigestMetrics,
+  listAlertTransitions,
+  listDigestProjects,
+  listEmailRecipients,
+  listEmailSubscriptions,
+  setEmailSubscription,
+  unsubscribeEmail,
+  type WeeklyDigestMetrics,
+} from "./email";
+export {
+  EVENT_CATALOG_STATEMENT_TIMEOUT_MS,
+  getEventCatalog,
+  getEventCatalogFlags,
+  type SaveEventCatalogResult,
+  saveEventCatalogMetadata,
+} from "./event-catalog";
+export {
   createSavedFunnel,
   deleteSavedFunnel,
   getDashboardFunnel,
@@ -1229,20 +1263,3 @@ export {
   getTrackingAlertsReport,
   refreshTrackingAlerts,
 } from "./tracking-alerts";
-export {
-  claimEmailSend,
-  DIGEST_EVENT_CANDIDATES,
-  type EmailOperatorSubscriptions,
-  type EmailProjectRow,
-  type EmailRecipientRow,
-  finishEmailSend,
-  getEmailProject,
-  getWeeklyDigestMetrics,
-  listAlertTransitions,
-  listDigestProjects,
-  listEmailRecipients,
-  listEmailSubscriptions,
-  setEmailSubscription,
-  unsubscribeEmail,
-  type WeeklyDigestMetrics,
-} from "./email";

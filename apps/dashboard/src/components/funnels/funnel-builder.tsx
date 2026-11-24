@@ -21,6 +21,7 @@ import { ArrowDown, Plus, Save, Trash2, X } from "lucide-react";
 import type { Route } from "next";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useId, useMemo, useState } from "react";
+import { DeprecatedBadge } from "@/components/event-catalog/deprecated-events";
 import { FUNNEL_RANGES, type FunnelRange } from "@/lib/funnel-params";
 import { breakdownLabels, windowLabels } from "./funnel-format";
 
@@ -63,6 +64,7 @@ export function FunnelBuilder({
   scope,
   project,
   events,
+  hidden,
   routes,
   saved,
   initialSteps,
@@ -75,6 +77,8 @@ export function FunnelBuilder({
   scope: string;
   project: string;
   events: FunnelEventOption[];
+  /** Names hidden in the event catalog; typed ones still work. */
+  hidden?: string[];
   routes: string[];
   saved: SavedFunnel | null;
   initialSteps: FunnelStep[] | null;
@@ -102,6 +106,13 @@ export function FunnelBuilder({
   const [error, setError] = useState<string | null>(null);
   const known = useMemo(
     () => new Map(events.map((event) => [event.name, event.properties])),
+    [events],
+  );
+  const deprecated = useMemo(
+    () =>
+      new Set(
+        events.filter((event) => event.deprecated).map((event) => event.name),
+      ),
     [events],
   );
   const complete = steps.every((step) => step.event.trim());
@@ -186,7 +197,11 @@ export function FunnelBuilder({
     >
       <datalist id={`${ids}-events`}>
         {events.map((event) => (
-          <option key={event.name} value={event.name} />
+          <option
+            key={event.name}
+            value={event.name}
+            label={event.deprecated ? "Deprecated" : undefined}
+          />
         ))}
       </datalist>
       <datalist id={`${ids}-routes`}>
@@ -240,10 +255,21 @@ export function FunnelBuilder({
                     }
                     className="font-mono text-xs"
                   />
-                  {unknown ? (
+                  {unknown && hidden?.includes(step.event.trim()) ? (
+                    <p className="text-[11px] text-muted-foreground">
+                      Hidden in the event catalog
+                    </p>
+                  ) : unknown ? (
                     <p className="text-[11px] text-amber-700">
                       Not seen in the last 30 days
                     </p>
+                  ) : null}
+                  {deprecated.has(step.event.trim()) ? (
+                    <DeprecatedBadge
+                      name={step.event.trim()}
+                      deprecated
+                      className="self-start"
+                    />
                   ) : null}
                 </Field>
                 <Field>

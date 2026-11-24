@@ -6,6 +6,7 @@ import type { AnalyticsEventRow } from "@logly/utils";
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatDistanceToNowStrict } from "date-fns";
 import { CircleDot, Server, UserRound } from "lucide-react";
+import { DeprecatedBadge } from "@/components/event-catalog/deprecated-events";
 import { formatCountry } from "@/lib/country-display";
 import { ActionsMenu } from "./actions-menu";
 
@@ -53,9 +54,12 @@ export const columns: ColumnDef<AnalyticsEventRow>[] = [
           <CircleDot className="h-3.5 w-3.5" />
         </span>
         <div className="min-w-0">
-          <p className="truncate font-mono text-[12px] font-medium">
-            {row.original.name}
-          </p>
+          <div className="flex min-w-0 items-center gap-1.5">
+            <p className="truncate font-mono text-[12px] font-medium">
+              {row.original.name}
+            </p>
+            <DeprecatedBadge name={row.original.name} />
+          </div>
           <p className="mt-0.5 text-[11px] text-muted-foreground">
             v1 · {row.original.id}
           </p>

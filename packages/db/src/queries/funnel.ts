@@ -16,14 +16,18 @@ import {
   type SavedFunnelInput,
   summarizeFunnel,
   summarizeFunnelOptions,
+  visibleEventNames,
 } from "@logly/utils";
 import { type SQL, sql } from "drizzle-orm";
 import { type Database, getDatabase } from "../client";
+import { getEventCatalogFlags } from "./event-catalog";
+import { listEventNamesByVolume, sampleEventNames } from "./event-vocabulary";
 
 /** Upper bound for one funnel read; the dashboard shows the error instead. */
 export const FUNNEL_STATEMENT_TIMEOUT_MS = 15_000;
 const OPTIONS_LOOKBACK_DAYS = 30;
-const OPTIONS_PROPERTY_SAMPLE = 5_000;
+const OPTIONS_EVENT_LIMIT = 200;
+const OPTIONS_PROPERTY_SAMPLE_PER_NAME = 100;
 
 function stepMatch(alias: string, step: FunnelStep): SQL {
   const table = sql.identifier(alias);
@@ -208,8 +212,10 @@ export async function listSavedFunnels(
 
 /**
  * Builder options: saved funnels plus the project's known event names (last
- * 30 days, top 200), their stored property keys (sampled from the latest
- * 5,000 events) and the top 100 recorded routes.
+ * 30 days, top 200), their stored property keys (sampled from each name's
+ * latest 100 events in that window, shared with the event catalog) and the
+ * top 100 recorded routes. Names hidden in the event catalog are left out;
+ * deprecated names are flagged.
  */
 export async function getFunnelOptions(
   project: string,
@@ -220,27 +226,13 @@ export async function getFunnelOptions(
     Date.now() - OPTIONS_LOOKBACK_DAYS * 86_400_000,
   ).toISOString();
   const projectId = sql`(select id from analytics_projects where slug = ${project})`;
-  const [funnels, names, keys, routes] = await Promise.all([
+  const [funnels, allNames, flags, routes] = await Promise.all([
     listSavedFunnels(project, db),
-    db.execute<{ name: string }>(sql`
-      select name from analytics_events
-      where project_id = ${projectId} and occurred_at >= ${since}::timestamptz
-      group by name order by count(*) desc, name limit 200
-    `),
-    db.execute<{ name: string; key: string }>(sql`
-      select recent.name, key
-      from (
-        select name, properties from analytics_events
-        where project_id = ${projectId} and occurred_at >= ${since}::timestamptz
-        order by occurred_at desc limit ${OPTIONS_PROPERTY_SAMPLE}
-      ) recent
-      cross join lateral jsonb_object_keys(
-        case when jsonb_typeof(recent.properties) = 'object'
-          then recent.properties else '{}'::jsonb end
-      ) key
-      group by recent.name, key
-      order by recent.name, key
-    `),
+    listEventNamesByVolume(db, projectId, {
+      since,
+      limit: OPTIONS_EVENT_LIMIT,
+    }),
+    getEventCatalogFlags(project, db),
     db.execute<{ route: string }>(sql`
       select route from analytics_events
       where project_id = ${projectId} and occurred_at >= ${since}::timestamptz
@@ -248,20 +240,21 @@ export async function getFunnelOptions(
       group by route order by count(*) desc, route limit 100
     `),
   ]);
-  const properties = new Map<string, string[]>();
-  for (const row of keys) {
-    if (!/^[a-z][a-z0-9_]{0,63}$/.test(row.key)) continue;
-    const list = properties.get(row.name) ?? [];
-    if (list.length < 50) list.push(row.key);
-    properties.set(row.name, list);
-  }
+  const names = visibleEventNames(allNames, flags);
+  const deprecated = new Set(flags.deprecated);
+  const samples = await sampleEventNames(db, projectId, names, {
+    perName: OPTIONS_PROPERTY_SAMPLE_PER_NAME,
+    since,
+  });
   return {
     funnels,
-    events: names.map((row) => ({
-      name: row.name,
-      properties: properties.get(row.name) ?? [],
+    events: names.map((name) => ({
+      name,
+      properties: samples.get(name)?.properties ?? [],
+      ...(deprecated.has(name) ? { deprecated: true } : {}),
     })),
     routes: routes.map((row) => row.route),
+    ...(flags.hidden.length ? { hidden: flags.hidden } : {}),
   };
 }
 

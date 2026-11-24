@@ -9,6 +9,7 @@ import {
   getDashboardFunnel,
   getDashboardPages,
   getDashboardRetention,
+  getEventCatalog,
   getFunnelOptions,
   getProjectPolicy,
   getTrackingAlertsReport,
@@ -23,13 +24,16 @@ import {
 import {
   type AnalyticsEventQuery,
   BreakdownQueryError,
+  EVENT_CATALOG_DEFAULT_STALE_DAYS,
   type FunnelBreakdown,
   type FunnelWindow,
+  isEventCatalogRange,
   isRetentionRange,
   isRetentionSurface,
   normalizeFunnelQuery,
   parseActorReadQuery,
   parseBreakdownQuery,
+  parseEventCatalogStaleDays,
   parseFunnelStepsParam,
   parsePageViewEvent,
   parseReleaseInput,
@@ -443,6 +447,39 @@ export function createCollectorApp() {
     if (!project || !/^[a-z0-9-]{2,64}$/.test(project))
       return context.json({ error: "Project is required" }, 400);
     return context.json(await getFunnelOptions(project));
+  });
+  app.get("/v1/dashboard/event-catalog", async (context) => {
+    const project = context.req.query("project");
+    if (!project || !/^[a-z0-9-]{2,64}$/.test(project))
+      return context.json({ error: "Project is required" }, 400);
+    const range = context.req.query("range") ?? "7d";
+    const staleParam = context.req.query("stale");
+    const staleDays = staleParam
+      ? parseEventCatalogStaleDays(staleParam)
+      : EVENT_CATALOG_DEFAULT_STALE_DAYS;
+    if (!isEventCatalogRange(range) || !staleDays)
+      return context.json({ error: "Invalid event catalog query" }, 400);
+    try {
+      return context.json(
+        await getEventCatalog({
+          project,
+          organization: context.req.query("organization"),
+          range,
+          staleDays,
+        }),
+      );
+    } catch (error) {
+      // 57014: the catalog exceeded its statement timeout.
+      const code =
+        (error as { code?: string }).code ??
+        (error as { cause?: { code?: string } }).cause?.code;
+      if (code === "57014")
+        return context.json(
+          { error: "The event catalog took too long. Try a shorter range." },
+          503,
+        );
+      throw error;
+    }
   });
   app.get("/v1/dashboard/event-summary", async (context) => {
     const split = (value?: string) => value?.split(",").filter(Boolean);

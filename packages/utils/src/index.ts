@@ -14,6 +14,7 @@ export * from "./actor-read";
 export * from "./app-versions";
 export * from "./breakdown";
 export * from "./countries";
+export * from "./event-catalog";
 export * from "./event-context";
 export * from "./pages";
 export * from "./releases";
@@ -71,6 +72,8 @@ export type AnalyticsEventFilterOptions = {
   names: string[];
   sources: Array<"browser" | "server" | "mobile">;
   platforms: Array<"web" | "ios" | "android">;
+  /** Event catalog: names marked deprecated (badged in pickers). Hidden names are already left out of `names`. */
+  deprecated?: string[];
 };
 
 export type AnalyticsTrendPoint = {

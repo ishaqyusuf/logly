@@ -10,10 +10,13 @@ export function RetentionEventSelect({
   query,
   value,
   names,
+  deprecated = [],
 }: {
   query: string;
   value: string | null;
   names: string[];
+  /** Deprecated in the event catalog; hidden names are already left out. */
+  deprecated?: string[];
 }) {
   const id = useId();
   const router = useRouter();
@@ -41,7 +44,7 @@ export function RetentionEventSelect({
         <option value="">Any event</option>
         {options.map((name) => (
           <option key={name} value={name}>
-            {name}
+            {deprecated.includes(name) ? `${name} (deprecated)` : name}
           </option>
         ))}
       </NativeSelect>

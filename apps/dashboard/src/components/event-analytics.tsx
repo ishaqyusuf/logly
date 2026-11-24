@@ -17,6 +17,7 @@ import { useMemo, useRef } from "react";
 import { EventRangeFilter } from "@/components/event-range-filter";
 import { OverviewChart } from "@/components/overview-chart";
 import { useEventFilterParams } from "@/hooks/use-event-filter-params";
+import { DeprecatedBadge } from "./event-catalog/deprecated-events";
 
 function searchParams(query: AnalyticsEventQuery) {
   const params = new URLSearchParams();
@@ -196,6 +197,7 @@ export function EventAnalytics({
                 <span className="min-w-0 flex-1 truncate font-mono text-xs">
                   {event.name}
                 </span>
+                <DeprecatedBadge name={event.name} />
                 <Badge
                   variant="outline"
                   className={
@@ -234,8 +236,11 @@ export function EventAnalytics({
             >
               <div className="min-w-0">
                 <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="truncate font-mono text-xs">
-                    {event.name}
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    <span className="truncate font-mono text-xs">
+                      {event.name}
+                    </span>
+                    <DeprecatedBadge name={event.name} />
                   </span>
                   <span className="text-xs font-medium tabular-nums">
                     {event.count.toLocaleString()}

@@ -21,6 +21,10 @@ const titles: Record<string, { title: string; description: string }> = {
     title: "Events",
     description: "Compare event names and inspect accepted signals",
   },
+  "/catalog": {
+    title: "Event catalog",
+    description: "Every event name, its volume, owner notes and naming hints",
+  },
   "/pages": {
     title: "Pages",
     description: "Top, entry, and exit pages or app screens",

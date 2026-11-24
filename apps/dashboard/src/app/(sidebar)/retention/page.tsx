@@ -100,6 +100,7 @@ export default async function RetentionPage({
                 surface !== "all"
               }
               eventNames={options.names}
+              deprecatedEvents={options.deprecated}
             />
           ) : null}
         </div>

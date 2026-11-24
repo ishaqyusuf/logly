@@ -6,6 +6,7 @@ import type {
   AnalyticsEventSummary,
 } from "@logly/utils";
 import { EventAnalytics } from "./event-analytics";
+import { DeprecatedEventsProvider } from "./event-catalog/deprecated-events";
 import { EventContextFilter } from "./event-context-filter";
 import { DataTable } from "./tables/events/data-table";
 
@@ -23,14 +24,16 @@ export function EventsWorkspace({
   projectName: string;
 }) {
   return (
-    <div className="space-y-6">
-      <EventContextFilter project={scope.project} />
-      <EventAnalytics
-        initialSummary={initialSummary}
-        scope={scope}
-        projectName={projectName}
-      />
-      <DataTable initialPage={initialPage} options={options} scope={scope} />
-    </div>
+    <DeprecatedEventsProvider names={options.deprecated}>
+      <div className="space-y-6">
+        <EventContextFilter project={scope.project} />
+        <EventAnalytics
+          initialSummary={initialSummary}
+          scope={scope}
+          projectName={projectName}
+        />
+        <DataTable initialPage={initialPage} options={options} scope={scope} />
+      </div>
+    </DeprecatedEventsProvider>
   );
 }

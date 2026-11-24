@@ -1,6 +1,7 @@
 import { createAdminClient } from "@ishaqyusuf/logly-server";
 import {
   type AnalyticsAppVersionsReport,
+  type AnalyticsEventCatalog,
   type AnalyticsEventFilterOptions,
   type AnalyticsEventPage,
   type AnalyticsEventQuery,
@@ -14,6 +15,7 @@ import {
   type AnalyticsPageViewEvent,
   type AnalyticsProjectSummary,
   type AnalyticsRetentionReport,
+  type EventCatalogQuery,
   type FunnelOptions,
   getDemoAnalytics,
   matchesEventContext,
@@ -23,6 +25,7 @@ import {
   serializeFunnelSteps,
   summarizeAnalyticsEvents,
   summarizeAppVersions,
+  summarizeEventCatalog,
   summarizeFunnel,
   summarizeFunnelOptions,
   summarizePages,
@@ -230,6 +233,23 @@ export async function getFunnelOptions(
     return summarizeFunnelOptions(getDemoAnalytics().events, project);
   return client.read<FunnelOptions>(
     `/v1/dashboard/funnels?${new URLSearchParams({ project })}`,
+  );
+}
+
+/** The project's event catalog: names, volume, sources, keys and metadata. */
+export async function getDashboardEventCatalog(
+  query: EventCatalogQuery,
+): Promise<AnalyticsEventCatalog> {
+  const client = dashboardClient();
+  if (!client) return summarizeEventCatalog(getDemoAnalytics().events, query);
+  const params = new URLSearchParams({
+    project: query.project,
+    range: query.range,
+    stale: String(query.staleDays),
+  });
+  if (query.organization) params.set("organization", query.organization);
+  return client.read<AnalyticsEventCatalog>(
+    `/v1/dashboard/event-catalog?${params}`,
   );
 }
 
